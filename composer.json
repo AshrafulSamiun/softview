@@ -6,15 +6,16 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
-        "consoletvs/charts": "5.*",
-        "fideloper/proxy": "~3.3",
+        "bonecms/laravel-captcha": "*",
+        "consoletvs/charts": "^6.5",
+        "fideloper/proxy": "^4.0",
         "hisorange/browser-detect": "^4.4",
         "intervention/image": "^2.5",
-        "laravel/framework": "5.5.*",
+        "laravel/framework": "^6.0",
         "laravel/tinker": "~1.0",
-        "laravelcollective/html": "^5.5",
+        "laravelcollective/html": "^6.0",
         "mews/captcha": "^3.2",
-        "nesbot/carbon": "1.26.0",
+        "nesbot/carbon": "^2.0",
         "nexmo/laravel": "^2.4",
         "stevebauman/location": "^6.6"
     },
@@ -62,6 +63,7 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
+            "kylekatarnls/update-helper": true,
             "symfony/thanks": true
         }
     }
