@@ -2,29 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-//use App\LibSocialLink as LibSocialLink;
-//use App\AccountContactPerson as AccountContactPerson;
-//use App\Classes\ArrayFunction as ArrayFunction;
-
-use Illuminate\Support\Facades\DB;
-use App\buildingInfo as BuildingInfo;
-use App\Project as Project;
-use App\FileUpload;
-use Intervention\Image\Facades\Image;
-use App\SafetyItemList as SafetyItemList;
-use App\ExternalServiceProviderList;
+use App\BuildingContactDetails;
 use App\BuildingContactList;
-use App\company;
-use App\customer;
-use App\LicenseAndPermit;
+use App\buildingInfo as BuildingInfo;
 use App\BuildingLicensePermit;
 use App\BuildingManagementType;
-use App\BuildingContactDetails;
-use App\SafetyDeviceEquipment;
-use App\ExternalServiceProvider;
 use App\BuildingPropertyDetails;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\ExternalServiceProvider;
+use App\ExternalServiceProviderList;
+use App\LicenseAndPermit;
+use App\Models\SafetyDeviceEquipment;
+use App\SafetyItemList as SafetyItemList;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class BuildingInfoController extends Controller

@@ -2,26 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Module as Module;
 use App\Menu as Menu;
-use App\servicePlan as servicePlan;
 use Illuminate\Support\Facades\DB;
 use Charts;
 use App\Country as Country;
 use App\Project as Project;
-use App\userCompany as userCompany;
-use App\provience as Provience;
-use App\PropertyManagementType as PropertyManagementType;
-use App\UserServicePlanDetails as UserServicePlanDetails;
-use App\UserServicePlan as UserServicePlan;
-use App\buildingInfo as BuildingInfo;
 use App\FileUpload as FileUpload;
-use App\AccountContactPerson as AccountContactPerson;
 use App\Classes\ArrayFunction as ArrayFunction;
-
-//use Browser;
-
 
 class DashboardController extends Controller
 {
@@ -159,7 +147,7 @@ class DashboardController extends Controller
             $data['lavel_one_arr']=$lavel_one_arr;
             $data['lavel_two_arr']=$lavel_two_arr;
             //dd($data['menu']);
-            $data['line'] = Charts::create('bar', 'highcharts')
+            /*$data['line'] = Charts::create('bar', 'highcharts')
                 ->title('Financial Year 2022')
                 ->elementLabel('Value in M')
                 ->labels(['Owner Equity', 'Liabilities', 'Assets','Revinue', 'COGS', 'Expenses'])
@@ -178,7 +166,7 @@ class DashboardController extends Controller
                 ->labels(['Current', 'Non-Current', 'Fixed'])
                 ->values([25,15,20])
                 ->dimensions(500,500)
-                ->responsive(false);
+                ->responsive(false);*/
         //return view('chart',compact('chart')); 
           //  dd($data['lavel_one_arr'][1]);
             return view('dashboard',$data);

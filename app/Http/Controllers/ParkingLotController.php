@@ -2,29 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Floor as Floor;
-use App\company;
-use App\customer;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingPropertyDetails as BuildingPropertyDetails;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
-use App\SafetyItemList as SafetyItemList;
-use App\ExternalServiceProviderList;
-use App\SafetyDeviceEquipment;
 use App\BuildingContactDetails;
-use App\ExternalServiceProvider;
 use App\BuildingContactList;
-use App\LicenseAndPermit;
+use App\buildingInfo as BuildingInfo;
 use App\BuildingLicensePermit;
-use App\ParkingLot;
-use App\ParkingLevel;
 use App\BuildingManagementType;
-use App\ParkingStall;
-use App\StorageStallDetails;
-use Illuminate\Support\Facades\DB;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\ExternalServiceProvider;
+use App\ExternalServiceProviderList;
+use App\Floor as Floor;
+use App\LicenseAndPermit;
+use App\Models\SafetyDeviceEquipment;
+use App\ParkingLevel;
+use App\ParkingLot;
+use App\ParkingStall;
+use App\SafetyItemList as SafetyItemList;
+use App\StorageStallDetails;
+use App\SubroomsListDetails as SubroomsListDetails;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class ParkingLotController extends Controller

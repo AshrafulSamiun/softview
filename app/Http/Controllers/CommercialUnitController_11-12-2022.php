@@ -2,23 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Floor as Floor;
-use App\company;
-use App\customer;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingPropertyDetails as BuildingPropertyDetails;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
-use App\SafetyItemList as SafetyItemList;
-use App\ExternalServiceProviderList;
-use App\SafetyDeviceEquipment;
 use App\BuildingContactDetails;
-use App\ExternalServiceProvider;
 use App\BuildingContactList;
+use App\buildingInfo as BuildingInfo;
 use App\CommercialUnit;
 use App\CommercialUnitDetails;
-
+use App\company;
+use App\customer;
+use App\ExternalServiceProvider;
+use App\ExternalServiceProviderList;
+use App\Models\SafetyDeviceEquipment;
+use App\SafetyItemList as SafetyItemList;
+use App\SubroomsList as SubroomsList;
+use App\SubroomsListDetails as SubroomsListDetails;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CommercialUnitController extends Controller

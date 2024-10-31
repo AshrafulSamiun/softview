@@ -2,22 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Floor as Floor;
-use App\company;
-use App\customer;
 use App\buildingInfo as BuildingInfo;
 use App\BuildingPropertyDetails as BuildingPropertyDetails;
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Floor as Floor;
+use App\Models\SafetyDeviceEquipment;
+use App\SafetyItemList as SafetyItemList;
 use App\SubroomsList as SubroomsList;
 use App\SubroomsListDetails as SubroomsListDetails;
-use App\SafetyItemList as SafetyItemList;
-use App\SafetyDeviceEquipment;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-
-
-
-use App\Classes\ArrayFunction as ArrayFunction;
 
 class FloorController extends Controller
 {
