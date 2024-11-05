@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Notifications\TwoFactorCode;
-use Auth;
-use Browser;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 class LoginController extends Controller
@@ -39,7 +38,6 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-      //return "1"+2*"007";die;
         $this->middleware('guest')->except('logout');
     }
 
@@ -52,38 +50,17 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request,$user)
     {
-      
         if($request->pin_code==$user->pin_code)
-        { 
-            // $brower=Browser::userAgent();
-
-            // $UserCredientialSql=UserCrediential::where('user_id',$user->id)->get();
-            // if(!empty($UserCredientialSql))
-            // {
-            //     foreach($UserCredientialSql as $value)
-            //     {
-
-
-            //         if($value->user_crediential==$brower)
-            //         {
-            //             return redirect('/Dashboard');die;
-            //         }
-
-            //     }
-            // }
-            
+        {
             $user->generateTwoFactorCode();
             $user->notify(new twoFactorCode());
             return redirect("/verify"); 
         }
         else
         {
-             //dd($user->pin_code);die;
             Auth::logout();
             $request->session()->invalidate();
             return redirect('/login')->withErrors(['pin_code' => 'Pin Code which you enter does not match']);
-
         }
-        
     }
 }

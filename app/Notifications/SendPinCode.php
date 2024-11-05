@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -33,8 +32,6 @@ class SendPinCode extends Notification
     {
         return (new MailMessage)
                     ->line('Your Pin Code is '.$notifiable->pin_code)
-                    //->action('Verify Here', route('verify.index'))
                     ->line('Thanks for stay with us.');
-                    //->line('If you have not tried to login, ignore this message.');
     }
 }

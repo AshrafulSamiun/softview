@@ -82,7 +82,7 @@ class User extends Authenticatable
             $zipCode=$position->zipCode;
             $timezone=$position->timezone;
            
-           $userLoginInfo=LoginInfo::create([
+           LoginInfo::create([
                 'project_id'        => $this->project_id,
                 'user_id'           => $this->id,
                 'ip_address'        => $ip,
