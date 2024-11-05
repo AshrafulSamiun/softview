@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\AddsOnItemsDetails as AddsOnItemsDetails;
+use App\Models\Country as Country;
+use App\Models\FinancialInfoDetail as FinancialInfoDetail;
+use App\Models\FinancialInfoType as FinancialInfoType;
+use App\Models\HousingPropertyManage as HousingPropertyManage;
+use App\Models\IncludedItemType as IncludedItemType;
+use App\Models\NewPostingHousingRental as NewPostingHousingRental;
+use App\Models\PropertyManage as PropertyManage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Country as Country;
-use App\keyPositionLavel as keyPositionLavel;
-use App\governmentAccountLavel as GovernmentAccountLavel;
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\company as Company;
-use App\keyPosition as keyPosition;
-use App\NewPostingHousingRental as NewPostingHousingRental;
-use App\PropertyManage as PropertyManage;
-use App\HousingPropertyManage as HousingPropertyManage;
-use App\IncludedItemType as IncludedItemType;
-use App\AddsOnItemsDetails as AddsOnItemsDetails;
-use App\FinancialInfoDetail as FinancialInfoDetail;
-use App\FinancialInfoType as FinancialInfoType;
 
 class PostingHousingRentalController extends Controller
 {

@@ -2,43 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Floor as Floor;
-use App\company;
-use App\customer;
-use App\Country as Country;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingPropertyDetails as BuildingPropertyDetails;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
-use App\ResidentialSuite;
-use App\CommercialUnit;
-use App\ParkingLot;
-use App\ParkingLevel;
-use App\BuildingManagementType;
-use App\ParkingStall;
-use App\BikeStall;
-use App\StorageLocker;
-use App\MailBox;
-use App\CommonAreaDetails;
-use App\UomSetting;
-use App\StorageStallDetails;
-use App\AccountCompany as AccountCompany;
-use App\PropertyAttribution;
-use App\PropertyAttributionDetails;
-use App\SupportingRoomDetails;
-use App\AccountHolder;
-use Illuminate\Support\Facades\DB;
-use App\ServiceProviderInsPkg;
-use App\PropertyProjectDuration;
-use App\PropertyProjectTimeline;
-use App\PropertyProjectAmount;
-use App\PropPrjPaymentSchedule;
-use App\PropertyProject;
-use App\PropertyProjectLocation;
-
-use App\PropPrjIncidentReport;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\AccountCompany as AccountCompany;
+use App\Models\AccountHolder;
+use App\Models\BikeStall;
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\CommercialUnit;
+use App\Models\CommonAreaDetails;
+use App\Models\Company;
+use App\Models\Country as Country;
+use App\Models\Customer;
+use App\Models\MailBox;
+use App\Models\ParkingStall;
+use App\Models\PropertyAttribution;
+use App\Models\PropertyAttributionDetails;
+use App\Models\PropertyProject;
+use App\Models\PropertyProjectAmount;
+use App\Models\PropertyProjectDuration;
+use App\Models\PropertyProjectLocation;
+use App\Models\PropertyProjectTimeline;
+use App\Models\PropPrjIncidentReport;
+use App\Models\PropPrjPaymentSchedule;
+use App\Models\ResidentialSuite;
+use App\Models\ServiceProviderInsPkg;
+use App\Models\StorageLocker;
+use App\Models\SupportingRoomDetails;
+use App\Models\UomSetting;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PropertyProjectController extends Controller
 {
@@ -81,7 +72,7 @@ class PropertyProjectController extends Controller
                                             ->get();
 
         //===================Company==========================================
-        $company_list               =company::where('status_active',1)
+        $company_list               =Company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -92,7 +83,7 @@ class PropertyProjectController extends Controller
 
 
         //===================Customer==========================================
-        $customer_list              =customer::where('status_active',1)
+        $customer_list              =Customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->whereNull('company_id')
@@ -150,7 +141,7 @@ class PropertyProjectController extends Controller
         
 
         //===================Company==========================================
-        $company_list               =company::where('status_active',1)
+        $company_list               =Company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -158,7 +149,7 @@ class PropertyProjectController extends Controller
             $company_arr[$value->id]=$value->legal_name;
         }
         //===================Customer==========================================
-        $customer_list              =customer::where('status_active',1)
+        $customer_list              =Customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->get();

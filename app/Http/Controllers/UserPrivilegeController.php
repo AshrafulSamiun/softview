@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User as User;
+use App\Models\UserPrivilege as UserPrivilege;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\User as User;
-use App\UserPrivilege as UserPrivilege;
 
 
 class UserPrivilegeController extends Controller

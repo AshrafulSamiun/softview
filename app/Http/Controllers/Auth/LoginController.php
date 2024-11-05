@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Contracts\Auth\Authenticatable;
 use App\Notifications\TwoFactorCode;
 use Auth;
-use Illuminate\Http\Request;
-use App\UserCrediential;
 use Browser;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 
 class LoginController extends Controller

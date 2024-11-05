@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\CoaGroup as coaGroup;
+use App\Models\CoaGroupInitiall as CoaGroupInitiall;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Country as Country;
-use App\coa_group_initiall as CoaGroupInitiall;
-use App\coaGroup as coaGroup;
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\company as Company;
 
 class CoaSettingController extends Controller
 {
@@ -25,7 +23,7 @@ class CoaSettingController extends Controller
         $ArrayFunction              =new ArrayFunction();
         $accounts_sub_group         =$ArrayFunction->accounts_sub_group;
 
-        $coa_setting_inserted_lavel=coaGroup::where('project_id',$project_id)
+        $coa_setting_inserted_lavel=CoaGroup::where('project_id',$project_id)
                                            // ->where("sub_level",5)
                                             ->orderBy('main_level')
                                             ->orderBy('reference_id')->get();
@@ -261,7 +259,7 @@ class CoaSettingController extends Controller
         $RId1=true;
         if($data_coa_setting)
         {
-            $RId1=coaGroup::insert($data_coa_setting);
+            $RId1=CoaGroup::insert($data_coa_setting);
         }
 
 
@@ -354,7 +352,7 @@ class CoaSettingController extends Controller
                                             'updated_by'                =>$user_id,
                                         );
 
-                                    $coaSettingData=coaGroup::where('id',"=",$details['id'])->update($coa_setting_data);
+                                    $coaSettingData=CoaGroup::where('id',"=",$details['id'])->update($coa_setting_data);
                                     if( !$coaSettingData)
                                     {
                                         DB::rollBack();
@@ -397,7 +395,7 @@ class CoaSettingController extends Controller
         $RId1=true;
         if(!empty($data_coa_setting))
         {
-            $RId1=coaGroup::insert($data_coa_setting);
+            $RId1=CoaGroup::insert($data_coa_setting);
         }
 
 

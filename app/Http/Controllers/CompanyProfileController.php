@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\Company as Company;
+use App\Models\CompanyGovernmentAccount as companyGovernmentAccount;
+use App\Models\Country as Country;
+use App\Models\GovernmentAccountLavel as GovernmentAccountLavel;
+use App\Models\KeyPosition as keyPosition;
+use App\Models\KeyPositionLavel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Country as Country;
-use App\keyPositionLavel as keyPositionLavel;
-use App\governmentAccountLavel as GovernmentAccountLavel;
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\company as Company;
-use App\keyPosition as keyPosition;
-use App\companyGovernmentAccount as companyGovernmentAccount;
 
 class CompanyProfileController extends Controller
 {
@@ -38,7 +38,7 @@ class CompanyProfileController extends Controller
         $data['country_arr']        =$country_arr;
 
 
-        $key_position_lavel=keyPositionLavel::where('status_active',1)
+        $key_position_lavel=KeyPositionLavel::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('page_id',1)
                                     ->get();
@@ -247,12 +247,12 @@ class CompanyProfileController extends Controller
 
         if($data_government)
         {
-            $RId1=companyGovernmentAccount::insert($data_government);
+            $RId1=CompanyGovernmentAccount::insert($data_government);
         }
 
          if($data_key_position)
         {
-            $RId2=keyPosition::insert($data_key_position);
+            $RId2=KeyPosition::insert($data_key_position);
         }
 
         
@@ -315,7 +315,7 @@ class CompanyProfileController extends Controller
 
         
 
-        $government_account_data   =companyGovernmentAccount::where('status_active',1)
+        $government_account_data   =CompanyGovernmentAccount::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('master_id',$id)
                                     ->where('page_id',1)
@@ -376,7 +376,7 @@ class CompanyProfileController extends Controller
         }
 
         // =======================================key position data=================================================
-        $key_position_lavel=keyPositionLavel::where('status_active',1)
+        $key_position_lavel=KeyPositionLevel::where('status_active',1)
                                     ->where('page_id',1)
                                     ->get();
         $data["key_position_data_arr"]=array();
@@ -395,7 +395,7 @@ class CompanyProfileController extends Controller
                
         }
 
-        $keyPosition_data   =keyPosition::where('status_active',1)
+        $keyPosition_data   =KeyPosition::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('master_id',$id)
                                     ->where('page_id',1)
@@ -524,7 +524,7 @@ class CompanyProfileController extends Controller
                         'updated_by'                =>$user_id,
                     );
 
-                    $RId3=companyGovernmentAccount::where('id',"=",$details['id'])->update($data_government_account);
+                    $RId3=CompanyGovernmentAccount::where('id',"=",$details['id'])->update($data_government_account);
 
                 }
                 else if($details['reference_id'])
@@ -585,7 +585,7 @@ class CompanyProfileController extends Controller
                         'updated_by'                =>$user_id,
                     ); 
 
-                    $RId4=keyPosition::where('id',"=",$details['id'])->update($key_position_data);
+                    $RId4=KeyPosition::where('id',"=",$details['id'])->update($key_position_data);
 
                 }
                 else
@@ -610,12 +610,12 @@ class CompanyProfileController extends Controller
 
         if(!empty($data_government))
         {
-            $RId1=companyGovernmentAccount::insert($data_government);
+            $RId1=CompanyGovernmentAccount::insert($data_government);
         }
 
         if(!empty($data_key_position))
         {
-            $RId2=keyPosition::insert($data_key_position);
+            $RId2=KeyPosition::insert($data_key_position);
         }
 
         
@@ -646,10 +646,10 @@ class CompanyProfileController extends Controller
         DB::beginTransaction();
 
         $company_delete=Company::find($id)->update(array('status_active' => 2));
-        $key_position_delete=keyPosition::where('master_id',$id)
+        $key_position_delete=KeyPosition::where('master_id',$id)
                                     ->where('page_id',1)
                                     ->update(array('status_active' => 2));
-        $government_account_delete=companyGovernmentAccount::where('master_id',$id)
+        $government_account_delete=CompanyGovernmentAccount::where('master_id',$id)
                                     ->where('page_id',1)
                                     ->update(array('status_active' => 2));
         if( $company_delete && $key_position_delete && $government_account_delete)

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApplicationForm as ApplicationForm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\ApplicationForm as ApplicationForm;
 
 
 class ApplicationFormController extends Controller

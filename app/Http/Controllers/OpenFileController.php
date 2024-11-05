@@ -2,16 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project as Project;
 use Illuminate\Http\Request;
-use App\company;
-use App\Project as Project;
-use App\AccountCompany as AccountCompany;
-use App\AcPeriodMaster;
 use Illuminate\Support\Facades\DB;
-
-
-
-
 
 
 class OpenFileController extends Controller

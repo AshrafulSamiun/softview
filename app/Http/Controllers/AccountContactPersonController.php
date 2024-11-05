@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountContactPerson as AccountContactPerson;
+use App\Models\Country as Country;
+use App\Models\Project as Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\AccountContactPerson as AccountContactPerson;
-use App\Project as Project;
-use App\Country as Country;
 
 
 class AccountContactPersonController extends Controller

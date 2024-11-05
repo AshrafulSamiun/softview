@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\industrySector;
-use App\Country as Country;
-use App\AccountHolderSuffix;
-use App\AccountHolderBoardOfDirector;
-use App\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
+use App\Models\AccountHolderBoardOfDirector;
+use App\Models\AccountHolderSuffix;
+use App\Models\Country as Country;
+use App\Models\industrySector;
+use App\Models\User;
 use App\Rules\UniqueEmailInTwoTables;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Mail;
-
 
 
 class AccountHolderBoardOfDirectorController extends Controller

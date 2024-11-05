@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Purchase;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\AccountHolder;
-use App\Country as Country;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\Purchase;
-use App\PurchaseDetails;
-use App\PurchaseChargeBreakdown;
-use App\PurchaseCharge;
-
+use App\Http\Controllers\Controller;
+use App\Models\AccountHolder;
+use App\Models\Country as Country;
+use App\Models\Purchase;
+use App\Models\PurchaseCharge;
+use App\Models\PurchaseChargeBreakdown;
+use App\Models\PurchaseDetails;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseCreditNoteController extends Controller

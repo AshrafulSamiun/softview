@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\BuildingContactDetails;
-use App\BuildingContactList;
-use App\buildingInfo as BuildingInfo;
-use App\CommercialUnit;
-use App\CommercialUnitDetails;
-use App\company;
-use App\customer;
-use App\ExternalServiceProvider;
-use App\ExternalServiceProviderList;
+use App\Models\BuildingContactDetails;
+use App\Models\BuildingContactList;
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\CommercialUnit;
+use App\Models\CommercialUnitDetails;
+use App\Models\Company;
+use App\Models\Customer;
+use App\Models\ExternalServiceProvider;
+use App\Models\ExternalServiceProviderList;
 use App\Models\SafetyDeviceEquipment;
-use App\SafetyItemList as SafetyItemList;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
+use App\Models\SafetyItemList as SafetyItemList;
+use App\Models\SubroomsList as SubroomsList;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,7 +32,7 @@ class CommercialUnitController extends Controller
         $user=\Auth::user();
         $project_id                 = $user->project_id;
         //===================Company==========================================
-        $company_list               =company::where('status_active',1)
+        $company_list               =Company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -43,7 +43,7 @@ class CommercialUnitController extends Controller
 
 
         //===================Customer==========================================
-        $customer_list              =customer::where('status_active',1)
+        $customer_list              =Customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->whereNull('company_id')
@@ -924,7 +924,7 @@ class CommercialUnitController extends Controller
         $user=\Auth::user();
         $project_id                 = $user->project_id;
         //===================Company==========================================
-        $company_list               =company::where('status_active',1)
+        $company_list               =Company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -943,7 +943,7 @@ class CommercialUnitController extends Controller
 //dd($company_id);die;
 
         //===================Customer==========================================
-        $customer_list_query        =customer::where('status_active',1)
+        $customer_list_query        =Customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1);
 

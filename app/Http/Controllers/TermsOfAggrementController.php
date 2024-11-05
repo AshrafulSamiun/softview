@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project as Project;
+use App\Models\TermsOfAggrement as TermsOfAggrement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\TermsOfAggrement as TermsOfAggrement;
-use App\Project as Project;
 
 
 class TermsOfAggrementController extends Controller

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\ProcedureInstruction as ProcedureInstruction;
+use App\Models\ProcedureInstruction as ProcedureInstruction;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ProcedureInstructionController extends Controller

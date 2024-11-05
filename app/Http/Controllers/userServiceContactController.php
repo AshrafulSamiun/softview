@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\Project as Project;
+use App\Models\ServiceContact as ServiceContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\service_contact as ServiceContact;
-use App\Project as Project;
 
 class userServiceContactController extends Controller
 {

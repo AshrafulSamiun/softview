@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\BuildingContactDetails;
-use App\BuildingContactList;
-use App\buildingInfo as BuildingInfo;
-use App\ExternalServiceProvider;
-use App\ExternalServiceProviderList;
+use App\Models\BuildingContactDetails;
+use App\Models\BuildingContactList;
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\ExternalServiceProvider;
+use App\Models\ExternalServiceProviderList;
+use App\Models\ResidentialSuite;
+use App\Models\ResidentialSuiteDetails;
 use App\Models\SafetyDeviceEquipment;
-use App\ResidentialSuite;
-use App\ResidentialSuiteDetails;
-use App\SafetyItemList as SafetyItemList;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
+use App\Models\SafetyItemList as SafetyItemList;
+use App\Models\SubroomsList as SubroomsList;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

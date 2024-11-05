@@ -1,14 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB;
-
+use App\Models\AccountCompany as AccountCompany;
+use App\Models\Project as Project;
+use App\Models\ServicePlan as servicePlan;
+use App\Models\UserServicePlan as UserServicePlan;
+use App\Models\UserServicePlanDetails as UserServicePlanDetails;
 use Illuminate\Http\Request;
-use App\UserServicePlanDetails as UserServicePlanDetails;
-use App\UserServicePlan as UserServicePlan;
-use App\servicePlan as servicePlan;
-use App\Project as Project;
-use App\AccountCompany as AccountCompany;
+use Illuminate\Support\Facades\DB;
 
 class UserServicePlanController extends Controller
 {
@@ -36,7 +35,7 @@ class UserServicePlanController extends Controller
             $master_id="";  
 
 
-            $service_plan = servicePlan::where('status', '=', 1)
+            $service_plan = ServicePlan::where('status', '=', 1)
                                // ->where('management_type',$managemnet_type)
                                // ->toSql();
                                 ->get();

@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 
-use Illuminate\Http\Request;
-use App\AccountType as AccountType;
-use App\TaxType as TaxType;
-use App\taxTypeInitial;
 use App\Classes\ArrayFunction as ArrayFunction;
-
-
-
+use App\Models\AccountType as AccountType;
+use App\Models\TaxType as TaxType;
+use App\Models\TaxTypeInitial;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 
 class TaxTypeController extends Controller
 {
@@ -25,7 +23,7 @@ class TaxTypeController extends Controller
         $user=\Auth::user();
         $project_id                             = $user->project_id;
         //===================Company==========================================
-        $tax_type_list                          =taxTypeInitial::where('status_active',1)
+        $tax_type_list                          =TaxTypeInitial::where('status_active',1)
                                                     ->whereIn('project_id',[$project_id,0])
                                                     ->get();
         $ArrayFunction              =new ArrayFunction();
@@ -84,7 +82,7 @@ class TaxTypeController extends Controller
         $user=\Auth::user();
         $project_id                             = $user->project_id;
         //===================Company==========================================
-        $tax_type_list                          =taxTypeInitial::where('status_active',1)
+        $tax_type_list                          =TaxTypeInitial::where('status_active',1)
                                                     ->whereIn('project_id',[$project_id,0])
                                                     ->get();
         $tax_type_arr=array();
@@ -280,7 +278,7 @@ class TaxTypeController extends Controller
         $user=\Auth::user();
         $project_id                             = $user->project_id;
         //===================Company==========================================
-        $tax_type_list                          =taxTypeInitial::where('status_active',1)
+        $tax_type_list                          =TaxTypeInitial::where('status_active',1)
                                                     ->whereIn('project_id',[$project_id,0])
                                                     ->get();
         $tax_type_arr=array();

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project as Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Project as Project;
 
 class DocumentSubmitionController extends Controller
 {

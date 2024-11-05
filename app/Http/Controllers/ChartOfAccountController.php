@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\ChartOfAccount as ChartOfAccount;
+use App\Models\CoaGroup as coaGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Country as Country;
-use App\ChartOfAccount as ChartOfAccount;
-use App\coaGroup as coaGroup;
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\company as Company;
 
 class ChartOfAccountController extends Controller
 {
@@ -61,7 +59,7 @@ class ChartOfAccountController extends Controller
             }
         }
 
-        $coa_setting_inserted_lavel=coaGroup::where('project_id',$project_id)
+        $coa_setting_inserted_lavel=CoaGroup::where('project_id',$project_id)
                                             ->orderBy('main_level')
                                             ->orderBy('reference_id')->get();
 

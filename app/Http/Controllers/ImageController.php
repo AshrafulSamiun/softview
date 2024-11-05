@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FileUpload;
 use Illuminate\Http\Request;
-use App\FileUpload;
 use Intervention\Image\Facades\Image;
 
 class ImageController extends Controller

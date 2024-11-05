@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Sales;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\AccountHolder;
-use App\Country as Country;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\Sale;
-use App\SaleDetails;
-use App\SaleChargeBreakdown;
-use App\SaleCharge;
+use App\Http\Controllers\Controller;
+use App\Models\AccountHolder;
+use App\Models\Country as Country;
+use App\Models\Sale;
+use App\Models\SaleCharge;
+use App\Models\SaleChargeBreakdown;
+use App\Models\SaleDetails;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SalesDebitNoteController extends Controller

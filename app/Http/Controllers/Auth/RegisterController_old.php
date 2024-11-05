@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
-use App\Project;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use App\Country as Country;
 use App\Mail\WelcomeMail;
+use App\Models\Country as Country;
+use App\Models\Project;
+use App\Models\User;
+use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -105,7 +105,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return \App\Models\User
      */
     protected function create(array $data)
     {

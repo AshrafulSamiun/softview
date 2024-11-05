@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcPeriodDetails as AcPeriodDetails;
+use App\Models\AcPeriodMaster;
+use App\Models\Company as Company;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use App\AcPeriodMaster;
-use App\AcPeriodDetails as AcPeriodDetails;
-use App\Company as Company;
-use App\AccountCode as AccountCode;
-use App\CoaPeriodDetails as CoaPeriodDetails;
 use Illuminate\Support\Facades\DB;
-
 
 
 class PeriodController extends Controller

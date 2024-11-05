@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\AccountCompany as AccountCompany;
-use App\AccountContactPerson as AccountContactPerson;
-use Illuminate\Support\Facades\DB;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\Country as Country;
-use App\Project as Project;
-
+use App\Models\AccountCompany as AccountCompany;
+use App\Models\Country as Country;
+use App\Models\Project as Project;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class AccountSetupController extends Controller

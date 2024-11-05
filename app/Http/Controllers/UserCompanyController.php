@@ -1,13 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB;
-
+use App\Models\FileUpload;
+use App\Models\Project as Project;
+use App\Models\UserCompany as userCompany;
 use Illuminate\Http\Request;
-use App\userCompany as userCompany;
-use App\User as User;
-use App\Project as Project;
-use App\FileUpload;
+use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 
 class UserCompanyController extends Controller
@@ -50,7 +48,7 @@ class UserCompanyController extends Controller
             $request->merge(['company_logo'     =>$image_arr->id]);  
         }
 
-        $user_company_info= userCompany::create($request->all());
+        $user_company_info= UserCompany::create($request->all());
 
 
         $user_project=Project::find($project_id)->update(array('project_name' => $legal_name,'project_status' => '99'));
@@ -126,7 +124,7 @@ class UserCompanyController extends Controller
 
        
 
-        $user_company_info= userCompany::find($id)->update($request->all());
+        $user_company_info= UserCompany::find($id)->update($request->all());
 
         $user_project=Project::find($project_id)->update(array('project_name' => $legal_name));
 

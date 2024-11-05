@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\AccountHolder;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\industrySector;
-use App\Country as Country;
-use App\AccountHolderSuffix;
-use App\AccountHolderBank;
-use App\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Models\AccountHolderBank;
+use App\Models\AccountHolderSuffix;
+use App\Models\Country as Country;
+use App\Models\industrySector;
+use App\Models\User;
 use App\Rules\UniqueEmailInTwoTables;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Mail;
-
 
 
 class AccountHolderBankController extends Controller

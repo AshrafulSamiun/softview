@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Module as Module;
-use App\Menu as Menu;
-use App\servicePlan as servicePlan;
-use Illuminate\Support\Facades\DB;
-use App\Country as Country;
-use App\Project as Project;
-use App\userCompany as userCompany;
-use App\provience as Provience;
-use App\PropertyManagementType as PropertyManagementType;
-use App\UserServicePlanDetails as UserServicePlanDetails;
-use App\UserServicePlan as UserServicePlan;
-use App\buildingInfo as BuildingInfo;
-use App\AccountContactPerson as AccountContactPerson;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\AccountContactPerson as AccountContactPerson;
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\Country as Country;
+use App\Models\Menu as Menu;
+use App\Models\Module as Module;
+use App\Models\Project as Project;
+use App\Models\PropertyManagementType as PropertyManagementType;
+use App\Models\Provience as Provience;
+use App\Models\ServicePlan as servicePlan;
+use App\Models\UserCompany as userCompany;
+use App\Models\UserServicePlan as UserServicePlan;
+use App\Models\UserServicePlanDetails as UserServicePlanDetails;
 
 
 //use Browser;
@@ -72,7 +70,7 @@ class DashboardController extends Controller
         }
         else if($project_type==1001)
         {
-            $service_plan=servicePlan::where('status', '=', 1)->get();
+            $service_plan=ServicePlan::where('status', '=', 1)->get();
 
             $master_plan_arr=array();
             $lavel_one_plan_arr=array();
@@ -117,7 +115,7 @@ class DashboardController extends Controller
         }  
         else if($project_type==99)
         {
-            $user_company= userCompany::where('project_id',$project_id)->first();
+            $user_company= UserCompany::where('project_id',$project_id)->first();
             $company_provience      = Provience::where('status_active',1)
                                                 ->where('country_id',$user_company->company_country_id)
                                                 ->get();
@@ -162,7 +160,7 @@ class DashboardController extends Controller
         }
         else if($project_type==98)
         {
-            $user_company           = userCompany::where('project_id',$project_id)->first();
+            $user_company           = UserCompany::where('project_id',$project_id)->first();
             $Buildinginfo           = BuildingInfo::where('project_id',$project_id)->first();
             $company_provience      = Provience::where('status_active',1)
                                                 ->where('country_id',$user_company->company_country_id)
@@ -222,7 +220,7 @@ class DashboardController extends Controller
         } 
         else if($project_type==97)
         {
-            $user_company           = userCompany::where('project_id',$project_id)->first();
+            $user_company           = UserCompany::where('project_id',$project_id)->first();
             $Buildinginfo           = BuildingInfo::where('project_id',$project_id)->first();
             $contactInfo            = AccountContactPerson::where('project_id',$project_id)->first();
 
@@ -282,7 +280,7 @@ class DashboardController extends Controller
             }
             
 
-            $service_plan=servicePlan::where('status', '=', 1)->orderBy('slno')->get();
+            $service_plan=ServicePlan::where('status', '=', 1)->orderBy('slno')->get();
 
             $master_plan_arr=array();
             $lavel_one_plan_arr=array();
@@ -376,7 +374,7 @@ class DashboardController extends Controller
 
         else if($project_type==96)
         {
-            $user_company           = userCompany::where('project_id',$project_id)->first();
+            $user_company           = UserCompany::where('project_id',$project_id)->first();
             $Buildinginfo           = BuildingInfo::where('project_id',$project_id)->first();
             $contactInfo            = AccountContactPerson::where('project_id',$project_id)->first();
             $ArrayFunction          =new ArrayFunction();
@@ -438,7 +436,7 @@ class DashboardController extends Controller
             }
             
 
-            $service_plan=servicePlan::where('status', '=', 1)->orderBy('slno')->get();
+            $service_plan=ServicePlan::where('status', '=', 1)->orderBy('slno')->get();
             $user_service_plan_mst=UserServicePlan::where('project_id',$project_id)->first();
            // dd($user_service_plan_mst);die;
             $user_service_plan=UserServicePlanDetails::where('project_id',$project_id)->get();
@@ -521,7 +519,7 @@ class DashboardController extends Controller
         }
         else if($project_type==9744555)
         {
-            $user_company           = userCompany::where('project_id',$project_id)->first();
+            $user_company           = UserCompany::where('project_id',$project_id)->first();
             $PropertyManagementType = PropertyManagementType::where('project_id',$project_id)->first();
 
             $user_service_plan      = UserServicePlan::where('status_active',1)
@@ -574,7 +572,7 @@ class DashboardController extends Controller
             }
 
 
-            $service_plan=servicePlan::where('status', '=', 1)->get();
+            $service_plan=ServicePlan::where('status', '=', 1)->get();
 
             $master_plan_arr=array();
             $lavel_one_plan_arr=array();

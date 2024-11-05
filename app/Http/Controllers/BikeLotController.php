@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\BikeLevel;
-use App\BikeLot;
-use App\BikeStall;
-use App\BuildingContactDetails;
-use App\BuildingContactList;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingLicensePermit;
-use App\BuildingManagementType;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\ExternalServiceProvider;
-use App\ExternalServiceProviderList;
-use App\Floor as Floor;
-use App\LicenseAndPermit;
+use App\Models\BikeLevel;
+use App\Models\BikeLot;
+use App\Models\BikeStall;
+use App\Models\BuildingContactDetails;
+use App\Models\BuildingContactList;
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\BuildingLicensePermit;
+use App\Models\BuildingManagementType;
+use App\Models\ExternalServiceProvider;
+use App\Models\ExternalServiceProviderList;
+use App\Models\Floor as Floor;
+use App\Models\LicenseAndPermit;
 use App\Models\SafetyDeviceEquipment;
-use App\SafetyItemList as SafetyItemList;
-use App\StorageStallDetails;
-use App\SubroomsListDetails as SubroomsListDetails;
+use App\Models\SafetyItemList as SafetyItemList;
+use App\Models\StorageStallDetails;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

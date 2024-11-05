@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\User as User;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\User as User;
+use Illuminate\Http\Request;
 
 
 class UserController extends Controller

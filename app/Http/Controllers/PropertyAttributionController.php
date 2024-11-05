@@ -2,32 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Floor as Floor;
-use App\company;
-use App\customer;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingPropertyDetails as BuildingPropertyDetails;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
-use App\ResidentialSuite;
-use App\CommercialUnit;
-use App\ParkingLot;
-use App\ParkingLevel;
-use App\BuildingManagementType;
-use App\ParkingStall;
-use App\BikeStall;
-use App\StorageLocker;
-use App\MailBox;
-use App\CommonAreaDetails;
-use App\UomSetting;
-use App\StorageStallDetails;
-use App\AccountCompany as AccountCompany;
-use App\PropertyAttribution;
-use App\PropertyAttributionDetails;
-use App\SupportingRoomDetails;
-use Illuminate\Support\Facades\DB;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\AccountCompany as AccountCompany;
+use App\Models\BikeStall;
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\CommercialUnit;
+use App\Models\CommonAreaDetails;
+use App\Models\Company;
+use App\Models\Customer;
+use App\Models\MailBox;
+use App\Models\ParkingStall;
+use App\Models\PropertyAttribution;
+use App\Models\PropertyAttributionDetails;
+use App\Models\ResidentialSuite;
+use App\Models\StorageLocker;
+use App\Models\SupportingRoomDetails;
+use App\Models\UomSetting;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PropertyAttributionController extends Controller
 {
@@ -57,7 +49,7 @@ class PropertyAttributionController extends Controller
         $data['main_company_arr']        =$main_company_arr;
 
         //===================Company==========================================
-        $company_list               =company::where('status_active',1)
+        $company_list               =Company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -68,7 +60,7 @@ class PropertyAttributionController extends Controller
 
 
         //===================Customer==========================================
-        $customer_list              =customer::where('status_active',1)
+        $customer_list              =Customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->whereNull('company_id')
@@ -106,7 +98,7 @@ class PropertyAttributionController extends Controller
         
 
         //===================Company==========================================
-        $company_list               =company::where('status_active',1)
+        $company_list               =Company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -114,7 +106,7 @@ class PropertyAttributionController extends Controller
             $company_arr[$value->id]=$value->legal_name;
         }
         //===================Customer==========================================
-        $customer_list              =customer::where('status_active',1)
+        $customer_list              =Customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->get();
@@ -1168,7 +1160,7 @@ class PropertyAttributionController extends Controller
         $data['main_company_arr']        =$main_company_arr;
 
         //===================Company==========================================
-        $company_list               =company::where('status_active',1)
+        $company_list               =Company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -1179,7 +1171,7 @@ class PropertyAttributionController extends Controller
 
 
         //===================Customer==========================================
-        $customer_list_query        =customer::where('status_active',1)
+        $customer_list_query        =Customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1);
 

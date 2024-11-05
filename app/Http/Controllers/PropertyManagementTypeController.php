@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB;
+use App\Models\Project as Project;
+use App\Models\PropertyManagementType as PropertyManagementType;
 use Illuminate\Http\Request;
-use App\PropertyManagementType as PropertyManagementType;
-use App\Project as Project;
+use Illuminate\Support\Facades\DB;
 
 
 class PropertyManagementTypeController extends Controller

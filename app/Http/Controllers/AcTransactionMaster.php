@@ -10,6 +10,6 @@ class AcTransactionMaster extends Model
 
     public function company()
 	{
-		return $this->belongsTo('App\Company','company_id', 'id');
+		return $this->belongsTo('App\Models\Company','company_id', 'id');
 	}
 }

@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\provience as provience;
-use App\servicePlan as servicePlan;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\ServicePlan as servicePlan;
+use Illuminate\Http\Request;
 
 class ServicePlanController extends Controller
 {
@@ -19,7 +18,7 @@ class ServicePlanController extends Controller
         
         $ArrayFunction          =new ArrayFunction();
         $row_status             =$ArrayFunction->row_status;
-        $servicePlan            =servicePlan::all();
+        $servicePlan            =ServicePlan::all();
         $yes_no=array(1=>"Yes",0=>"No");
 
         $sl=0;
@@ -91,7 +90,7 @@ class ServicePlanController extends Controller
             'slno' => 'required',
         ]);
      
-        return servicePlan::create($request->all());
+        return ServicePlan::create($request->all());
     }
 
     /**
@@ -132,7 +131,7 @@ class ServicePlanController extends Controller
             'status' => 'required',
             'slno' => 'required',
         ]);
-        servicePlan::find($id)->update($request->all());
+        ServicePlan::find($id)->update($request->all());
         
         return ['message'=>'update successfully'];
     }
@@ -145,7 +144,7 @@ class ServicePlanController extends Controller
      */
     public function destroy($id)
     {
-        servicePlan::find($id)->delete();
+        ServicePlan::find($id)->delete();
         return ['message'=>'Module deleted'];
     }
 }

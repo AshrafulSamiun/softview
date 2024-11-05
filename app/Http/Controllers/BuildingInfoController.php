@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\BuildingContactDetails;
-use App\BuildingContactList;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingLicensePermit;
-use App\BuildingManagementType;
-use App\BuildingPropertyDetails;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\ExternalServiceProvider;
-use App\ExternalServiceProviderList;
-use App\LicenseAndPermit;
+use App\Models\BuildingContactDetails;
+use App\Models\BuildingContactList;
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\BuildingLicensePermit;
+use App\Models\BuildingManagementType;
+use App\Models\BuildingPropertyDetails;
+use App\Models\ExternalServiceProvider;
+use App\Models\ExternalServiceProviderList;
+use App\Models\LicenseAndPermit;
 use App\Models\SafetyDeviceEquipment;
-use App\SafetyItemList as SafetyItemList;
+use App\Models\SafetyItemList as SafetyItemList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -1014,7 +1014,7 @@ class BuildingInfoController extends Controller
 
        
 
-        $building_list=buildingInfo::where('status_active',1)
+        $building_list=BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('id',$id)
                                     ->first();
@@ -2643,7 +2643,7 @@ class BuildingInfoController extends Controller
                             'updated_by'                =>$user_id,
                         );
       
-        $buildingInfo=buildingInfo::where('id',"=",$id)->update($update_data);
+        $buildingInfo=BuildingInfo::where('id',"=",$id)->update($update_data);
 
         if($buildingInfo)
         {
@@ -3947,7 +3947,7 @@ class BuildingInfoController extends Controller
                             'updated_by'                =>$user_id,
                         );
       
-        $buildingInfo=buildingInfo::where('id',"=",$id)->update($update_data);
+        $buildingInfo=BuildingInfo::where('id',"=",$id)->update($update_data);
 
         if($buildingInfo)
         {

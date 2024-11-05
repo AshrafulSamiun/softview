@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\AccountHolderSuffix;
 use App\Classes\ArrayFunction as ArrayFunction;
-use App\Country as Country;
-use App\industrySector;
 use App\Models\AccountHolderEmployee;
-use App\User;
+use App\Models\AccountHolderSuffix;
+use App\Models\Country as Country;
+use App\Models\industrySector;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

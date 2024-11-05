@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserCrediential;
 use App\Notifications\TwoFactorCode;
-use App\Notifications\SendUserName;
-use Illuminate\Http\Request;
 use Browser;
-use App\UserCrediential;
+use Illuminate\Http\Request;
 
 class TwoFactorController extends Controller
 {

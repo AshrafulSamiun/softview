@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\Floor as Floor;
+use App\Models\MailBox;
+use App\Models\MailRoom;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
 use Illuminate\Http\Request;
-use App\Floor as Floor;
-use App\company;
-use App\customer;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingPropertyDetails as BuildingPropertyDetails;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
-use App\MailBox;
-use App\MailRoom;
-
 use Illuminate\Support\Facades\DB;
 
 class MailRoomController extends Controller

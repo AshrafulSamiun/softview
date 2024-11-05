@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BuildingInfo as BuildingInfo;
+use App\Models\CommonArea;
+use App\Models\CommonAreaDetails;
+use App\Models\Floor as Floor;
+use App\Models\SubroomsList as SubroomsList;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
 use Illuminate\Http\Request;
-use App\Floor as Floor;
-use App\company;
-use App\customer;
-use App\buildingInfo as BuildingInfo;
-use App\BuildingPropertyDetails as BuildingPropertyDetails;
-use App\SubroomsList as SubroomsList;
-use App\SubroomsListDetails as SubroomsListDetails;
 use Illuminate\Support\Facades\DB;
-use App\CommonArea;
-use App\CommonAreaDetails;
 
 class CommonAreaController extends Controller
 {

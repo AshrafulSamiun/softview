@@ -1,18 +1,16 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-use Illuminate\Http\Request;
-use App\User;
-use App\Project;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Models\Country as Country;
+use App\Models\Project;
+use App\Models\User;
 use App\Notifications\TwoFactorCode;
-use App\Country as Country;
-use App\SendCode as SendCode;
-use App\loginInfo;
-use Stevebauman\Location\Facades\Location;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Mail;
+
 class RegisterController extends Controller
 {
     /*
@@ -89,7 +87,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return \App\Models\User
      */
     protected function create(array $data)
     {

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\MaintenanceRoom as MaintenanceRoom;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\MaintenanceRoom as MaintenanceRoom;
+use Illuminate\Http\Request;
 
 class MaintenanceRoomController extends Controller
 {
