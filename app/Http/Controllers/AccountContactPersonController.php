@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AccountContactPerson as AccountContactPerson;
-use App\Models\Country as Country;
-use App\Models\Project as Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Project as Project;
+use App\Models\keyPositionLavel as keyPositionLavel;
+use App\Models\keyPosition as keyPosition;
 
 
 class AccountContactPersonController extends Controller
@@ -18,39 +18,50 @@ class AccountContactPersonController extends Controller
      */
     public function index()
     {
-         $country                            =Country::where('status_active',1)->get();
-
-
-        foreach ($country as $key => $value) {
-            $country_arr[$value->id]        =$value->country_name;
-            $country_code_arr[$value->id]   =$value->country_code;
+        $user_info          = \Auth::user();
+        $project_id         = $user_info->project_id;
+        $key_position_lavel=keyPositionLavel::where('status_active',1)
+                                    ->whereIn('project_id',[0,$project_id])
+                                    ->where('page_id',2)
+                                    ->get();
+        foreach ($key_position_lavel as $key => $value) {
+            $key_position_lavel_arr[$value->id]['reference_id']        =$value->id;
+            $key_position_lavel_arr[$value->id]['reference_value']     =$value->field_name;
+            $key_position_lavel_arr[$value->id]['key_position_name']   ='';
+            $key_position_lavel_arr[$value->id]['office_phone']        ='';
+            $key_position_lavel_arr[$value->id]['email']               ='';
+            $key_position_lavel_arr[$value->id]['id']                  ='';
+        }
+ 
+        $key_position_lavel=keyPosition::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('page_id',2)
+                                    ->get();
+        $editmode=false;
+        foreach ($key_position_lavel as $key => $value) {
+            $key_position_lavel_arr[$value->reference_id]['reference_id']        =$value->reference_id;
+            $key_position_lavel_arr[$value->reference_id]['reference_value']     =$value->reference_value;
+            $key_position_lavel_arr[$value->reference_id]['key_position_name']   =$value->key_position_name;
+            $key_position_lavel_arr[$value->reference_id]['office_phone']        =$value->office_phone;
+            $key_position_lavel_arr[$value->reference_id]['email']               =$value->email;
+            $key_position_lavel_arr[$value->reference_id]['id']                  =$value->id;
+            $editmode=true;
+        }
+    
+        $sl=0;
+        foreach ($key_position_lavel_arr as $key => $value) {
+            $key_position_lavel_temp_arr[$sl]['reference_id']        =$value['reference_id'];
+            $key_position_lavel_temp_arr[$sl]['reference_value']     =$value['reference_value'];
+            $key_position_lavel_temp_arr[$sl]['key_position_name']   =$value['key_position_name'];
+            $key_position_lavel_temp_arr[$sl]['office_phone']        =$value['office_phone'];
+            $key_position_lavel_temp_arr[$sl]['email']               =$value['email'];
+            $key_position_lavel_temp_arr[$sl]['id']                  =$value['id'];
+            $sl++;
         }
 
-        $project_id                         = \Auth::user()->project_id;
-        $user_id                            = \Auth::user()->id; 
-        $data['country_arr']                =$country_arr;
 
-        $contact_person_data                =AccountContactPerson::where('project_id',$project_id)->where('status_active',1)->get();
-        $data['contact_person_data']        =array();
-
-
-        foreach($contact_person_data as $key=>$val)
-        {
-            $data['contact_person_data'][$val->contact_person_id]['id']                          =$val->id;
-            $data['contact_person_data'][$val->contact_person_id]['full_name']                   =$val->full_name;
-            $data['contact_person_data'][$val->contact_person_id]['job_title']                   =$val->job_title;
-            $data['contact_person_data'][$val->contact_person_id]['street_number']               =$val->street_number;
-            $data['contact_person_data'][$val->contact_person_id]['city']                        =$val->city;
-            $data['contact_person_data'][$val->contact_person_id]['state']                       =$val->state;
-            $data['contact_person_data'][$val->contact_person_id]['country']                     =$val->country;
-            $data['contact_person_data'][$val->contact_person_id]['post_code']                   =$val->post_code;
-            $data['contact_person_data'][$val->contact_person_id]['po_box']                      =$val->po_box;
-            $data['contact_person_data'][$val->contact_person_id]['office_phone']                =$val->office_phone;
-            $data['contact_person_data'][$val->contact_person_id]['mobile']                      =$val->mobile;
-            $data['contact_person_data'][$val->contact_person_id]['email']                       =$val->email;
-            $data['contact_person_data'][$val->contact_person_id]['fax_no']                      =$val->fax_no;
-            //$data['contact_person_data'][$val->contact_person_id]['contact_person_id']           =$val->contact_person_id;
-        }
+        $data['editmode']                      =$editmode;
+        $data['key_position_lavel_arr']        =$key_position_lavel_temp_arr;
         return $data;
     }
 
@@ -73,46 +84,41 @@ class AccountContactPersonController extends Controller
     public function store(Request $request)
     {
 
-       
-        request()->validate([
             
-
-            'full_name'=>'required',
-            'job_title'=>'required',
-            'street_number'=>'required',
-            'city'=>'required',
-            'state'=>'required',
-            'country'=>'required',
-            'post_code'=>'required',
-            'po_box'=>'required',
-            'office_phone'=>'required',
-            'mobile'=>'required',
-            'email'=>'required',
-            'fax_no'=>'required',
-            'contact_person_id'=>'required',
-            
-           
-        ]);
-
-
-
-
-        
         $user_info  = \Auth::user();
         $project_id = $user_info->project_id;
         $user_id    = $user_info->id;
-        $request->merge(['project_id'       =>$project_id]);
-        $request->merge(['inserted_by'      =>$user_id]);
-        //dd($request->file('building_photo_url'));die;
+       
         DB::beginTransaction();
 
         
-        $account_contact_person= AccountContactPerson::create($request->all());
+        foreach($request->key_management_list_arr as $key=>$details)
+        {
+            if($details['key_position_name']!="")
+            {
+                $data_key_position[]= array(
+                    'project_id'                =>$project_id,
+                    'page_id'                   =>2,
+                    'master_id'                 =>0,
+                    'reference_id'              =>$details['reference_id'],
+                    'reference_value'           =>$details['reference_value'],
+                    'office_phone'              =>$details['office_phone'],
+                    'key_position_name'         =>$details['key_position_name'],
+                    'email'                     =>$details['email'],
+                    'inserted_by'               =>$user_id,
+                );  
+            }        
+        }
 
+        $RId1=false;
+        if(!empty($data_key_position))
+        {
+            $RId1=keyPosition::insert($data_key_position);
+        }
 
-        $user_project=Project::find($project_id)->update(array('project_status' => '98'));
+        $user_project=Project::find($project_id)->update(array('project_status' => '99'));
 
-        if($account_contact_person  && $user_project)
+        if($user_project  && $RId1)
          {
            DB::commit();
            return 1;
@@ -157,43 +163,55 @@ class AccountContactPersonController extends Controller
     public function update(Request $request, $id)
     {
         
-
-        request()->validate([
-            
-
-            'full_name'=>'required',
-            'job_title'=>'required',
-            'street_number'=>'required',
-            'city'=>'required',
-            'state'=>'required',
-            'country'=>'required',
-            'post_code'=>'required',
-            'po_box'=>'required',
-            'office_phone'=>'required',
-            'mobile'=>'required',
-            'email'=>'required',
-            'fax_no'=>'required',
-            'contact_person_id'=>'required',
-        ]);
-
-
-
-
-        
         $user_info  = \Auth::user();
         $project_id = $user_info->project_id;
         $user_id    = $user_info->id;
-        $request->merge(['project_id'       =>$project_id]);
-        $request->merge(['updated_by'       =>$user_id]);
-        //dd($request->file('building_photo_url'));die;
         DB::beginTransaction();
-
         
-        $account_contact_person= AccountContactPerson::find($id)->update($request->all());
+        foreach($request->key_management_list_arr as $key=>$details)
+        {
+            if($details['key_position_name']!="")
+            {
+                if($details['id']!="")
+                {
+                    $key_position_data= array(
+                        'project_id'                =>$project_id,
+                        'page_id'                   =>2,
+                        'master_id'                 =>0,
+                        'reference_id'              =>$details['reference_id'],
+                        'reference_value'           =>$details['reference_value'],
+                        'office_phone'              =>$details['office_phone'],
+                        'key_position_name'         =>$details['key_position_name'],
+                        'email'                     =>$details['email'],
+                        'updated_by'                =>$user_id,
+                    ); 
 
+                    $RId4=keyPosition::where('id',"=",$details['id'])->update($key_position_data);
 
+                }
+                else{
 
-        if($account_contact_person)
+                    $data_key_position[]= array(
+                        'project_id'                =>$project_id,
+                        'page_id'                   =>2,
+                        'master_id'                 =>0,
+                        'reference_id'              =>$details['reference_id'],
+                        'reference_value'           =>$details['reference_value'],
+                        'office_phone'              =>$details['office_phone'],
+                        'key_position_name'         =>$details['key_position_name'],
+                        'email'                     =>$details['email'],
+                        'inserted_by'               =>$user_id,
+                    );
+                }  
+            }        
+        }
+        $RId1=true;
+        if(!empty($data_key_position))
+        {
+            $RId1=keyPosition::insert($data_key_position);
+        }
+
+        if($RId1)
         {
            DB::commit();
            return 1;

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 use Carbon\Carbon;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Stevebauman\Location\Facades\Location;
+use App\Models\LoginInfo;
 
 class User extends Authenticatable
 {
@@ -16,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'image_id','email', 'password','pin_code','two_factor_code','two_factor_expire_at','project_type','user_type','status_active','authenticated_by_admin',
+        'name', 'image_id','email', 'user_name','password','pin_code','two_factor_code','two_factor_expire_at','project_type','user_type','status_active','authenticated_by_admin','company_id',
         'project_id','user_sequence','account_holder_id',
     ];
 
@@ -33,9 +35,11 @@ class User extends Authenticatable
 
     public function generateTwoFactorCode()
     {
+
         $this->timestamps=false;
         $this->two_factor_code=rand(100000,999999);
         $this->two_factor_expire_at= Carbon::now()->addMinutes(10)->toDateTimeString();
+        //dd($this->two_factor_expire_at);die;
         $this->save();
     }
     public function resetTwoFactorCode()
@@ -82,7 +86,7 @@ class User extends Authenticatable
             $zipCode=$position->zipCode;
             $timezone=$position->timezone;
            
-           LoginInfo::create([
+           $userLoginInfo=loginInfo::create([
                 'project_id'        => $this->project_id,
                 'user_id'           => $this->id,
                 'ip_address'        => $ip,
@@ -93,6 +97,7 @@ class User extends Authenticatable
                 'zip_code'          => $zipCode,
                 'region_code'       => $regionCode,
                 'region_name'       => $regionName,
+                'device_name'       => $_SERVER['HTTP_USER_AGENT'],
                 'time_zone'         => $timezone,
                 
             ]);

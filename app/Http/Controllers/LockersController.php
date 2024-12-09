@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\Locker as Locker;
-use App\Models\Suits as Suits;
 use Illuminate\Http\Request;
+use App\Models\Suits as Suits;
+use App\Models\Locker as Locker;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class LockersController extends Controller
 {

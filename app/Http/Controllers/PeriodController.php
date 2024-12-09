@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AcPeriodDetails as AcPeriodDetails;
-use App\Models\AcPeriodMaster;
-use App\Models\Company as Company;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Models\AcPeriodMaster;
+use App\Models\AcPeriodDetails as AcPeriodDetails;
+use App\Models\Company as Company;
+use App\Models\AccountCode as AccountCode;
+use App\Models\CoaPeriodDetails as CoaPeriodDetails;
 use Illuminate\Support\Facades\DB;
+
 
 
 class PeriodController extends Controller
@@ -25,22 +29,12 @@ class PeriodController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $user_data = \Auth::user();
         $user_id=$user_data->id;
         $project_id=$user_data->project_id;
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-            return 20; 
-        }
-
-
-        $period_data=AcPeriodMaster::where('project_id',$project_id)->where('company_id',$company_id)->get();
+        $period_data=AcPeriodMaster::where('project_id',$project_id)->get();
         $sl=0;
         $data=array();
         foreach($period_data as $key=>$val)
@@ -87,6 +81,7 @@ class PeriodController extends Controller
         $sl++;  
         
         }
+
        return $data;
 
     }
@@ -126,7 +121,7 @@ class PeriodController extends Controller
             $company_id=$request->session()->get('company_id');
         }
         else {
-            return 20; 
+            return; 
         }
 
         
@@ -138,7 +133,6 @@ class PeriodController extends Controller
         $request->merge(['inserted_by' =>$user_id]);
         $request->merge(['project_id' =>$project_id]);
         $request->merge(['company_id' =>$company_id]);
-        $request->merge(['posting_status' =>0]);
         $coa_group=0;
 
         DB::beginTransaction();

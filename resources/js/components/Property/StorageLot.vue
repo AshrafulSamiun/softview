@@ -1979,7 +1979,7 @@
 </style>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatePicker from 'vue2-datepicker';
     import VueTimepicker from 'vue2-timepicker';
     import 'vue2-timepicker/dist/VueTimepicker.css'
@@ -2575,7 +2575,7 @@
                         var response_data=response.data.split("**");
                         if(response_data[0]==1)
                         { 
-                            Swal(
+                            showAlert(
                                 'Posted!',
                                 'Your Data has been Posted.',
                                 'success'
@@ -2586,7 +2586,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                     
                 })
@@ -2611,7 +2611,7 @@
                         var response_data=response.data.split("**");
                         if(response_data[0]==1)
                         { 
-                            Swal(
+                            showAlert(
                                 'Posted!',
                                 'Your Data has been Reposted.',
                                 'success'
@@ -2621,7 +2621,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                     
                 })
@@ -2635,10 +2635,7 @@
                     var response_data=response.data.split("**");
                     if(response_data[0]==1)
                     {
-                        toast({
-                            type: 'success',
-                            title: 'Data Update Successfully'
-                        });
+                        showToast('Data Update Successfully', 'success');
                         
                         this.editStorageLot(response_data[1]);
                         
@@ -2646,13 +2643,10 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }
                 }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });               
                 
             },
@@ -2841,10 +2835,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                         return;
                     }
                 });             
@@ -3406,7 +3397,7 @@
                     this.form.delete('/StorageLots/'+id).then(()=>{
                         
                         if(result.value) {
-                            Swal(
+                            showAlert(
                                 'Deleted!',
                                 'Your Data has been deleted.',
                                 'success'
@@ -3416,7 +3407,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                
                 })
@@ -3439,7 +3430,7 @@
                     this.form.delete('/StorageLots/'+this.form.id).then(()=>{
                         
                         if(result.value) {
-                            Swal(
+                            showAlert(
                                 'Deleted!',
                                 'Your Data has been deleted.',
                                 'success'
@@ -3449,7 +3440,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                
                 })
@@ -3464,10 +3455,7 @@
 					var response_data=data.split("**");
                     if(response_data[0]==1)
                     {
-                         toast({
-                            type: 'success',
-                            title: 'Data Update Successfully'
-                        });
+                         showToast('Data Update Successfully', 'success');
 
                         
                         this.editStorageLot(response_data[1]);
@@ -3476,10 +3464,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }
                 });
             },
@@ -3493,10 +3478,7 @@
                     var response_data=data.split("**");
                     if(response_data[0]==1)
                     {
-                         toast({
-                            type: 'success',
-                            title: 'Data Save Successfully'
-                        });
+                         showToast('Data Update Successfully', 'success');
 
                         if(type==1)
                         {
@@ -3516,10 +3498,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }                    
                 })
             },            

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
+use Illuminate\Http\Request;
 use App\Models\AccountCompany as AccountCompany;
+use App\Models\AccountContactPerson as AccountContactPerson;
+use Illuminate\Support\Facades\DB;
+use App\Classes\ArrayFunction as ArrayFunction;
 use App\Models\Country as Country;
 use App\Models\Project as Project;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\keyPositionLavel as keyPositionLavel;
+use App\Models\keyPosition as keyPosition;
+
 
 
 class AccountSetupController extends Controller
@@ -16,7 +20,6 @@ class AccountSetupController extends Controller
     {
         $ArrayFunction                      =new ArrayFunction();
         $row_status                         =$ArrayFunction->row_status;
-        $user_type_arr                      =$ArrayFunction->user_type_arr;
         $year_arr                           =$ArrayFunction->year_arr;
         $country                            =Country::where('status_active',1)->get();
 
@@ -24,72 +27,96 @@ class AccountSetupController extends Controller
         foreach ($country as $key => $value) {
             $country_arr[$value->id]        =$value->country_name;
             $country_code_arr[$value->id]   =$value->country_code;
-        }
-
+        }     
 
         $data['country_arr']                =$country_arr;
         $data['row_status']                 =$row_status;
-        $data['user_type_arr']              =$user_type_arr;
+      
         $data['year_arr']                   =$year_arr;
         $project_id                         = \Auth::user()->project_id;
         $user_id                            = \Auth::user()->id;
+
+
+        $key_position_lavel=keyPositionLavel::where('status_active',1)
+                                    ->whereIn('project_id',[0,$project_id])
+                                    ->where('page_id',1)
+                                    ->get();
+        foreach ($key_position_lavel as $key => $value) {
+            $key_position_lavel_arr[$value->id]['reference_id']        =$value->id;
+            $key_position_lavel_arr[$value->id]['reference_value']     =$value->field_name;
+            $key_position_lavel_arr[$value->id]['key_position_name']   ='';
+            $key_position_lavel_arr[$value->id]['office_phone']        ='';
+            $key_position_lavel_arr[$value->id]['email']               ='';
+            $key_position_lavel_arr[$value->id]['id']                  ='';
+        }
+
+
+
+        $key_position_lavel=keyPosition::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('page_id',1)
+                                    ->get();
+        
+        foreach ($key_position_lavel as $key => $value) {
+            $key_position_lavel_arr[$value->reference_id]['reference_id']        =$value->reference_id;
+            $key_position_lavel_arr[$value->reference_id]['reference_value']     =$value->reference_value;
+            $key_position_lavel_arr[$value->reference_id]['key_position_name']   =$value->key_position_name;
+            $key_position_lavel_arr[$value->reference_id]['office_phone']        =$value->office_phone;
+            $key_position_lavel_arr[$value->reference_id]['email']               =$value->email;
+            $key_position_lavel_arr[$value->reference_id]['id']                  =$value->id;
+            
+        }
+      
+        $sl=0;
+        foreach ($key_position_lavel_arr as $key => $value) {
+            $key_position_lavel_temp_arr[$sl]['reference_id']        =$value['reference_id'];
+            $key_position_lavel_temp_arr[$sl]['reference_value']     =$value['reference_value'];
+            $key_position_lavel_temp_arr[$sl]['key_position_name']   =$value['key_position_name'];
+            $key_position_lavel_temp_arr[$sl]['office_phone']        =$value['office_phone'];
+            $key_position_lavel_temp_arr[$sl]['email']               =$value['email'];
+            $key_position_lavel_temp_arr[$sl]['id']                  =$value['id'];
+            $sl++;
+        }
+
+
+
+        $data['key_position_lavel_arr']        =$key_position_lavel_temp_arr;
+
         $company_data                       =AccountCompany::where('project_id',$project_id)->where('status_active',1)->get();
         $data['company_data']               =array();
         $property_code_sql=Project::where('id',$project_id)->get(['property_code']);
         $account_no=$property_code_sql[0]->property_code;
 
-         $data['account_no']                 =$account_no;
+        $data['account_no']                 =$account_no;
         foreach($company_data as $key=>$val)
         {
             $data['company_data']['id']                                         =$val->id;
-            $data['company_data']['company_logo_id']                            =$val->company_logo_id;
-            $data['company_data']['strata_management']                          =$val->strata_management;
-            $data['company_data']['coop_property']                              =$val->coop_property;
-            $data['company_data']['free_hold_management']                       =$val->free_hold_management;
-            $data['company_data']['leasehold_management']                       =$val->leasehold_management;
-            $data['company_data']['property_management']                        =$val->property_management;
+
             $data['company_data']['business_registration_number']               =$val->business_registration_number;
-            $data['company_data']['registration_date']                          =$val->registration_date;
+            $data['company_data']['business_registration_date']                 =$val->business_registration_date;
             $data['company_data']['business_registration_city']                 =$val->business_registration_city;
             $data['company_data']['business_registration_state']                =$val->business_registration_state;
-            $data['company_data']['registration_country']                       =$val->registration_country;
-            $data['company_data']['business_license_no']                        =$val->business_license_no;
-            $data['company_data']['issued_by']                                  =$val->issued_by;
+            $data['company_data']['business_registration_country']              =$val->business_registration_country;
+            $data['company_data']['business_registration_zip_code']             =$val->business_registration_zip_code;
+
+            
+            $data['company_data']['license_no']                                 =$val->license_no;
+            $data['company_data']['license_date']                               =$val->license_date;
+            $data['company_data']['license_issuer']                             =$val->license_issuer;
             $data['company_data']['license_country']                            =$val->license_country;
-            $data['company_data']['expirey_date']                               =$val->expirey_date;
+            $data['company_data']['license_expirey_date']                       =$val->license_expirey_date;
             $data['company_data']['id']                                         =$val->id;
             $data['company_data']['legal_name']                                 =$val->legal_name;
-            $data['company_data']['head_office_email']                          =$val->head_office_email;
-            $data['company_data']['head_office_fax_no']                         =$val->head_office_fax_no;
-            $data['company_data']['head_office_cell_phone']                     =$val->head_office_cell_phone;
-            $data['company_data']['head_office_website']                        =$val->head_office_website;
+            $data['company_data']['zip_code']                                   =$val->zip_code;
+            $data['company_data']['state']                                      =$val->state;
+            $data['company_data']['country']                                    =$val->country;
+            $data['company_data']['city']                                       =$val->city;
+            $data['company_data']['website']                                    =$val->website;
             $data['company_data']['contact_person_email']                       =$val->contact_person_email;
-            $data['company_data']['contact_person_fax_no']                      =$val->contact_person_fax_no;
+            $data['company_data']['position_in_company']                        =$val->position_in_company;
             $data['company_data']['contact_person_cell_phone']                  =$val->contact_person_cell_phone;
-            $data['company_data']['contact_person_website']                     =$val->contact_person_website;
-            $data['company_data']['business_number']                            =$val->business_number;
-            $data['company_data']['emp_identification_number']                  =$val->emp_identification_number;
-            $data['company_data']['payroll']                                    =$val->payroll;
-            $data['company_data']['sales_tax']                                  =$val->sales_tax;
-            $data['company_data']['income_tax']                                 =$val->income_tax;
-            $data['company_data']['import_and_export']                          =$val->import_and_export;
-            $data['company_data']['dependent_residential_suite']                =$val->dependent_residential_suite;
-            $data['company_data']['dependent_residental_parking_lot']           =$val->dependent_residental_parking_lot;
-            $data['company_data']['dependent_residental_storage_lot']           =$val->dependent_residental_storage_lot;
-            $data['company_data']['dependent_commercial_unit']                  =$val->dependent_commercial_unit;
-            $data['company_data']['dependent_commercial_parking_lot']           =$val->dependent_commercial_parking_lot;
-            $data['company_data']['dependent_commercial_storage_lot']           =$val->dependent_commercial_storage_lot;
-            $data['company_data']['independent_residential_suite']              =$val->independent_residential_suite;
-            $data['company_data']['independent_residental_parking_lot']         =$val->independent_residental_parking_lot;
-            $data['company_data']['independent_residental_storage_lot']         =$val->independent_residental_storage_lot;
-            $data['company_data']['independent_commercial_unit']                =$val->independent_commercial_unit;
-            $data['company_data']['independent_commercial_parking_lot']         =$val->independent_commercial_parking_lot;
-            $data['company_data']['independent_commercial_storage_lot']         =$val->independent_commercial_storage_lot;
-            $data['company_data']['rantal_suite_unit']                          =$val->rantal_suite_unit;
-            $data['company_data']['buy_and_sell_suite_unit']                    =$val->buy_and_sell_suite_unit;
-            $data['company_data']['rental_parking']                             =$val->rental_parking;
-            $data['company_data']['rental_storage']                             =$val->rental_storage;
-            $data['company_data']['landholders_residency']                      =$val->landholders_residency;
+            $data['company_data']['contact_person_name']                        =$val->contact_person_name;
+
         }
         return $data;
     }
@@ -100,56 +127,71 @@ class AccountSetupController extends Controller
         request()->validate([
             'legal_name'                        => 'required',
             'business_registration_number'      => 'required',
-            'registration_date'                 => 'required',
+            'business_registration_zip_code'    => 'required',
             'business_registration_city'        => 'required',
             'business_registration_state'       => 'required',
-            'registration_country'              => 'required',
-            'business_license_no'               => 'required',
-            'issued_by'                         => 'required',
-            'license_country'                   => 'required',
-            'expirey_date'                      => 'required',
-            'headoffice_street_number'          => 'required',
-            'headoffice_city'                   => 'required',
-            'headoffice_state'                  => 'required',
-            'headoffice_country'                => 'required',
+            'business_registration_country'     => 'required',
+            'license_no'                        => 'required',
+            'license_issuer'                    => 'required',
+            'license_date'                      => 'required',
+            'license_expirey_date'              => 'required',
+            'zip_code'                          => 'required',
+            'city'                              => 'required',
+            'state'                             => 'required',
+            'country'                           => 'required',
+            'website'                           =>'required',
             'contact_person_email'              => 'required',
-            'contact_person_fax_no'             => 'required',
+            'contact_person_name'               => 'required',
             'contact_person_cell_phone'         => 'required',
-            'contact_person_website'            => 'required',
-            'business_number'                   => 'required',
-            'emp_identification_number'         => 'required',
-            'payroll'                           => 'required',
-            'sales_tax'                         => 'required',
-            'income_tax'                        => 'required',
-            'import_and_export'                 => 'required',
+            'position_in_company'               => 'required',
+            
              
         ]);
-
 
 
         $user_data                              = \Auth::user();
         $user_id                                =$user_data->id;
         $project_id                             =$user_data->project_id;
+       
+        $license_date                           =date("Y-m-d",strtotime($request->input('license_date')));
+        $license_expirey_date                   =date("Y-m-d",strtotime($request->input('license_expirey_date')));
         $request->merge(['user_id'              =>$user_id]);
         $request->merge(['inserted_by'          =>$user_id]);
         $request->merge(['project_id'           =>$project_id]);
-        $registration_date                      =date("Y-m-d",strtotime($request->input('registration_date')));
-        $expirey_date                           =date("Y-m-d",strtotime($request->input('expirey_date')));
+        $request->merge(['license_date'         =>$license_date]);
+        $request->merge(['license_expirey_date' =>$license_expirey_date]);
 
-        $request->merge(['registration_date'    =>$registration_date]);
-        $request->merge(['expirey_date'         =>$expirey_date]);
-
-
-
+        //dd($request->all());
         DB::beginTransaction();
 
         $company_insert=AccountCompany::create($request->all());
 
-        $user_project=Project::find($project_id)->update(array('project_status' => 99));
+        $user_project=Project::find($project_id)->update(array('project_status' => 103));
 
+        foreach($request->key_management_list_arr as $key=>$details)
+        {
+            if($details['key_position_name']!="")
+            {
+                $data_key_position[]= array(
+                    'project_id'                =>$project_id,
+                    'page_id'                   =>1,
+                    'master_id'                 =>$company_insert->id,
+                    'reference_id'              =>$details['reference_id'],
+                    'reference_value'           =>$details['reference_value'],
+                    'office_phone'              =>$details['office_phone'],
+                    'key_position_name'         =>$details['key_position_name'],
+                    'email'                     =>$details['email'],
+                    'inserted_by'               =>$user_id,
+                );  
+            }        
+        }
+        $RId2=true;
+        if(!empty($data_key_position))
+        {
+            $RId2=keyPosition::insert($data_key_position);
+        }
 
-
-        if( $company_insert && $user_project)
+        if( $company_insert && $user_project && $RId2)
         {
            DB::commit();
            return 1;
@@ -168,30 +210,26 @@ class AccountSetupController extends Controller
     public function update(Request $request, $id)
     {
         request()->validate([
-            'legal_name'                            => 'required',
-            'business_registration_number'          => 'required',
-            'registration_date'                     => 'required',
-            'business_registration_city'            => 'required',
-            'business_registration_state'           => 'required',
-            'registration_country'                  => 'required',
-            'business_license_no'                   => 'required',
-            'issued_by'                             => 'required',
-            'license_country'                       => 'required',
-            'expirey_date'                          => 'required',
-            'head_office_email'                     => 'required',
-            'head_office_fax_no'                    => 'required',
-            'head_office_cell_phone'                => 'required',
-            'head_office_website'                   => 'required',
-            'contact_person_email'                  => 'required',
-            'contact_person_fax_no'                 => 'required',
-            'contact_person_cell_phone'             => 'required',
-            'contact_person_website'                => 'required',
-            'business_number'                       => 'required',
-            'emp_identification_number'             => 'required',
-            'payroll'                               => 'required',
-            'sales_tax'                             => 'required',
-            'income_tax'                            => 'required',
-            'import_and_export'                     => 'required',
+            'legal_name'                        => 'required',
+            'business_registration_number'      => 'required',
+            'business_registration_zip_code'    => 'required',
+            'business_registration_city'        => 'required',
+            'business_registration_state'       => 'required',
+            'business_registration_country'     => 'required',
+            'license_no'                        => 'required',
+            'license_issuer'                    => 'required',
+            'license_date'                      => 'required',
+            'license_expirey_date'              => 'required',
+            'zip_code'                          => 'required',
+            'city'                              => 'required',
+            'state'                             => 'required',
+            'country'                           => 'required',
+            'website'                           =>'required',
+            'contact_person_email'              => 'required',
+            'contact_person_name'               => 'required',
+            'contact_person_cell_phone'         => 'required',
+            'position_in_company'               => 'required',
+            
              
         ]);
 
@@ -200,21 +238,61 @@ class AccountSetupController extends Controller
         $user_id                                    =$user_data->id;
         $project_id                                 =$user_data->project_id;
         $request->merge(['updated_by'               =>$user_id]);
-        $registration_date                          =date("Y-m-d",strtotime($request->input('registration_date')));
-        $expirey_date                               =date("Y-m-d",strtotime($request->input('expirey_date')));
+        $license_date                           =date("Y-m-d",strtotime($request->input('license_date')));
+        $license_expirey_date                   =date("Y-m-d",strtotime($request->input('license_expirey_date')));
 
-        $request->merge(['registration_date'        =>$registration_date]);
-        $request->merge(['expirey_date'             =>$expirey_date]);
+        $request->merge(['license_date'         =>$license_date]);
+        $request->merge(['license_expirey_date' =>$license_expirey_date]);
         DB::beginTransaction();
 
         $company_update                             =AccountCompany::find($id)->update($request->all());
 
+        foreach($request->key_management_list_arr as $key=>$details)
+        {
+            if($details['key_position_name']!="")
+            {
+                if($details['id']!="")
+                {
+                    $key_position_data= array(
+                        'project_id'                =>$project_id,
+                        'page_id'                   =>1,
+                        'master_id'                 =>$id,
+                        'reference_id'              =>$details['reference_id'],
+                        'reference_value'           =>$details['reference_value'],
+                        'office_phone'              =>$details['office_phone'],
+                        'key_position_name'         =>$details['key_position_name'],
+                        'email'                     =>$details['email'],
+                        'updated_by'                =>$user_id,
+                    ); 
 
-        
+                    $RId4=keyPosition::where('id',"=",$details['id'])->update($key_position_data);
 
+                }
+                else{
 
+                    $data_key_position[]= array(
+                        'project_id'                =>$project_id,
+                        'page_id'                   =>1,
+                        'master_id'                 =>$id,
+                        'reference_id'              =>$details['reference_id'],
+                        'reference_value'           =>$details['reference_value'],
+                        'office_phone'              =>$details['office_phone'],
+                        'key_position_name'         =>$details['key_position_name'],
+                        'email'                     =>$details['email'],
+                        'inserted_by'               =>$user_id,
+                    );
 
-        if($company_update)
+                }  
+            }        
+        }
+        $RId2=true;
+        if(!empty($data_key_position ))
+        {
+            $RId2=keyPosition::insert($data_key_position);
+        }
+    
+
+        if($company_update && $RId2)
         {
            DB::commit();
            return 1;

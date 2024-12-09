@@ -541,7 +541,7 @@
 </style>
 
 <script>
-    import Vue from 'vue';
+    import {ref} from "vue";
     import VueTimepicker from 'vue2-timepicker';
     import 'vue2-timepicker/dist/VueTimepicker.css';
     //import { jsPDF } from "jspdf";
@@ -740,7 +740,7 @@
                         }
                     })
                     .catch(()=>{
-                       Swal("failed!","there was some wrong","warning");
+                       showAlert("failed!","there was some wrong","warning");
                 
                     });
             },
@@ -751,10 +751,7 @@
                     var response_data=data.split("**");
                     if(response_data[0]==1)
                     {
-                        toast({
-                            type: 'success',
-                            title: 'Data Save successfully'
-                        });
+                        showToast('Data Update Successfully', 'success');
                     
                         this.form.reset();
                         this.form.reset();
@@ -766,10 +763,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }
                     
                     
@@ -794,7 +788,7 @@
                       this.form.delete('/CompanyProfiles/'+this.form.id).then(()=>{
                         
                           if(result.value) {
-                               Swal(
+                               showAlert(
                                 'Deleted!',
                                 'Your Company has been deleted.',
                                 'success'
@@ -804,7 +798,7 @@
                           }            
 
                       }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                   });
                
               })

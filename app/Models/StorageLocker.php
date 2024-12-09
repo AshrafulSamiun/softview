@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StorageLocker extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'project_id','master_id','details_id','item_id','system_prefix','system_no','uom', 'item_size',  'item_name',
         'property_name','allocated','storage_type_1','storage_type_2','storage_type_3','storage_type_4','storage_type_5','storage_type_6',

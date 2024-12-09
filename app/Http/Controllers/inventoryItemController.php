@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\InventoryItem;
-use App\Models\TaxType as TaxType;
 use Illuminate\Http\Request;
+use App\Models\AccountType as AccountType;
+use App\Models\TaxType as TaxType;
+use App\Models\taxTypeInitial;
+use App\Models\inventoryItem;
+use App\Classes\ArrayFunction as ArrayFunction;
 use Illuminate\Support\Facades\DB;
 
 
@@ -96,7 +98,7 @@ class inventoryItemController extends Controller
         $item_category              =$ArrayFunction->item_category;
         $unit_of_measurement        =$ArrayFunction->unit_of_measurement;
        
-        $inventory_item_data=InventoryItem::where('project_id',$project_id)
+        $inventory_item_data=inventoryItem::where('project_id',$project_id)
                                         ->get();
 
         $sl=0;
@@ -207,7 +209,7 @@ class inventoryItemController extends Controller
 
         
 
-        $max_system_data = InventoryItem::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from account_types where  project_id=".$project_id." ) and project_id=".$project_id)->get(['system_prefix']);
+        $max_system_data = inventoryItem::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from account_types where  project_id=".$project_id." ) and project_id=".$project_id)->get(['system_prefix']);
                               
         if(count($max_system_data)>0)
         {
@@ -223,7 +225,7 @@ class inventoryItemController extends Controller
         $request->merge(['system_prefix'           =>$max_system_prefix]);
 
         DB::beginTransaction();
-        $inventory_item_info= InventoryItem::create($request->all());
+        $inventory_item_info= inventoryItem::create($request->all());
 
 
 
@@ -305,7 +307,7 @@ class inventoryItemController extends Controller
             }
         }
 
-        $inventory_data=InventoryItem::where('status_active',1)
+        $inventory_data=inventoryItem::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('id',$id)
                                     ->first();
@@ -367,7 +369,7 @@ class inventoryItemController extends Controller
        
 
         DB::beginTransaction();
-        $inventory_item_info= InventoryItem::find($id)->update($request->all());
+        $inventory_item_info= inventoryItem::find($id)->update($request->all());
 
 
 
@@ -395,7 +397,7 @@ class inventoryItemController extends Controller
         $user_data = \Auth::user();
         $user_id=$user_data->id;
         DB::beginTransaction();
-        $inventory_item_info= InventoryItem::find($id)->update(['updated_by'=>$user_id,'status_active'=>0,'is_deleted'=>1]);
+        $inventory_item_info= inventoryItem::find($id)->update(['updated_by'=>$user_id,'status_active'=>0,'is_deleted'=>1]);
 
 
 

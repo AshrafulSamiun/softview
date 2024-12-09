@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Sales;
 
-use App\Classes\ArrayFunction as ArrayFunction;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+
 use App\Models\AccountHolder;
 use App\Models\Country as Country;
+use App\Classes\ArrayFunction as ArrayFunction;
 use App\Models\Sale;
-use App\Models\SaleCharge;
-use App\Models\SaleChargeBreakdown;
 use App\Models\SaleDetails;
-use Illuminate\Http\Request;
+use App\Models\SaleChargeBreakdown;
+use App\Models\SaleCharge;
+
 use Illuminate\Support\Facades\DB;
 
 class SalesOfferController extends Controller

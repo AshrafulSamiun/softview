@@ -73,12 +73,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
-	
-
-	
-
-
+	import {ref} from "vue";
     export default {
         name:'list-product-categories',
        
@@ -90,7 +85,6 @@
             	form:new Form({
             		account_no:'',
                   	id:''
-
             	}),
       
 			}

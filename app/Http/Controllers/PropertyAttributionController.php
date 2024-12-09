@@ -2,24 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\AccountCompany as AccountCompany;
-use App\Models\BikeStall;
-use App\Models\BuildingInfo as BuildingInfo;
+use Illuminate\Http\Request;
+use App\Models\Floor as Floor;
+use App\Models\company;
+use App\Models\customer;
+use App\Models\buildingInfo as BuildingInfo;
+use App\Models\BuildingPropertyDetails as BuildingPropertyDetails;
+use App\Models\SubroomsList as SubroomsList;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
+use App\Models\ResidentialSuite;
 use App\Models\CommercialUnit;
-use App\Models\CommonAreaDetails;
-use App\Models\Company;
-use App\Models\Customer;
-use App\Models\MailBox;
+use App\Models\ParkingLot;
+use App\Models\ParkingLevel;
+use App\Models\BuildingManagementType;
 use App\Models\ParkingStall;
+use App\Models\BikeStall;
+use App\Models\StorageLocker;
+use App\Models\MailBox;
+use App\Models\CommonAreaDetails;
+use App\Models\UomSetting;
+use App\Models\StorageStallDetails;
+use App\Models\AccountCompany as AccountCompany;
 use App\Models\PropertyAttribution;
 use App\Models\PropertyAttributionDetails;
-use App\Models\ResidentialSuite;
-use App\Models\StorageLocker;
 use App\Models\SupportingRoomDetails;
-use App\Models\UomSetting;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class PropertyAttributionController extends Controller
 {
@@ -49,7 +57,7 @@ class PropertyAttributionController extends Controller
         $data['main_company_arr']        =$main_company_arr;
 
         //===================Company==========================================
-        $company_list               =Company::where('status_active',1)
+        $company_list               =company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -60,7 +68,7 @@ class PropertyAttributionController extends Controller
 
 
         //===================Customer==========================================
-        $customer_list              =Customer::where('status_active',1)
+        $customer_list              =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->whereNull('company_id')
@@ -98,7 +106,7 @@ class PropertyAttributionController extends Controller
         
 
         //===================Company==========================================
-        $company_list               =Company::where('status_active',1)
+        $company_list               =company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -106,7 +114,7 @@ class PropertyAttributionController extends Controller
             $company_arr[$value->id]=$value->legal_name;
         }
         //===================Customer==========================================
-        $customer_list              =Customer::where('status_active',1)
+        $customer_list              =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->get();
@@ -1160,7 +1168,7 @@ class PropertyAttributionController extends Controller
         $data['main_company_arr']        =$main_company_arr;
 
         //===================Company==========================================
-        $company_list               =Company::where('status_active',1)
+        $company_list               =company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -1171,7 +1179,7 @@ class PropertyAttributionController extends Controller
 
 
         //===================Customer==========================================
-        $customer_list_query        =Customer::where('status_active',1)
+        $customer_list_query        =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1);
 

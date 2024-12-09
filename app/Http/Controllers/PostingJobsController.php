@@ -1,11 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Country as Country;
-use App\Models\NewPostingJob as NewPostingJob;
 use Illuminate\Http\Request;
+use App\Models\AccountCompany as AccountCompany;
+use App\Models\AccountContactPerson as AccountContactPerson;
 use Illuminate\Support\Facades\DB;
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\Country as Country;
+use App\Models\Project as Project;
+use App\Models\NewPostingJob as NewPostingJob;
 
+ 
 
 class PostingJobsController extends Controller
 {

@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Company extends Model
+class company extends Model
 {
-    use HasFactory;
-
     protected $fillable = ['account_no','project_id','account_prefix','scope_of_operation','legal_name','business_registration_number',
                     'registration_date','business_registration_city','business_registration_state','registration_country',
                     'business_license_no','issued_by','license_state','license_country','expirey_date','headoffice_house_number',

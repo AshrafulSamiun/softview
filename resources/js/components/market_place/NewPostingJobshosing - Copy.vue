@@ -1787,7 +1787,7 @@
 </template>
 
 <script>
-	import Vue from 'vue'; 
+	import {ref} from "vue"; 
     export default {
         name:'list-product-categories',
        
@@ -2047,16 +2047,13 @@
 					       //success
 					     
 					
-							toast({
-							  type: 'success',
-							  title: 'Data Update Successfully'
-							});
+							showToast('Data Update Successfully', 'success');
 					
 					     this.form.reset ();
 					     this.fetchNewPostingJobs();
 				    })
 				    .catch(()=>{
-					   Swal("failed!","there was some wrong","warning");
+					   showAlert("failed!","there was some wrong","warning");
 				
 				    });
             },

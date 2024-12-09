@@ -54,7 +54,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatePicker from 'vue2-datepicker';
 
 

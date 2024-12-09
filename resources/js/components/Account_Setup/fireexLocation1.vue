@@ -282,7 +282,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatatableFactory from 'vuejs-datatable';	
 	Vue.use(DatatableFactory);
 	//var eventBus = new Vue();
@@ -403,16 +403,13 @@
 					      $('.modal.in').modal('hide');
 					      $('.modal-backdrop').remove() ;
 					
-							toast({
-							  type: 'success',
-							  title: 'Data Update Successfully'
-							});
+							showToast('Data Update Successfully', 'success');
 					
 					     this.form.reset ();
 					     this.fetchFireExtinguisher();
 				    })
 				    .catch(()=>{
-					   Swal("failed!","there was some wrong","warning");
+					   showAlert("failed!","there was some wrong","warning");
 				
 				    });
             },
@@ -448,7 +445,7 @@
 	                  this.form.delete('/FireExtinguisherLocations/'+id).then(()=>{
 	                    
 	                      if(result.value) {
-	                           Swal(
+	                           showAlert(
 	                            'Deleted!',
 	                            'Your file has been deleted.',
 	                            'success'
@@ -457,7 +454,7 @@
 	                      }            
 
 	                  }).catch(()=>{
-	                    Swal("failed!","there was some wrong","warning");
+	                    showAlert("failed!","there was some wrong","warning");
 	              });
                
               })

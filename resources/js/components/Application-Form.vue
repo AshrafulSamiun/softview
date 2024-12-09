@@ -327,7 +327,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import VueTimepicker from 'vue2-timepicker';
     import 'vue2-timepicker/dist/VueTimepicker.css';
     //import { jsPDF } from "jspdf";
@@ -557,7 +557,7 @@
                         }
 				    })
 				    .catch(()=>{
-					   Swal("failed!","there was some wrong","warning");
+					   showAlert("failed!","there was some wrong","warning");
 				
 				    });
             },
@@ -580,10 +580,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }
         	    })
             },
@@ -672,7 +669,7 @@
                       this.form.delete('/ApplicationForms/'+this.form.id).then(()=>{
                         
                           if(result.value) {
-                               Swal(
+                               showAlert(
                                 'Deleted!',
                                 'Your Company has been deleted.',
                                 'success'
@@ -682,7 +679,7 @@
                           }            
 
                       }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                   });
                
               })

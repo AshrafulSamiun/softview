@@ -300,7 +300,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	
 
 	

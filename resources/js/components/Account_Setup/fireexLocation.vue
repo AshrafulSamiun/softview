@@ -259,7 +259,7 @@
                       this.form.delete('/Lockers/'+id).then(()=>{
                         
                           if(result.value) {
-                               Swal(
+                               showAlert(
                                 'Deleted!',
                                 'Your file has been deleted.',
                                 'success'
@@ -268,7 +268,7 @@
                           }            
 
                       }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                   });
                
               })

@@ -22,7 +22,7 @@
 </template>
 	
     <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatatableFactory from 'vuejs-datatable';	
 	Vue.use(DatatableFactory);
 	var eventBus = new Vue();

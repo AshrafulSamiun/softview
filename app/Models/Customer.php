@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class customer extends Model
 {
-    use HasFactory;
-
     protected $fillable = ['page_id', 'project_id', 'system_prefix','system_no', 'account_no', 'scope_of_operation',
      'customer_type','company_id','account_status', 'status_date', 'acount_reason','account_comments','legal_name',
      'operational_name', 'headoffice_house_number', 'headoffice_street_number','headoffice_city', 'headoffice_state', 'headoffice_country',

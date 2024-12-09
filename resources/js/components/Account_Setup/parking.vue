@@ -202,10 +202,7 @@
 					      $('.modal.in').modal('hide');
 					      $('.modal-backdrop').remove() ;
 					
-							toast({
-							  type: 'success',
-							  title: 'Data Update Successfully'
-							});
+							showToast('Data Update Successfully', 'success');
 					
 					     this.form.reset ();
 					     this.fetchParkings();
@@ -247,7 +244,7 @@
                       this.form.delete('/Parkings/'+id).then(()=>{
                         
                           if(result.value) {
-                               Swal(
+                               showAlert(
                                 'Deleted!',
                                 'Your file has been deleted.',
                                 'success'
@@ -256,7 +253,7 @@
                           }            
 
                       }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                   });
                
               })

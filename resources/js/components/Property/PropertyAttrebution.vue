@@ -1083,7 +1083,7 @@
 </style>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatePicker from 'vue2-datepicker';
     import VueTimepicker from 'vue2-timepicker';
     import 'vue2-timepicker/dist/VueTimepicker.css'
@@ -1777,7 +1777,7 @@
                         else
                         {
 
-                            Swal("failed!","Allocated Size Must be Less than or Equal to Available Size.","warning");
+                            showAlert("failed!","Allocated Size Must be Less than or Equal to Available Size.","warning");
                             self.form.total_common_area=self.form.total_common_area-item.previous_allocated*1+item.actual_allocated*1;
                             item.previous_allocated=item.actual_allocated*1;
                             item.available=item.available_actual*1;
@@ -1832,7 +1832,7 @@
                         }
                         else
                         {
-                            Swal("failed!","Allocated Size Must be Less than or Equal to Available Size.","warning");
+                            showAlert("failed!","Allocated Size Must be Less than or Equal to Available Size.","warning");
                             self.form.total_supporting_area=self.form.total_supporting_area-item.previous_allocated*1+item.actual_allocated*1;
                             item.previous_allocated=item.actual_allocated*1;
                             item.available=item.available_actual*1;
@@ -2055,7 +2055,7 @@
                     this.form.delete('/PropertyAttributions/'+id).then(()=>{
                         
                         if(result.value) {
-                            Swal(
+                            showAlert(
                                 'Deleted!',
                                 'Your Data has been deleted.',
                                 'success'
@@ -2065,7 +2065,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                
                 })
@@ -2088,7 +2088,7 @@
                     this.form.delete('/PropertyAttributions/'+this.form.id).then(()=>{
                         
                         if(result.value) {
-                            Swal(
+                            showAlert(
                                 'Deleted!',
                                 'Your Data has been deleted.',
                                 'success'
@@ -2098,7 +2098,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                
                 })
@@ -2113,10 +2113,7 @@
 					var response_data=data.split("**");
                     if(response_data[0]==1)
                     {
-                         toast({
-                            type: 'success',
-                            title: 'Data Update Successfully'
-                        });
+                         showToast('Data Update Successfully', 'success');
 
                         
                         this.editPropertyAttribution(response_data[1]);
@@ -2125,10 +2122,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }
                 });
             },
@@ -2139,10 +2133,7 @@
                     var response_data=data.split("**");
                     if(response_data[0]==1)
                     {
-                         toast({
-                            type: 'success',
-                            title: 'Data Save Successfully'
-                        });
+                         showToast('Data Update Successfully', 'success');
 
                         if(type==1)
                         {
@@ -2162,10 +2153,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }                    
                 })
             },            

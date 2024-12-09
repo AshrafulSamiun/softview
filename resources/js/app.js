@@ -12,13 +12,15 @@ import { Form } from 'vform';
 window.Form=Form;
 
 import Swal from 'sweetalert2';
-const toast = Swal.mixin({
-    toast: true,
-    position: 'center',
-    showConfirmButton: false,
-    timer: 3000
-});
-window.toast=toast;
+window.Swal = Swal;
+
+window.showAlert = function (title,text,icon) {
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: icon
+    });
+};
 
 window.showToast = function (message, icon = 'success') {
     Swal.fire({
@@ -27,10 +29,29 @@ window.showToast = function (message, icon = 'success') {
         title: message,
         position: 'top-end',
         showConfirmButton: false,
-        timer: 3000,
+        timer: 1500,
         timerProgressBar: true,
     });
 };
+
+window.toast = function (icon, title) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    Toast.fire({
+        icon: icon,
+        title: title
+    });
+}
 
 import $ from 'jquery';
 window.$ = $;

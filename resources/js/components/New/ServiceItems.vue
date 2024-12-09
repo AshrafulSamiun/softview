@@ -330,7 +330,7 @@
 </style>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatePicker from 'vue2-datepicker';
     import VueTimepicker from 'vue2-timepicker';
     import 'vue2-timepicker/dist/VueTimepicker.css'
@@ -464,10 +464,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                         return;
                     }
                 });             
@@ -582,7 +579,7 @@
                     this.form.delete('/ServiceItems/'+id).then(()=>{
                         
                         if(result.value) {
-                            Swal(
+                            showAlert(
                                 'Deleted!',
                                 'Your Data has been deleted.',
                                 'success'
@@ -592,7 +589,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                
                 })
@@ -613,7 +610,7 @@
                     this.form.delete('/ServiceItems/'+this.form.id).then(()=>{
                         
                         if(result.value) {
-                            Swal(
+                            showAlert(
                                 'Deleted!',
                                 'Your Data has been deleted.',
                                 'success'
@@ -623,7 +620,7 @@
                         }            
 
                     }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                     });
                
                 })
@@ -638,10 +635,7 @@
 					var response_data=data.split("**");
                     if(response_data[0]==1)
                     {
-                         toast({
-                            type: 'success',
-                            title: 'Data Update Successfully'
-                        });
+                         showToast('Data Update Successfully', 'success');
 
                         
                         this.editTax(response_data[1]);
@@ -650,10 +644,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }
                 });
             },
@@ -664,10 +655,7 @@
                     var response_data=data.split("**");
                     if(response_data[0]==1)
                     {
-                         toast({
-                            type: 'success',
-                            title: 'Data Save Successfully'
-                        });
+                         showToast('Data Update Successfully', 'success');
 
                         if(type==1)
                         {
@@ -687,10 +675,7 @@
                     }
                     else{
 
-                        toast({
-                            type: 'danger',
-                            title: 'Invalid Operation'
-                        });
+                        showToast("there was some wrong","warning");
                     }                    
                 })
             },            

@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BuildingInfo as BuildingInfo;
+use Illuminate\Http\Request;
 use App\Models\Floor as Floor;
+use App\Models\company;
+use App\Models\customer;
+use App\Models\buildingInfo as BuildingInfo;
+use App\Models\BuildingPropertyDetails as BuildingPropertyDetails;
+use App\Models\SubroomsList as SubroomsList;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
 use App\Models\MailBox;
 use App\Models\MailRoom;
-use App\Models\SubroomsListDetails as SubroomsListDetails;
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\DB;
 
 class MailRoomController extends Controller
@@ -17,24 +22,39 @@ class MailRoomController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
         //===================Company==========================================
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
+        $data['company_arr']        =$company_arr;
 
-            return  20;
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->whereNull('company_id')
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
         }
+
+        $data['customer_arr']        =$customer_arr;
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
+                                    ->whereNull('company_name')
+                                    ->whereNull('customer_name')
                                     ->get(['id','building_no','building_name']);
 
         //===================Building==========================================
@@ -52,24 +72,34 @@ class MailRoomController extends Controller
     }
 
 
-    public function MailRoomLits( request $request)
+    public function MailRoomLits()
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
 
-            return  20;
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
         }
 
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
                                     ->get(['id','building_no','building_name']);
 
         //===================Building==========================================
@@ -99,6 +129,7 @@ class MailRoomController extends Controller
         $mail_room_list=MailRoom::where('status_active',1)
                                         ->where('project_id',$project_id)
                                         ->get();
+                                        //dd($mail_room_list);die;
 
 
 
@@ -115,7 +146,28 @@ class MailRoomController extends Controller
             $data['mail_room_list'][$key]['mailroom_size_qty']   =$value->mailroom_size_qty;
             $data['mail_room_list'][$key]['room_no']             =$value->room_no;
             $data['mail_room_list'][$key]['room_name']           =$value->room_name;
-           
+
+            if($value->company_name>0)
+            {
+                $data['mail_room_list'][$key]['company_name']     =$company_arr[$value->company_name];
+
+            }
+            else
+            {
+                $data['mail_room_list'][$key]['company_name']      ="";
+
+            }
+
+            if($value->customer_name>0)
+            {
+                $data['mail_room_list'][$key]['customer_name']     =$customer_arr[$value->customer_name];
+
+            }
+            else
+            {
+                $data['mail_room_list'][$key]['customer_name']      ="";
+
+            }
 
             if($value->building_name>0)
             {
@@ -202,48 +254,50 @@ class MailRoomController extends Controller
         $subrooms_list_arr=array();
         $total_mail_box=0;
         $sl=0;
- 
-        $subrooms_details               =SubroomsListDetails::where('status_active',1)
-                                        ->where('item_type',6)
-                                        ->where('master_id',$floor_id)
-                                        ->where('property_no',$room_no)
-                                        ->get(['id','item_qty','item_name','item_id']);
+ //dd($inserted_mail_room);
+       // if(empty($inserted_mail_room))
+      //  {
 
-        foreach ($subrooms_details as $key => $value) {
-            $total_mail_box=$value->item_qty;
-            if($value->item_qty>1)
-            {
-                for($i=1;$i<=$value->item_qty;$i++)
+            $subrooms_details               =SubroomsListDetails::where('status_active',1)
+                                            ->where('item_type',6)
+                                            ->where('master_id',$floor_id)
+                                            ->where('property_no',$room_no)
+                                            ->get(['id','item_qty','item_name','item_id']);
+
+          //  dd($subrooms_details);     
+            foreach ($subrooms_details as $key => $value) {
+                $total_mail_box=$value->item_qty;
+                if($value->item_qty>1)
                 {
-                    $subrooms_list_arr[$sl]['item_name']     =$value->item_name."-".str_pad($i,2,"0",STR_PAD_LEFT);
-                    $subrooms_list_arr[$sl]['item_id']       =$value->item_id;
+                    for($i=1;$i<=$value->item_qty;$i++)
+                    {
+                        $subrooms_list_arr[$sl]['item_name']     =$value->item_name."-".str_pad($i,2,"0",STR_PAD_LEFT);
+                        $subrooms_list_arr[$sl]['item_id']       =$value->item_id;
+                        $subrooms_list_arr[$sl]['comments']      =$value->comments;
+                        $subrooms_list_arr[$sl]['id']            ="";
+                        $subrooms_list_arr[$sl]['details_id']    =$value->id;
+                        $subrooms_list_arr[$sl]['item_size']     ="";
+                        $subrooms_list_arr[$sl]['disable']       =false;
+                        $subrooms_list_arr[$sl]['uom']           =1;
+                        $sl++;
+                    }
+                }
+                else 
+                {
+                    $subrooms_list_arr[$sl]['item_name']     =$value->item_name;
                     $subrooms_list_arr[$sl]['comments']      =$value->comments;
+                    $subrooms_list_arr[$sl]['item_id']       =$value->item_id;
                     $subrooms_list_arr[$sl]['id']            ="";
-                    $subrooms_list_arr[$sl]['property_name'] ="";
                     $subrooms_list_arr[$sl]['details_id']    =$value->id;
                     $subrooms_list_arr[$sl]['item_size']     ="";
                     $subrooms_list_arr[$sl]['disable']       =false;
                     $subrooms_list_arr[$sl]['uom']           =1;
                     $sl++;
                 }
-            }
-            else 
-            {
-                $subrooms_list_arr[$sl]['item_name']     =$value->item_name;
-                $subrooms_list_arr[$sl]['comments']      =$value->comments;
-                $subrooms_list_arr[$sl]['item_id']       =$value->item_id;
-                $subrooms_list_arr[$sl]['id']            ="";
-                $subrooms_list_arr[$sl]['property_name'] ="";
-                $subrooms_list_arr[$sl]['details_id']    =$value->id;
-                $subrooms_list_arr[$sl]['item_size']     ="";
-                $subrooms_list_arr[$sl]['disable']       =false;
-                $subrooms_list_arr[$sl]['uom']           =1;
-                $sl++;
-            }
 
-            $subrooms_list_check[$value->item_id]=$value->item_id;
-        }
-          
+                $subrooms_list_check[$value->item_id]=$value->item_id;
+            }
+       // }   
 
         $data['total_mail_box']        =$total_mail_box;
         $data['subrooms_list_arr']     =$subrooms_list_arr;
@@ -276,25 +330,15 @@ class MailRoomController extends Controller
             'room_name'             => 'required',
             'room_uom'              => 'required',
             'mailroom_size_qty'     => 'required',
-            'strata_lot_no'         => 'required',
         ]);
 
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return  20;
-        }
 
         $user_data = \Auth::user();
         $user_id=$user_data->id;
         $project_id=$user_data->project_id;
-        $request->merge(['user_id'          =>$user_id]);
-        $request->merge(['inserted_by'      =>$user_id]);
-        $request->merge(['project_id'       =>$project_id]);
-        $request->merge(['company_name'     =>$company_id]);
+        $request->merge(['user_id' =>$user_id]);
+        $request->merge(['inserted_by' =>$user_id]);
+        $request->merge(['project_id' =>$project_id]);
 
         $max_system_data = MailRoom::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from mail_rooms 
             where building_name=".$request->input('building_name')."  and project_id=".$project_id." ) 
@@ -389,23 +433,20 @@ class MailRoomController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id, Request $request)
+    public function edit($id)
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        $user_type                  = $user->user_type;
-        $data['user_type']          =$user_type;
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
-
-            return  20;
-        }
-        
+        $data['company_arr']        =$company_arr;
 
         $mail_room=MailRoom::where('status_active',1)
                                     ->where('project_id',$project_id)
@@ -417,14 +458,52 @@ class MailRoomController extends Controller
         $building_id    =$mail_room->building_name;
         $floor_id       =$mail_room->floor_no;
         $mail_room_id   =$mail_room->id;
+        //dd($company_id);die;
 
-        
-
-        $building_list        =BuildingInfo::where('status_active',1)
+        //===================Customer==========================================
+        $customer_list_query        =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
-                                    ->get(['id','building_no','building_name']);
-       
+                                    ->where('customer_type',1);
+
+        if($company_id)
+        {
+            $customer_list_query->where('company_id',$company_id);
+        }
+        else{
+
+            $customer_list_query ->whereNull('company_id');
+        }
+
+        $customer_list=$customer_list_query->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
+        }
+
+        $data['customer_arr']        =$customer_arr;
+
+
+
+
+        $building_list_query        =BuildingInfo::where('status_active',1)
+                                    ->where('project_id',$project_id);
+        if($company_id)
+        {
+            $building_list_query->where('company_name',$company_id);
+        }
+        else{
+            $building_list_query ->whereNull('company_name');
+        }
+
+        if($customer_id)
+        {
+            $building_list_query->where('customer_name',$customer_id);
+        }
+        else{
+            $building_list_query ->whereNull('customer_name');
+        }
+
+        $building_list=$building_list_query->get(['id','building_no','building_name']);
 
         //===================Building==========================================
 
@@ -522,7 +601,6 @@ class MailRoomController extends Controller
             'room_name'             => 'required',
             'room_uom'              => 'required',
             'mailroom_size_qty'     => 'required',
-            'strata_lot_no'     => 'required',
         ]);
 
         
@@ -539,10 +617,11 @@ class MailRoomController extends Controller
                                         ->where('master_id',$id)
                                         ->select(DB::raw('Max(system_prefix) as max_system_prefix'))
                                         ->get();
-
+                                        //dd($max_mailbox_prefix_sql);
         $max_system_prefix=$request->input('system_prefix');
         $max_mailbox_prefix=$max_mailbox_prefix_sql[0]->max_system_prefix;
 
+                                       // dd($max_mailbox_prefix);die;
         DB::beginTransaction();
         $data_mail_room= MailRoom::find($id)->update($request->all());
         $data_subrooms_list_details="";
@@ -638,6 +717,9 @@ class MailRoomController extends Controller
         $mail_box_delete=MailBox::where('master_id',$id)
                                     ->update(array('status_active' => 2,'is_deleted' => 1,'updated_by' =>$user_id));
 
+        
+        
+
 
         if( $mail_room_delete && $mail_box_delete )
         {
@@ -652,183 +734,5 @@ class MailRoomController extends Controller
         die;
 
         
-    }
-
-    public function post(Request $request,$id)
-    {
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>$request->input("posting_status"),
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=MailRoom::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-    public function adjust(Request $request, $id)
-    {
-        request()->validate([
-            'building_name'         => 'required',
-            'floor_no'              => 'required',
-            'property_name'         => 'required',
-            'room_no'               => 'required',
-            'room_name'             => 'required',
-            'room_uom'              => 'required',
-            'mailroom_size_qty'     => 'required',
-            'strata_lot_no'     => 'required',
-        ]);
-
-        
-
-
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id;
-        $request->merge(['user_id'          =>$user_id]);
-        $request->merge(['updated_by'       =>$user_id]);
-        $request->merge(['project_id'       =>$project_id]);
-        $request->merge(['posting_status'   =>3]);
-
-        $max_mailbox_prefix_sql     =MailBox::where('status_active',1)
-                                        ->where('master_id',$id)
-                                        ->select(DB::raw('Max(system_prefix) as max_system_prefix'))
-                                        ->get();
-
-        $max_system_prefix=$request->input('system_prefix');
-        $max_mailbox_prefix=$max_mailbox_prefix_sql[0]->max_system_prefix;
-
-        DB::beginTransaction();
-        $data_mail_room= MailRoom::find($id)->update($request->all());
-        $data_subrooms_list_details="";
-        foreach($request->subrooms_list_arr as $key=>$details)
-        {
-                      
-            if($details['disable']==false)
-            {
-                if($details['id']!="")
-                {
-                    $subrooms_list_details_data= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'details_id'                =>$details['details_id'],
-                        'uom'                       =>$details['uom'],
-                        'item_size'                 =>$details['item_size'],
-                        'item_name'                 =>$details['item_name'],
-                        'property_name'             =>$details['property_name'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $subroomData=MailBox::where('id',"=",$details['id'])->update($subrooms_list_details_data);
-                    if( !$subroomData)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else
-                {
-                    $max_mailbox_prefix++;
-                    $mailbox_system_no="MLB-".str_pad($max_system_prefix, 3, 0, STR_PAD_LEFT).str_pad($max_mailbox_prefix, 4, 0, STR_PAD_LEFT);
-                    $data_subrooms_list_details[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$mailroom_info->id,
-                        'system_prefix'             =>$max_mailbox_prefix,
-                        'system_no'                 =>$mailbox_system_no,
-                        'item_id'                   =>$details['item_id'],
-                        'details_id'                =>$details['details_id'],
-                        'uom'                       =>$details['uom'],
-                        'item_size'                 =>$details['item_size'],
-                        'item_name'                 =>$details['item_name'],
-                        'property_name'             =>$details['property_name'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-                }
-            }
-                   
-        } 
-
-
-        $RId1=true;
-        $RId2=true;
-        if(!empty($data_subrooms_list_details))
-        {
-            $RId1=MailBox::insert($data_subrooms_list_details);
-        }
-        if($data_mail_room  && $RId1)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-
-
-    public function repost(Request $request,$id)
-    {
-
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>4,
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=MailRoom::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
     }
 }

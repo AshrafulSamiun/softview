@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Notifications\SendPinCode;
 use App\Notifications\SendUserName;
-use Illuminate\Http\Request;
+use App\Notifications\SendPinCode;
+
 
 
 class SendsUserNameController extends Controller

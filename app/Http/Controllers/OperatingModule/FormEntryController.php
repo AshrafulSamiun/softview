@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\OperatingModule;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Http\Controllers\Controller;
-use App\Models\FormEntry;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\FormEntry;
 use Illuminate\Support\Facades\DB;
 
 class FormEntryController extends Controller

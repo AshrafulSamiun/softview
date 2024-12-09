@@ -1,0 +1,66 @@
+
+            <table width="1300" align="center">
+                <tr><td align="center" style="font-size:28px;" colspan="8"><img class="media-object img-circle" src="{{asset('images/bmtf_logo.png')}}" width="38" height="38"></td></tr>
+                <tr><td align="center" style="font-size:30px;" colspan="8"><b>{{$company_name}}</b></td></tr>
+                <tr><td align="center" style="font-size:30px;" colspan="8"><b>Bank Info</b></td></tr>
+                
+            </table>
+            <table width="3700" align="center" class="table">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>System No </th>
+                        <th>Bank Account No</th>
+                        <th>Bank Account Name</th>
+                        <th>Branch Name</th>
+                        <th>Chart of Accounts</th>
+                        <th>House Number </th>
+                        <th>Street Number</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Country</th>
+                        <th>Zip- Code</th>
+                        <th>Office Phone </th>
+                        <th>Mobile No </th>
+                        <th>Email </th>
+                        <th>Fax </th>
+                        <th>Website</th>
+                    </tr>
+                </thead>
+                
+               <tbody>
+
+                
+                <tr>
+                    <td><a href="http://localhost:8000/download/bank_info/14_1733031735.xls" id="download_excel"></a>
+                    </td>
+                </tr>
+                
+                @if(!empty($data['account_holder_list']))
+                    @foreach ($data['account_holder_list'] as $key => $value) 
+                        <tr>
+                            <td>{{$key+1}}</td>
+                            <td>{{$value['system_no']}} </td>
+                            <td>{{$value['bank_acount_no']}} </td>
+                            <td>{{$value['bank_account_name']}}</td>
+                            <td>{{$value['branch_name']}}</td>
+                            <td>{{$value['chart_of_acocounts']}}</td>
+                            <td>{{$value['house_number']}}</td>
+                            <td>{{$value['street_number']}}</td>
+                            <td>{{$value['city']}}</td>
+                            <td>{{$value['state']}}</td>
+                            <td>{{$value['zip_code']}} </td>
+                            <td>{{$value['office_phone']}}</td>
+                            <td>{{$value['cell_phone']}}</td>
+                            <td>{{$value['email']}}</td>
+                            <td>{{$value['fax_no']}}</td>
+                            <td>{{$value['website']}}</td>                          
+                        </tr>
+                    @endforeach
+                 @endif
+                </tbody>
+
+            </table>
+
+
+            

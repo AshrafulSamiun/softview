@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\FileUpload;
-use App\Models\Project as Project;
-use App\Models\UserCompany as userCompany;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+use Illuminate\Http\Request;
+use App\Models\userCompany as userCompany;
+use App\Models\User as User;
+use App\Models\Project as Project;
+use App\Models\FileUpload;
 use Intervention\Image\Facades\Image;
 
 class UserCompanyController extends Controller
@@ -22,7 +24,7 @@ class UserCompanyController extends Controller
             //'company_logo' => 'required',
             'website' => 'required',
         ]);
-//echo "sdfsdfsdf";die;
+            //echo "sdfsdfsdf";die;
     	$user_info 	= \Auth::user();
     	$project_id = $user_info->project_id;
     	$user_id 	= $user_info->id;
@@ -48,7 +50,7 @@ class UserCompanyController extends Controller
             $request->merge(['company_logo'     =>$image_arr->id]);  
         }
 
-        $user_company_info= UserCompany::create($request->all());
+        $user_company_info= userCompany::create($request->all());
 
 
         $user_project=Project::find($project_id)->update(array('project_name' => $legal_name,'project_status' => '99'));
@@ -124,7 +126,7 @@ class UserCompanyController extends Controller
 
        
 
-        $user_company_info= UserCompany::find($id)->update($request->all());
+        $user_company_info= userCompany::find($id)->update($request->all());
 
         $user_project=Project::find($project_id)->update(array('project_name' => $legal_name));
 

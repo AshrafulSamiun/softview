@@ -2,34 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\AccountCompany as AccountCompany;
-use App\Models\AccountHolder;
-use App\Models\BikeStall;
-use App\Models\BuildingInfo as BuildingInfo;
-use App\Models\CommercialUnit;
-use App\Models\CommonAreaDetails;
-use App\Models\Company;
+use Illuminate\Http\Request;
+use App\Models\Floor as Floor;
+use App\Models\company;
+use App\Models\customer;
 use App\Models\Country as Country;
-use App\Models\Customer;
-use App\Models\MailBox;
+use App\Models\buildingInfo as BuildingInfo;
+use App\Models\BuildingPropertyDetails as BuildingPropertyDetails;
+use App\Models\SubroomsList as SubroomsList;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
+use App\Models\ResidentialSuite;
+use App\Models\CommercialUnit;
+use App\Models\ParkingLot;
+use App\Models\ParkingLevel;
+use App\Models\BuildingManagementType;
 use App\Models\ParkingStall;
+use App\Models\BikeStall;
+use App\Models\StorageLocker;
+use App\Models\MailBox;
+use App\Models\CommonAreaDetails;
+use App\Models\UomSetting;
+use App\Models\StorageStallDetails;
+use App\Models\AccountCompany as AccountCompany;
 use App\Models\PropertyAttribution;
 use App\Models\PropertyAttributionDetails;
-use App\Models\PropertyProject;
-use App\Models\PropertyProjectAmount;
-use App\Models\PropertyProjectDuration;
-use App\Models\PropertyProjectLocation;
-use App\Models\PropertyProjectTimeline;
-use App\Models\PropPrjIncidentReport;
-use App\Models\PropPrjPaymentSchedule;
-use App\Models\ResidentialSuite;
-use App\Models\ServiceProviderInsPkg;
-use App\Models\StorageLocker;
 use App\Models\SupportingRoomDetails;
-use App\Models\UomSetting;
-use Illuminate\Http\Request;
+use App\Models\AccountHolder;
 use Illuminate\Support\Facades\DB;
+use App\Models\ServiceProviderInsPkg;
+use App\Models\PropertyProjectDuration;
+use App\Models\PropertyProjectTimeline;
+use App\Models\PropertyProjectAmount;
+use App\Models\PropPrjPaymentSchedule;
+use App\Models\PropertyProject;
+use App\Models\PropertyProjectLocation;
+
+use App\Models\PropPrjIncidentReport;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class PropertyProjectController extends Controller
 {
@@ -72,7 +81,7 @@ class PropertyProjectController extends Controller
                                             ->get();
 
         //===================Company==========================================
-        $company_list               =Company::where('status_active',1)
+        $company_list               =company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -83,7 +92,7 @@ class PropertyProjectController extends Controller
 
 
         //===================Customer==========================================
-        $customer_list              =Customer::where('status_active',1)
+        $customer_list              =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->whereNull('company_id')
@@ -141,7 +150,7 @@ class PropertyProjectController extends Controller
         
 
         //===================Company==========================================
-        $company_list               =Company::where('status_active',1)
+        $company_list               =company::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->get();
         $company_arr=array();
@@ -149,7 +158,7 @@ class PropertyProjectController extends Controller
             $company_arr[$value->id]=$value->legal_name;
         }
         //===================Customer==========================================
-        $customer_list              =Customer::where('status_active',1)
+        $customer_list              =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('customer_type',1)
                                     ->get();
@@ -1065,7 +1074,7 @@ class PropertyProjectController extends Controller
                
             }
         }
-        //dd($request->project_amount_arr);
+//dd($request->project_amount_arr);
         foreach($request->project_amount_arr as $key=>$details)
         {
             if($details['amount_before_tax'])
@@ -1128,7 +1137,7 @@ class PropertyProjectController extends Controller
                 );              
             }
         } 
-        //dd($data_property_details);die;
+//dd($data_property_details);die;
         $RId1=true;
         if(!empty($data_property_details))
         {

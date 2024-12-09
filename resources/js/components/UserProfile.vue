@@ -1806,7 +1806,7 @@
 </style>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatePicker from 'vue2-datepicker';
 	import DatatableFactory from 'vuejs-datatable';	
 	Vue.use(DatatableFactory);
@@ -2587,7 +2587,7 @@
 					}
 					else
 					{
-						Swal("failed!","there was some wrong","warning");
+						showAlert("failed!","there was some wrong","warning");
 					}
 					
         	    })
@@ -2622,7 +2622,7 @@
 						else
 						{
 							alert(data)
-							Swal("failed!","there was some wrong","warning");
+							showAlert("failed!","there was some wrong","warning");
 						}
 				    })
 				 

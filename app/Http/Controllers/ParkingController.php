@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\Floor as Floor;
-use App\Parking as Parking;
 use Illuminate\Http\Request;
+use App\Models\Parking as Parking;
+use App\Models\Floor as Floor;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class ParkingController extends Controller
 {

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\Country as Country;
-use App\Models\Provience as provience;
 use Illuminate\Http\Request;
+use App\Models\provience as provience;
+use App\Models\Country as Country;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 
 class provienceController extends Controller
@@ -19,7 +19,7 @@ class provienceController extends Controller
     {
         $ArrayFunction          =new ArrayFunction();
         $row_status             =$ArrayFunction->row_status;
-        $provience              =Provience::all();
+        $provience              =provience::all();
         $country                =Country::where('status_active',1)->get();
 //dd($row_status);die;
         foreach ($country as $key => $value) {
@@ -45,7 +45,7 @@ class provienceController extends Controller
 
     public function get_provience_by_country($country)
     {
-        $provience=Provience::where('status_active',1)->where('country_id',$country)->get();
+        $provience=provience::where('status_active',1)->where('country_id',$country)->get();
 
         $provience_option="<option value=''>Select Provience</option>";
 
@@ -78,7 +78,7 @@ class provienceController extends Controller
             'country_id' => 'required',
             'status_active' => 'required',
         ]);
-         return Provience::create($request->all());
+         return provience::create($request->all());
     }
 
     /**
@@ -117,7 +117,7 @@ class provienceController extends Controller
             'country_id' => 'required',
             'status_active' => 'required',
         ]);
-        Provience::find($id)->update($request->all());
+        provience::find($id)->update($request->all());
         
         return ['message'=>'update successfully'];
     }
@@ -130,7 +130,7 @@ class provienceController extends Controller
      */
     public function destroy($id)
     {
-        Provience::find($id)->delete();
+        provience::find($id)->delete();
         return ['message'=>'Module deleted'];
     }
 }

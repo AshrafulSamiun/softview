@@ -57,7 +57,7 @@ current_fs.css({
 });
 previous_fs.css({'opacity': opacity});
 },
-duration: 500
+    duration: 500
 });
 setProgressBar(--current);
 });

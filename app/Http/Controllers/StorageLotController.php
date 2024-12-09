@@ -2,25 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\BuildingContactDetails;
-use App\Models\BuildingContactList;
-use App\Models\BuildingInfo as BuildingInfo;
-use App\Models\BuildingLicensePermit;
-use App\Models\BuildingManagementType;
-use App\Models\ExternalServiceProvider;
-use App\Models\ExternalServiceProviderList;
-use App\Models\Floor as Floor;
-use App\Models\LicenseAndPermit;
-use App\Models\SafetyDeviceEquipment;
-use App\Models\SafetyItemList as SafetyItemList;
-use App\Models\StorageLevel;
-use App\Models\StorageLocker;
-use App\Models\StorageLot;
-use App\Models\StorageStallDetails;
-use App\Models\SubroomsListDetails as SubroomsListDetails;
 use Illuminate\Http\Request;
+use App\Models\Floor as Floor;
+use App\Models\company;
+use App\Models\customer;
+use App\Models\buildingInfo as BuildingInfo;
+use App\Models\BuildingPropertyDetails as BuildingPropertyDetails;
+use App\Models\SubroomsList as SubroomsList;
+use App\Models\SubroomsListDetails as SubroomsListDetails;
+use App\Models\SafetyItemList as SafetyItemList;
+use App\Models\ExternalServiceProviderList;
+use App\Models\SafetyDeviceEquipment;
+use App\Models\BuildingContactDetails;
+use App\Models\ExternalServiceProvider;
+use App\Models\BuildingContactList;
+use App\Models\LicenseAndPermit;
+use App\Models\BuildingLicensePermit;
+use App\Models\StorageLot;
+use App\Models\StorageLevel;
+use App\Models\BuildingManagementType;
+use App\Models\StorageLocker;
+use App\Models\StorageStallDetails;
+
 use Illuminate\Support\Facades\DB;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class StorageLotController extends Controller
 {
@@ -29,7 +34,7 @@ class StorageLotController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
 
         $user=\Auth::user();
@@ -37,15 +42,6 @@ class StorageLotController extends Controller
 
         $ArrayFunction              =new ArrayFunction();
         $property_management_arr    =$ArrayFunction->property_management_type;
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
 
         $ksl=0;
         foreach($property_management_arr as $key=>$val)
@@ -76,11 +72,34 @@ class StorageLotController extends Controller
         }
         $data['license_and_permit_list_arr']        =$license_and_permit_list_arr;
 
-        
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
+        }
+        $data['company_arr']        =$company_arr;
+
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->whereNull('company_id')
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
+        }
+
+        $data['customer_arr']        =$customer_arr;
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
+                                    ->whereNull('company_name')
+                                    ->whereNull('customer_name')
                                     ->get(['id','building_no','building_name']);
 
         //===================Building==========================================
@@ -105,9 +124,9 @@ class StorageLotController extends Controller
             $safety_item_list_arr[$sl]['item_qty']      ="";
             $sl++;
         }
-
-
         $data['safety_item_list_arr']        =$safety_item_list_arr;
+
+
         $external_service_provider_list=ExternalServiceProviderList::where('status_active',1)
                                     ->where('page_id',1)
                                     ->get();
@@ -313,25 +332,34 @@ class StorageLotController extends Controller
 
 
 
-    public function StorageLotsList(Request $request)
+    public function StorageLotsList()
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
 
-            return "10**200"; 
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
         }
 
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
                                     ->get(['id','building_no','building_name']);
 
         //===================Building==========================================
@@ -341,11 +369,12 @@ class StorageLotController extends Controller
             $building_arr[$value->id]=$value->building_no;
         }
 
+      
+
         //===================Floor==========================================
 
         $floor_list              =Floor::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
                                     ->get(['id','system_no']);
 
 
@@ -359,7 +388,6 @@ class StorageLotController extends Controller
         $sl=0;
         $storage_lot_list=StorageLot::where('status_active',1)
                                         ->where('project_id',$project_id)
-                                        ->where('company_name',$company_id)
                                         ->get();
         foreach ($storage_lot_list as $key => $value) {
 
@@ -372,9 +400,32 @@ class StorageLotController extends Controller
             $data['storage_lot_list'][$key]['lot_uom']             =$value->lot_uom;
 
             $data['storage_lot_list'][$key]['storage_lot_size_qty']   =$value->storage_lot_size_qty;
+           // $data['storage_lot_list'][$key]['floor_no']            =$value->system_no;
+          //  $data['storage_lot_list'][$key]['unit_name']           =$value->unit_name;
          
 
-            
+            if($value->company_name>0)
+            {
+                $data['storage_lot_list'][$key]['company_name']     =$company_arr[$value->company_name];
+
+            }
+            else
+            {
+                $data['storage_lot_list'][$key]['company_name']      ="";
+
+            }
+
+            if($value->customer_name>0)
+            {
+                $data['storage_lot_list'][$key]['customer_name']     =$customer_arr[$value->customer_name];
+
+            }
+            else
+            {
+                $data['storage_lot_list'][$key]['customer_name']      ="";
+
+            }
+
             if($value->building_name>0)
             {
                 $data['storage_lot_list'][$key]['building_name']     =$building_arr[$value->building_name];
@@ -396,10 +447,13 @@ class StorageLotController extends Controller
                 $data['storage_lot_list'][$key]['floor_no']      ="";
 
             }
+
             
             $sl++;
+
         }
 
+       // $data['storage_lot_list']        =$commercial_unit_list;
         
         return $data;
 
@@ -423,31 +477,20 @@ class StorageLotController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'building_name'     => 'required',
-            'floor_no'          => 'required',
-            'lot_number'        => 'required',
-            'property_name'     => 'required',
-            'strata_lot_no'     => 'required',
+            'building_name' => 'required',
+            'floor_no'      => 'required',
+            'lot_number'      => 'required',
+            'property_name'    => 'required',
             
         ]);
 
-        
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
 
         $user_data = \Auth::user();
         $user_id=$user_data->id;
         $project_id=$user_data->project_id;
-        $request->merge(['user_id'      =>$user_id]);
-        $request->merge(['inserted_by'  =>$user_id]);
-        $request->merge(['project_id'   =>$project_id]);
-        $request->merge(['company_name' =>$company_id]);
+        $request->merge(['user_id' =>$user_id]);
+        $request->merge(['inserted_by' =>$user_id]);
+        $request->merge(['project_id' =>$project_id]);
 
         
 
@@ -495,25 +538,27 @@ class StorageLotController extends Controller
             $level_system_no="STGLV-".str_pad($max_level_system_prefix, 2, 0, STR_PAD_LEFT);
 
             $data_storege_lavel_details[]= array(
-                'project_id'                    =>$project_id,
-                'master_id'                     =>$storege_info->id,
-                'details_id'                    =>$level['details_id'],
-                'system_prefix'                 =>$max_level_system_prefix,
-                'system_no'                     =>$level_system_no,
-                'property_name'                 =>$level['property_name'],
-                'uom'                           =>$request->single_subroom_uom,
-                'item_size'                     =>$level['item_size'],
-                'storage_type_1'                =>$request->storage_type_total_arr[$key][1],
-                'storage_type_2'                =>$request->storage_type_total_arr[$key][2],
-                'storage_type_3'                =>$request->storage_type_total_arr[$key][3],
-                'storage_type_4'                =>$request->storage_type_total_arr[$key][4],
-                'storage_type_5'                =>$request->storage_type_total_arr[$key][5],
-                'storage_type_6'                =>$request->storage_type_total_arr[$key][6],
-                'storage_type_7'                =>$request->storage_type_total_arr[$key][7],
-                'storage_type_8'                =>$request->storage_type_total_arr[$key][8],
-                'inserted_by'                   =>$user_id,
+                'project_id'                =>$project_id,
+                'master_id'                 =>$storege_info->id,
+                'details_id'                =>$level['details_id'],
+                'system_prefix'             =>$max_level_system_prefix,
+                'system_no'                 =>$level_system_no,
+                'property_name'             =>$level['property_name'],
+                'uom'                       =>$request->single_subroom_uom,
+                'item_size'                 =>$level['item_size'],
+                'storage_type_1'              =>$request->storage_type_total_arr[$key][1],
+                'storage_type_2'              =>$request->storage_type_total_arr[$key][2],
+                'storage_type_3'              =>$request->storage_type_total_arr[$key][3],
+                'storage_type_4'              =>$request->storage_type_total_arr[$key][4],
+                'storage_type_5'              =>$request->storage_type_total_arr[$key][5],
+                'storage_type_6'              =>$request->storage_type_total_arr[$key][6],
+                'storage_type_7'              =>$request->storage_type_total_arr[$key][7],
+                'storage_type_8'              =>$request->storage_type_total_arr[$key][8],
+              //  'storage_type_9'              =>$request->storage_type_total_arr[$key][9],
+              //  'storage_type_10'             =>$request->storage_type_total_arr[$key][10],
+              //  'storage_type_11'             =>$request->storage_type_total_arr[$key][11],
+                'inserted_by'               =>$user_id,
             );
-
             $system_prefix=0; 
             foreach($level as $key2=>$locker_details)
             {
@@ -1238,12 +1283,18 @@ class StorageLotController extends Controller
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        $data['user_type']          =$user->user_type;
         $ArrayFunction              =new ArrayFunction();
         $storage_type_arr           =$ArrayFunction->storage_type_arr;
         $stall_closest_item_arr     =$ArrayFunction->stall_closest_item_arr;
         //===================Company==========================================
-       
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
+        }
+        $data['company_arr']        =$company_arr;
 
         $storage_lot=StorageLot::where('status_active',1)
                                     ->where('project_id',$project_id)
@@ -1251,17 +1302,52 @@ class StorageLotController extends Controller
                                     ->first();
         $data['storage_lot_arr']=$storage_lot;                            
         $company_id     =$storage_lot->company_name;
+        $customer_id    =$storage_lot->customer_name;
         $building_id    =$storage_lot->building_name;
         $floor_id       =$storage_lot->floor_no;
+        //dd($company_id);die;
 
-        
-
-        $building_list        =BuildingInfo::where('status_active',1)
+        //===================Customer==========================================
+        $customer_list_query        =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
-                                    ->get(['id','building_no','building_name']);
+                                    ->where('customer_type',1);
 
-        
+        if($company_id)
+        {
+            $customer_list_query->where('company_id',$company_id);
+        }
+        else{
+
+            $customer_list_query ->whereNull('company_id');
+        }
+
+        $customer_list=$customer_list_query->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
+        }
+
+        $data['customer_arr']        =$customer_arr;
+
+        $building_list_query        =BuildingInfo::where('status_active',1)
+                                    ->where('project_id',$project_id);
+        if($company_id)
+        {
+            $building_list_query->where('company_name',$company_id);
+        }
+        else{
+            $building_list_query ->whereNull('company_name');
+        }
+
+        if($customer_id)
+        {
+            $building_list_query->where('customer_name',$customer_id);
+        }
+        else{
+            $building_list_query ->whereNull('customer_name');
+        }
+
+        $building_list=$building_list_query->get(['id','building_no','building_name']);
 
         //===================Building==========================================
 
@@ -1452,8 +1538,8 @@ class StorageLotController extends Controller
         }
 
         $storege_locker_details               =StorageLocker::where('status_active',1)
-                                                ->where('master_id',$id)
-                                                ->get();
+                                            ->where('master_id',$id)
+                                            ->get();
         $storege_locker_update_arr=array();
         $storege_locker_check_arr=array();
         foreach ($storege_locker_details as $key => $value) {
@@ -1474,10 +1560,13 @@ class StorageLotController extends Controller
             $storege_locker_update_arr[$value->details_id][$value->system_prefix]['storage_type_7'] =$value->storage_type_7;
             $storege_locker_update_arr[$value->details_id][$value->system_prefix]['storage_type_8'] =$value->storage_type_8;
             $storege_locker_update_arr[$value->details_id][$value->system_prefix]['storage_type_9'] =$value->storage_type_9;
-           
+           // $storege_locker_update_arr[$value->details_id][$value->system_prefix]['storage_type_10']  =$value->storage_type_10;
+           // $storege_locker_update_arr[$value->details_id][$value->system_prefix]['storage_type_11']  =$value->storage_type_11;
+           // $storege_locker_update_arr[$value->details_id][$value->system_prefix]['storage_type_12']  =$value->storage_type_12;
             $storege_locker_check_arr[$value->details_id][$value->system_prefix]=$value->system_prefix;
         }
 
+        //dd($storege_locker_update_arr);
         $storege_locker_extra_info          =StorageStallDetails::where('status_active',1)
                                             ->where('master_id',$id)
                                             ->where('page_id',8)
@@ -1858,11 +1947,10 @@ class StorageLotController extends Controller
     public function update(Request $request, $id)
     {
         request()->validate([
-            'building_name'     => 'required',
-            'floor_no'          => 'required',
-            'lot_number'        => 'required',
-            'property_name'     => 'required',
-            'strata_lot_no'     => 'required',
+            'building_name' => 'required',
+            'floor_no'      => 'required',
+            'lot_number'      => 'required',
+            'property_name'    => 'required',
             
         ]);
         
@@ -1899,7 +1987,12 @@ class StorageLotController extends Controller
             $storege_locker_max_prefix_arr[$value->details_id]=$value->system_prefix;
         } 
        // dd($storege_locker_max_prefix_arr);die;
-        DB::beginTransaction();      
+        DB::beginTransaction();
+
+        
+
+
+        
        
         $storage_lot_update= StorageLot::find($id)->update($request->all());;
         $max_system_prefix=$request->input('system_prefix');
@@ -1909,18 +2002,21 @@ class StorageLotController extends Controller
             if($level['id'])
             {
                 $storege_lavel_details_data= array(
-                    'property_name'                 =>$level['property_name'],
-                    'uom'                           =>$request->single_subroom_uom,
-                    'item_size'                     =>$level['item_size'],
-                    'storage_type_1'                =>$request->storage_type_total_arr[$key][1],
-                    'storage_type_2'                =>$request->storage_type_total_arr[$key][2],
-                    'storage_type_3'                =>$request->storage_type_total_arr[$key][3],
-                    'storage_type_4'                =>$request->storage_type_total_arr[$key][4],
-                    'storage_type_5'                =>$request->storage_type_total_arr[$key][5],
-                    'storage_type_6'                =>$request->storage_type_total_arr[$key][6],
-                    'storage_type_7'                =>$request->storage_type_total_arr[$key][7],
-                    'storage_type_8'                =>$request->storage_type_total_arr[$key][8],
-                    'updated_by'                    =>$user_id,
+                    'property_name'             =>$level['property_name'],
+                    'uom'                       =>$request->single_subroom_uom,
+                    'item_size'                 =>$level['item_size'],
+                    'storage_type_1'              =>$request->storage_type_total_arr[$key][1],
+                    'storage_type_2'              =>$request->storage_type_total_arr[$key][2],
+                    'storage_type_3'              =>$request->storage_type_total_arr[$key][3],
+                    'storage_type_4'              =>$request->storage_type_total_arr[$key][4],
+                    'storage_type_5'              =>$request->storage_type_total_arr[$key][5],
+                    'storage_type_6'              =>$request->storage_type_total_arr[$key][6],
+                    'storage_type_7'              =>$request->storage_type_total_arr[$key][7],
+                    'storage_type_8'              =>$request->storage_type_total_arr[$key][8],
+                 //   'storage_type_9'              =>$request->storage_type_total_arr[$key][9],
+                  //  'storage_type_10'             =>$request->storage_type_total_arr[$key][10],
+                   // 'storage_type_11'             =>$request->storage_type_total_arr[$key][11],
+                    'updated_by'                =>$user_id,
                 );
                 
                 $system_prefix=$storege_locker_max_prefix_arr[$level['details_id']]; 
@@ -1945,7 +2041,9 @@ class StorageLotController extends Controller
                                 'storage_type_6'              =>$locker_details['storage_type_6'],
                                 'storage_type_7'              =>$locker_details['storage_type_7'],
                                 'storage_type_8'              =>$locker_details['storage_type_8'],
-                          
+                            //    'storage_type_9'              =>$locker_details['storage_type_9'],
+                             //   'storage_type_10'             =>$locker_details['storage_type_10'],
+                            //    'storage_type_11'             =>$locker_details['storage_type_11'],
                                 'updated_by'                =>$user_id,
                             );
 
@@ -2154,7 +2252,7 @@ class StorageLotController extends Controller
            
                    
         }
-
+//dd($data_subrooms_locker_details);die;
         foreach($request->license_and_permit_list_arr as $key=>$details)
         {
             if($details['issued_by']!="")
@@ -3221,1437 +3319,5 @@ class StorageLotController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-
-    public function post(Request $request,$id)
-    {
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>$request->input("posting_status"),
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=StorageLot::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-    public function adjust(Request $request, $id)
-    {
-        request()->validate([
-            'building_name'     => 'required',
-            'floor_no'          => 'required',
-            'lot_number'        => 'required',
-            'property_name'     => 'required',
-            'strata_lot_no'     => 'required',
-            
-        ]);
-        
-        $user_info  = \Auth::user();
-        $project_id = $user_info->project_id;
-        $user_id    = $user_info->id;
-        $request->merge(['project_id'           =>$project_id]);
-        $request->merge(['updated_by'           =>$user_id]);
-        $request->merge(['posting_status'       =>3]);
-
-        $max_system_level_data = StorageLevel::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from storage_levels 
-            where building_name=".$request->input('building_name')."  and project_id=".$project_id." ) 
-            and building_name=".$request->input('building_name')."  and project_id=".$project_id)->get(['system_prefix']);
-
-        if(count($max_system_level_data)>0)
-        {
-            $max_level_system_prefix=$max_system_level_data[0]->system_prefix+1; 
-        }
-        else
-        {
-            $max_level_system_prefix=1; 
-        }
-
-
-        $storege_locker_max_prefix = StorageLocker::where('project_id', '=', $project_id)
-                                    ->where('master_id', '=', $id)
-                                    ->where('status_active', '=', 1)
-                                    ->select('details_id',DB::raw('MAX(system_prefix) as system_prefix'))
-                                    ->groupBy('details_id')
-                                    //->toSql();
-                                    ->get();
-
-        $storege_locker_max_prefix_arr=array();
-        foreach ($storege_locker_max_prefix as $key => $value) {
-            $storege_locker_max_prefix_arr[$value->details_id]=$value->system_prefix;
-        } 
-
-        DB::beginTransaction();      
-       
-        $storage_lot_update= StorageLot::find($id)->update($request->all());;
-        $max_system_prefix=$request->input('system_prefix');
-        foreach($request->subrooms_list_arr as $key=>$level)
-        {
-
-            if($level['id'])
-            {
-                $storege_lavel_details_data= array(
-                    'property_name'                 =>$level['property_name'],
-                    'uom'                           =>$request->single_subroom_uom,
-                    'item_size'                     =>$level['item_size'],
-                    'storage_type_1'                =>$request->storage_type_total_arr[$key][1],
-                    'storage_type_2'                =>$request->storage_type_total_arr[$key][2],
-                    'storage_type_3'                =>$request->storage_type_total_arr[$key][3],
-                    'storage_type_4'                =>$request->storage_type_total_arr[$key][4],
-                    'storage_type_5'                =>$request->storage_type_total_arr[$key][5],
-                    'storage_type_6'                =>$request->storage_type_total_arr[$key][6],
-                    'storage_type_7'                =>$request->storage_type_total_arr[$key][7],
-                    'storage_type_8'                =>$request->storage_type_total_arr[$key][8],
-                    'updated_by'                    =>$user_id,
-                );
-                
-                $system_prefix=$storege_locker_max_prefix_arr[$level['details_id']]; 
-                foreach($level as $key2=>$locker_details)
-                {
-                           
-                    if($key2>=0 && is_array($locker_details))
-                    {
-                        if($locker_details['id'])
-                        {
-                            $subrooms_list_details_data= array(
-                                'item_name'                 =>$locker_details['item_name'],
-                                'property_name'             =>$locker_details['property_name'],
-                                'item_id'                   =>$locker_details['item_id'],
-                                'uom'                       =>$request->single_subroom_uom,
-                                'item_size'                 =>$locker_details['item_size'],
-                                'storage_type_1'              =>$locker_details['storage_type_1'],
-                                'storage_type_2'              =>$locker_details['storage_type_2'],
-                                'storage_type_3'              =>$locker_details['storage_type_3'],
-                                'storage_type_4'              =>$locker_details['storage_type_4'],
-                                'storage_type_5'              =>$locker_details['storage_type_5'],
-                                'storage_type_6'              =>$locker_details['storage_type_6'],
-                                'storage_type_7'              =>$locker_details['storage_type_7'],
-                                'storage_type_8'              =>$locker_details['storage_type_8'],
-                          
-                                'updated_by'                =>$user_id,
-                            );
-
-                            $storege_locker_update=StorageLocker::where('id',"=",$locker_details['id'])->update($subrooms_list_details_data);
-                            if( !$storege_locker_update)
-                            {
-                                DB::rollBack();
-                                return 10;
-                                die;
-                            }
-                            //==============================update=========================================
-                            foreach($locker_details['details'] as $key3=>$locker_extend)
-                            {
-                                if($locker_extend['id'])
-                                {
-                                    $data_subrooms_locker_details_update= array(
-                                                'project_id'                =>$project_id,
-                                                'master_id'                 =>$id,
-                                                'item_id'                   =>$key3,
-                                                'details_id'                =>$locker_details['details_id'],
-                                                'system_no'                 =>$locker_details['system_no'],
-                                                'page_id'                   =>8,
-                                                'status'                    =>$locker_extend['status'],
-                                                'comments'                  =>$locker_extend['comments'],
-                                                'inserted_by'               =>$user_id,
-                                            );
-
-                                    $storege_locker_details_update=StorageStallDetails::where('id',"=",$locker_extend['id'])->update($data_subrooms_locker_details_update);
-                                    if( !$storege_locker_details_update)
-                                    {
-                                        DB::rollBack();
-                                        return 10;
-                                        die;
-                                    }
-                                }
-                                else
-                                {
-                                    if($locker_extend['status'])
-                                    {
-                                        $data_subrooms_locker_details[]= array(
-                                            'project_id'                =>$project_id,
-                                            'master_id'                 =>$id,
-                                            'item_id'                   =>$key3,
-                                            'details_id'                =>$locker_details['details_id'],
-                                            'system_no'                 =>$locker_details['system_no'],
-                                            'page_id'                   =>8,
-                                            'status'                    =>$locker_extend['status'],
-                                            'comments'                  =>$locker_extend['comments'],
-                                            'inserted_by'               =>$user_id,
-                                        );
-                                    }
-                                }
-                            }
-
-                        }
-                        else
-                        {
-                            $system_prefix++;
-                            $system_no_locker="BKS-".str_pad($max_system_prefix, 2, 0, STR_PAD_LEFT)."-".str_pad($max_level_system_prefix, 2, 0, STR_PAD_LEFT)."-".str_pad($system_prefix, 4, 0, STR_PAD_LEFT);
-                           
-                            $data_subrooms_list_details[]= array(
-                                'project_id'                =>$project_id,
-                                'master_id'                 =>$id,
-                                'system_prefix'             =>$system_prefix,
-                                'system_no'                 =>$system_no_locker,
-                                'item_name'                 =>$locker_details['item_name'],
-                                'property_name'             =>$locker_details['property_name'],
-                                'item_id'                   =>$locker_details['item_id'],
-                                'details_id'                =>$locker_details['details_id'],
-                                'uom'                       =>$request->single_subroom_uom,
-                                'item_size'                 =>$locker_details['item_size'],
-                                'storage_type_1'            =>$locker_details['storage_type_1'],
-                                'storage_type_2'            =>$locker_details['storage_type_2'],
-                                'storage_type_3'            =>$locker_details['storage_type_3'],
-                                'storage_type_4'            =>$locker_details['storage_type_4'],
-                                'storage_type_5'            =>$locker_details['storage_type_5'],
-                                'storage_type_6'            =>$locker_details['storage_type_6'],
-                                'storage_type_7'            =>$locker_details['storage_type_7'],
-                                'storage_type_8'            =>$locker_details['storage_type_8'],
-                              //  'storage_type_9'            =>$locker_details['storage_type_9'],
-                               // 'storage_type_10'           =>$locker_details['storage_type_10'],
-                              //  'storage_type_11'           =>$locker_details['storage_type_11'],
-                                'inserted_by'               =>$user_id,
-                            );
-
-                            foreach($locker_details['details'] as $key3=>$locker_extend)
-                            {
-                                if($locker_extend['status'])
-                                {
-                                    $data_subrooms_locker_details[]= array(
-                                        'project_id'                =>$project_id,
-                                        'master_id'                 =>$id,
-                                        'item_id'                   =>$key3,
-                                        'details_id'                =>$locker_details['details_id'],
-                                        'system_no'                 =>$system_no_locker,
-                                        'page_id'                   =>8,
-                                        'status'                    =>$locker_extend['status'],
-                                        'comments'                  =>$locker_extend['comments'],
-                                        'inserted_by'               =>$user_id,
-                                    );
-                                }
-                            }
-
-                        }
-                        
-                    }
-
-                }
-                
-
-                $storege_lavel_update=StorageLevel::where('id',"=",$level['id'])->update($storege_lavel_details_data);
-                if( !$storege_lavel_update)
-                {
-                    DB::rollBack();
-                    return 10;
-                    die;
-                }
-                
-            }
-            else
-            {
-                $level_system_no="BIKLV-".str_pad($max_level_system_prefix, 2, 0, STR_PAD_LEFT);
-
-                $data_storege_lavel_details[]= array(
-                    'project_id'                =>$project_id,
-                    'master_id'                 =>$id,
-                    'details_id'                =>$level['details_id'],
-                    'system_prefix'             =>$max_level_system_prefix,
-                    'system_no'                 =>$level_system_no,
-                    'property_name'             =>$level['property_name'],
-                    'uom'                       =>$request->single_subroom_uom,
-                    'item_size'                 =>$level['item_size'],
-                    'storage_type_1'              =>$request->storage_type_total_arr[$key][1],
-                    'storage_type_2'              =>$request->storage_type_total_arr[$key][2],
-                    'storage_type_3'              =>$request->storage_type_total_arr[$key][3],
-                    'storage_type_4'              =>$request->storage_type_total_arr[$key][4],
-                    'storage_type_5'              =>$request->storage_type_total_arr[$key][5],
-                    'storage_type_6'              =>$request->storage_type_total_arr[$key][6],
-                    'storage_type_7'              =>$request->storage_type_total_arr[$key][7],
-                    'storage_type_8'              =>$request->storage_type_total_arr[$key][8],
-                   // 'storage_type_9'              =>$request->storage_type_total_arr[$key][9],
-                   // 'storage_type_10'             =>$request->storage_type_total_arr[$key][10],
-                   // 'storage_type_11'             =>$request->storage_type_total_arr[$key][11],
-                    'inserted_by'               =>$user_id,
-                );
-                $system_prefix=0; 
-                foreach($level as $key2=>$locker_details)
-                {
-                           
-                    if($key2>=0 && is_array($locker_details))
-                    {
-
-                        $system_prefix++;
-                        $system_no_locker="BKS-".str_pad($max_system_prefix, 2, 0, STR_PAD_LEFT)."-".str_pad($max_level_system_prefix, 2, 0, STR_PAD_LEFT)."-".str_pad($system_prefix, 4, 0, STR_PAD_LEFT);
-                       
-
-                       // $item_name=$locker_details['item_name'];
-
-                        $data_subrooms_list_details[]= array(
-                            'project_id'                =>$project_id,
-                            'master_id'                 =>$id,
-                            'system_prefix'             =>$system_prefix,
-                            'system_no'                 =>$system_no_locker,
-                            'item_name'                 =>$locker_details['item_name'],
-                            'property_name'             =>$locker_details['property_name'],
-                            'item_id'                   =>$locker_details['item_id'],
-                            'details_id'                =>$locker_details['details_id'],
-                            'uom'                       =>$request->single_subroom_uom,
-                            'item_size'                 =>$locker_details['item_size'],
-                            'storage_type_1'            =>$locker_details['storage_type_1'],
-                            'storage_type_2'            =>$locker_details['storage_type_2'],
-                            'storage_type_3'            =>$locker_details['storage_type_3'],
-                            'storage_type_4'            =>$locker_details['storage_type_4'],
-                            'storage_type_5'            =>$locker_details['storage_type_5'],
-                            'storage_type_6'            =>$locker_details['storage_type_6'],
-                            'storage_type_7'            =>$locker_details['storage_type_7'],
-                            'storage_type_8'            =>$locker_details['storage_type_8'],
-                          //  'storage_type_9'            =>$locker_details['storage_type_9'],
-                          //  'storage_type_10'           =>$locker_details['storage_type_10'],
-                          //  'storage_type_11'           =>$locker_details['storage_type_11'],
-                            'inserted_by'               =>$user_id,
-                        );
-
-                        foreach($locker_details['details'] as $key3=>$locker_extend)
-                        {
-                            if($locker_extend['status'])
-                            {
-                                $data_subrooms_locker_details[]= array(
-                                    'project_id'                =>$project_id,
-                                    'master_id'                 =>$id,
-                                    'item_id'                   =>$key3,
-                                    'details_id'                =>$locker_details['details_id'],
-                                    'system_no'                 =>$system_no_locker,
-                                    'page_id'                   =>8,
-                                    'status'                    =>$locker_extend['status'],
-                                    'comments'                  =>$locker_extend['comments'],
-                                    'inserted_by'               =>$user_id,
-                                );
-                            }
-                        }
-                    }
-
-                }
-                $max_level_system_prefix++;
-            }
-           
-                   
-        }
-
-        foreach($request->license_and_permit_list_arr as $key=>$details)
-        {
-            if($details['issued_by']!="")
-            {
-
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-                if($details['id'])
-                {
-                    $licence_permit_data= array(
-                        'issued_by'                 =>$details['issued_by'],
-                        'expiry_date'               =>$expiry_date,
-                        'phone'                     =>$details['phone'],
-                        'website'                   =>$details['website'],
-                        'mobile'                    =>$details['mobile'],
-                        'email'                     =>$details['email'],
-                        'comment'                   =>$details['comment'],
-                        'updated_by'               =>$user_id,
-                    );
-
-                    $licence_permit=BuildingLicensePermit::where('id',"=",$details['id'])->update($licence_permit_data);
-                    if( !$licence_permit)
-                    
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else
-                {
-                    $data_licence_permit[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'reference_id'              =>$details['reference_id'],
-                        'item_name'                 =>$details['item_name'],
-                        'page_id'                   =>8,
-                        'issued_by'                 =>$details['issued_by'],
-                        'expiry_date'               =>$expiry_date,
-                        'phone'                     =>$details['phone'],
-                        'website'                   =>$details['website'],
-                        'mobile'                    =>$details['mobile'],
-                        'email'                     =>$details['email'],
-                        'comment'                   =>$details['comment'],
-                        'inserted_by'               =>$user_id,
-                    );
-                }
-                
-            }
-        }
-
-        foreach($request->property_management_type_arr as $key=>$details)
-        {
-            if($details['id_no']!="")
-            {
-                if($details['id']!="")
-                {
-
-                    $building_management_type_data= array(
-                        
-                        'id_no'                     =>$details['id_no'],
-                        'name'                      =>$details['name'],
-                        'phone'                     =>$details['phone'],
-                        'website'                   =>$details['website'],
-                        'mobile'                    =>$details['mobile'],
-                        'email'                     =>$details['email'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $PropertyManagementType=BuildingManagementType::where('id',"=",$details['id'])->update($building_management_type_data);
-                    if( !$PropertyManagementType)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else 
-                {
-                    $data_building_management_type[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'reference_id'              =>$details['reference_id'],
-                        'page_id'                   =>8,
-                        'item_name'                 =>$details['item_name'],
-                        'id_no'                     =>$details['id_no'],
-                        'name'                      =>$details['name'],
-                        'phone'                     =>$details['phone'],
-                        'website'                   =>$details['website'],
-                        'mobile'                    =>$details['mobile'],
-                        'email'                     =>$details['email'],
-                        'inserted_by'               =>$user_id,
-                    );
-                }
-                
-            }
-        }
-
-
-
-        foreach($request->fire_extinguisher_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-
-        foreach($request->smoke_detecter_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->sprinkler_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->water_valve_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->gfci_breaker_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->sump_pump_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->emergency_bell_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->emergency_light_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->first_aid_station_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->first_aid_box_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-        foreach($request->aed_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'comments'                  =>$details['comments'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->external_service_provider_details_arr as $key=>$details)
-        {
-            if($details['id_no']!="")
-            {
-                if($details['schedule_date'])
-                {
-                    $schedule_date                               =date("Y-m-d",strtotime($details['schedule_date']));
-                }
-                else $schedule_date="";
-
-                if($details['schedule_date'])
-                {
-                    $schedule_date                               =date("Y-m-d",strtotime($details['schedule_date']));
-                }
-                else $schedule_date="";
-
-                if($details['id'])
-                {
-                    $external_service_provider_data= array(
-                        
-                        'id_no'                     =>$details['id_no'],
-                        'account_no'                =>$details['account_no'],
-                        'website'                   =>$details['website'],
-                        'schedule_date'             =>$schedule_date,
-                        'expected_due_date'         =>$schedule_date,
-                        'billing_cycle'             =>$details['billing_cycle'],
-                        'bill_delivery_method'      =>$details['bill_delivery_method'],
-                        'payment_method'            =>$details['payment_method'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $ExternalService=ExternalServiceProvider::where('id',"=",$details['id'])->update($external_service_provider_data);
-                    if( !$ExternalService)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else
-                {
-                    $data_external_service_provider[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'reference_id'              =>$details['reference_id'],
-                        'item_name'                 =>$details['item_name'],
-                        'page_id'                   =>8,
-                        'id_no'                     =>$details['id_no'],
-                        'account_no'                =>$details['account_no'],
-                        'website'                   =>$details['website'],
-                        'schedule_date'             =>$schedule_date,
-                        'expected_due_date'         =>$schedule_date,
-                        'billing_cycle'             =>$details['billing_cycle'],
-                        'bill_delivery_method'      =>$details['bill_delivery_method'],
-                        'payment_method'            =>$details['payment_method'],
-                        'inserted_by'               =>$user_id,
-                    );
-                }
-                
-            }
-        }
-
-
-        foreach($request->building_contact_details_arr as $item_id=>$item_details)
-        {
-            if($item_id>0)
-            {
-               foreach($item_details as $key=>$details)
-                {
-                    if($details['contact_no']!="")
-                    {
-
-                        if($details['id']!="")
-                        {
-                            $building_contact_data= array(
-                                'contact_no'                =>$details['contact_no'],
-                                'phone'                     =>$details['phone'],
-                                'website'                   =>$details['website'],
-                                'mobile'                    =>$details['mobile'],
-                                'email'                     =>$details['email'],
-                                'hours_of_operation'        =>$details['hours_of_operation'],
-                                'comment'                   =>$details['comment'],
-                                'updated_by'                =>$user_id,
-                            );
-                            $building_contact=BuildingContactDetails::where('id',"=",$details['id'])->update($building_contact_data);
-                            if( !$building_contact)
-                            {
-                                DB::rollBack();
-                                return 10;
-                                die;
-                            }
-                        }
-                        else
-                        {
-                             $data_building_contact[]= array(
-                                'project_id'                =>$project_id,
-                                'master_id'                 =>$id,
-                                'item_id'                   =>$item_id,
-                                'page_id'                   =>8,
-                                'reference_id'              =>$details['reference_id'],
-                                'item_name'                 =>$details['item_name'],
-                                'contact_no'                =>$details['contact_no'],
-                                'phone'                     =>$details['phone'],
-                                'website'                   =>$details['website'],
-                                'mobile'                    =>$details['mobile'],
-                                'email'                     =>$details['email'],
-                                'hours_of_operation'        =>$details['hours_of_operation'],
-                                'comment'                   =>$details['comment'],
-                                'inserted_by'               =>$user_id,
-                            );
-                        }
-                       
-                    }
-                } 
-            }
-            
-        }
-
-        
-        $RId1=true;
-        $RId2=true;
-        $RId3=true;
-        $RId4=true;
-        $RId5=true;
-        $RId6=true;
-        $RId7=true;
-        $RId8=true;
-
-        if(!empty($data_storege_lavel_details))
-        {
-            $RId1=StorageLevel::insert($data_storege_lavel_details);
-        }
-        if(!empty($data_subrooms_list_details))
-        {
-            $RId2=StorageLocker::insert($data_subrooms_list_details);
-        }
-        if(!empty($data_subrooms_locker_details))
-        {
-            $RId8=StorageStallDetails::insert($data_subrooms_locker_details);
-        }
-        if(!empty($data_licence_permit))
-        {
-            $RId3=BuildingLicensePermit::insert($data_licence_permit);
-        }
-
-        if(!empty($data_building_management_type))
-        {
-            $RId4=BuildingManagementType::insert($data_building_management_type);
-        }
-
-
-        if(!empty($data_safety_device_equipment))
-        {
-            $RId5=SafetyDeviceEquipment::insert($data_safety_device_equipment);
-        }
-
-        if(!empty($data_external_service_provider))
-        {
-            $RId6=ExternalServiceProvider::insert($data_external_service_provider);
-        }
-
-        if(!empty($data_building_contact))
-        {
-            $RId7=BuildingContactDetails::insert($data_building_contact);
-        }
-
-
-
-        if($storage_lot_update  && $RId1 && $RId2 && $RId3 && $RId4 && $RId5 && $RId6 && $RId7 && $RId8)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-
-
-    public function repost(Request $request,$id)
-    {
-
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>4,
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=StorageLot::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
     }
 }

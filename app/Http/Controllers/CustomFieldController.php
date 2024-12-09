@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BuildingContactList as BuildingContactList;
-use App\Models\CustomField as CustomField;
-use App\Models\ServiceType as ServiceType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\BuildingContactList as BuildingContactList;
+
+use App\Models\CustomField as CustomField;
+use App\Models\ServiceType as ServiceType;
 
 class CustomFieldController extends Controller
 {

@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\OwnerOthorizePerson as ownerOthorizePerson;
-use App\Models\UserCompany as userCompany;
-use App\Models\UserLicenseInsurence as userLicenseInsurence;
-use App\Models\UserProfile as userProfile;
-use App\Models\UserVehicle as userVehicle;
 use Illuminate\Http\Request;
+use App\Models\User as User;
+use App\Models\userProfile as userProfile;
+use App\Models\userCompany as userCompany;
+use App\Models\ownerOthorizePerson as ownerOthorizePerson;
+use App\Models\userVehicle as userVehicle;
+use App\Models\userLicenseInsurence as userLicenseInsurence;
 use Illuminate\Support\Facades\DB;
+
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class UserProfileController extends Controller
 {
@@ -32,7 +34,7 @@ class UserProfileController extends Controller
         $data['year_arr']=$year_arr;
         $project_id = \Auth::user()->project_id;
         $user_id = \Auth::user()->id;
-        $user_data=UserProfile::where('project_id',$project_id)
+        $user_data=userProfile::where('project_id',$project_id)
                                 ->where('user_id',$user_id)
                                 ->where('status_active',1)->get();
 
@@ -79,7 +81,7 @@ class UserProfileController extends Controller
             $data['user_data']['billing_postal_code']   =$val->billing_postal_code;
         }
 
-        $user_company_data=UserCompany::where('project_id',$project_id)
+        $user_company_data=userCompany::where('project_id',$project_id)
                                 ->where('user_id',$user_id)->get();
 
         $sl=0;
@@ -103,7 +105,7 @@ class UserProfileController extends Controller
             $data['user_data']['status_active']         =$val->status_active;
         }
 
-        $ownerOthorize_data=OwnerOthorizePerson::where('project_id',$project_id)
+        $ownerOthorize_data=ownerOthorizePerson::where('project_id',$project_id)
                                 ->where('user_id',$user_id)->get();
 
         $sl=0;
@@ -127,7 +129,7 @@ class UserProfileController extends Controller
 
         }
 
-        $user_vehicle_data=UserVehicle::where('project_id',$project_id)
+        $user_vehicle_data=userVehicle::where('project_id',$project_id)
                                 ->where('user_id',$user_id)->get();
 
         $sl=0;
@@ -143,7 +145,7 @@ class UserProfileController extends Controller
         }
 
 
-        $userLicenseInsurence_data=UserLicenseInsurence::where('project_id',$project_id)
+        $userLicenseInsurence_data=userLicenseInsurence::where('project_id',$project_id)
                                                 ->where('user_id',$user_id)->get();
 
         $sl=0;
@@ -219,11 +221,11 @@ class UserProfileController extends Controller
         //print_r($request->input('project_id'));die;
         DB::beginTransaction();
 
-        $user_insert=UserProfile::create($request->all());
+        $user_insert=userProfile::create($request->all());
 
         if($request->input('legal_name'))
         {
-            $company_insert=UserCompany::create($request->all());
+            $company_insert=userCompany::create($request->all());
         }
         else
         {
@@ -232,7 +234,7 @@ class UserProfileController extends Controller
 
         if($request->input('fm_legal_name'))
         {
-            $ownerOthorizePerson_insert=OwnerOthorizePerson::create($request->all());
+            $ownerOthorizePerson_insert=ownerOthorizePerson::create($request->all());
         }
         else
         {
@@ -265,7 +267,7 @@ class UserProfileController extends Controller
         $vehicle_insert=true;
         if(!empty($data_vehicle))
         {
-            $vehicle_insert=UserVehicle::insert($data_vehicle);
+            $vehicle_insert=userVehicle::insert($data_vehicle); 
         }
 
 
@@ -306,7 +308,7 @@ class UserProfileController extends Controller
             if($request->input('car_insurence_expire_date')) 
                 $request->merge(['car_insurence_expire_date'    =>date("Y-m-d",strtotime($request->input('car_insurence_expire_date')))]);
             //date("Y-m-d",strtotime($request->input('permit_start'))
-            $licenseInsurence_insert=UserLicenseInsurence::create($request->all());
+            $licenseInsurence_insert=userLicenseInsurence::create($request->all());
         }
         else
         {
@@ -382,11 +384,11 @@ class UserProfileController extends Controller
         //print_r($request->input('project_id'));die;
         DB::beginTransaction();
 
-        $user_insert=UserProfile::create($request->all());
+        $user_insert=userProfile::create($request->all());
 
         if($request->input('legal_name'))
         {
-            $company_insert=UserCompany::create($request->all());
+            $company_insert=userCompany::create($request->all());
         }
         else
         {
@@ -395,7 +397,7 @@ class UserProfileController extends Controller
 
         if($request->input('fm_legal_name'))
         {
-            $ownerOthorizePerson_insert=OwnerOthorizePerson::create($request->all());
+            $ownerOthorizePerson_insert=ownerOthorizePerson::create($request->all());
         }
         else
         {
@@ -428,7 +430,7 @@ class UserProfileController extends Controller
         $vehicle_insert=true;
         if(!empty($data_vehicle))
         {
-            $vehicle_insert=UserVehicle::insert($data_vehicle);
+            $vehicle_insert=userVehicle::insert($data_vehicle); 
         }
 
 
@@ -469,7 +471,7 @@ class UserProfileController extends Controller
             if($request->input('car_insurence_expire_date')) 
                 $request->merge(['car_insurence_expire_date'    =>date("Y-m-d",strtotime($request->input('car_insurence_expire_date')))]);
             //date("Y-m-d",strtotime($request->input('permit_start'))
-            $licenseInsurence_insert=UserLicenseInsurence::create($request->all());
+            $licenseInsurence_insert=userLicenseInsurence::create($request->all());
         }
         else
         {

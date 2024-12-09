@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NewPostingJob extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
+
+ 
         'account_no','project_id','user_id','landlord','leaseholder','tenant','shareholder','servive_provider','seller','guest',
         'visitor','post_user_id','post_name','post_rank','posting_user_type','posting_class','payment_status','posting_status',
         'new_posting_date','renew_posting_date','reported_posting_date','Paid_posting_date','edited_posting_date','validation_period_posting_date',

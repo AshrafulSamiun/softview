@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\User as User;
 use Illuminate\Http\Request;
+use App\Models\User as User;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 
 class UserController extends Controller
@@ -50,6 +50,20 @@ class UserController extends Controller
 
         $project_id = \Auth::user()->project_id;
         $user_data=User::where('project_id','=',$project_id)->select('id','name')->get();
+
+        $data['user_data']=$user_data;
+
+        if(empty($data['user_data'])) $data['user_data']=array();
+        return $data;
+    }
+
+    public function UserTypeData($user_type)
+    {
+
+        $project_id = \Auth::user()->project_id;
+        $user_data=User::where('project_id','=',$project_id)
+                         ->where('user_type','=',$user_type)
+                         ->select('id','name')->get();
 
         $data['user_data']=$user_data;
 

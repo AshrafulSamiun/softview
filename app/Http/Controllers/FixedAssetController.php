@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\AccountType;
-use App\Models\AssetCategory;
-use App\Models\FixedAsset;
-use App\Models\TaxTypeInitial;
 use Illuminate\Http\Request;
+use App\Classes\ArrayFunction as ArrayFunction;
 use Illuminate\Support\Facades\DB;
+use App\Models\AssetCategory;
+use App\Models\taxTypeInitial;
+use App\Models\FixedAsset;
+use App\Models\AccountType;
 
 class FixedAssetController extends Controller
 {
@@ -40,7 +40,7 @@ class FixedAssetController extends Controller
                 $sub_category[$val->root_item][$val->id]=$val->item_name;
         }
 
-        $account_type_list                          =TaxTypeInitial::where('status_active',1)
+        $account_type_list                          =taxTypeInitial::where('status_active',1)
                                                         ->where('type',4)
                                                         ->whereIn('project_id',[$project_id,0])
                                                         ->get();
@@ -279,7 +279,7 @@ class FixedAssetController extends Controller
                 $sub_category[$val->root_item][$val->id]=$val->item_name;
         }
 
-        $account_type_list                          =TaxTypeInitial::where('status_active',1)
+        $account_type_list                          =taxTypeInitial::where('status_active',1)
                                                         ->where('type',4)
                                                         ->whereIn('project_id',[$project_id,0])
                                                         ->get();

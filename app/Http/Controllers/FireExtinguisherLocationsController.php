@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Floor as Floor;
+use App\Models\Suits as Suits;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class FireExtinguisherLocationsController extends Controller
 {

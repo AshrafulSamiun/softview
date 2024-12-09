@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AccountHolder extends Model
 {
-    use HasFactory;
-
     protected $fillable = ['project_id', 'system_prefix', 'system_no','account_type',  'entity_type', 'first_name', 'middle_name','last_name','industry_sector',
     	 'reg_cor_dir_info', 'register_corp_first_name','register_corp_middle_name','register_corp_last_name', 'register_corp_phone_no', 'register_corp_email',
     	'register_emergency_contact','house_number', 'street_number', 'city','state', 'country','zip_code','email', 'fax_no', 'cell_phone', 'website', 

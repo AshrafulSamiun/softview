@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu as Menu;
-use App\Models\Module as Module;
 use Illuminate\Http\Request;
+use App\Models\Module as Module;
+use App\Models\Menu as Menu;
 use Illuminate\Support\Facades\DB;
 
 class MenuController extends Controller

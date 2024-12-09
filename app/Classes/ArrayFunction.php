@@ -5,6 +5,11 @@ namespace App\Classes;
 
 class ArrayFunction{
 
+    public $service_plan_arr=array(1=>"Security Guard",
+                                    2=>"Concierge",
+                                    3=>"Concierge & Security",
+                                    4=>"Enterprise",
+                                    5=>"Artemis");
 
     public $reporting_period_arr=array(1=>"Monthly",
                                     2=>"Quarterly",
@@ -12,6 +17,120 @@ class ArrayFunction{
                                     4=>"Every 6 Months",
                                     5=>"Yearly");
 
+    public $recurring_cycle_arr=array(1=>"Daily",
+                                    2=>"Weekly",
+                                    3=>"Bi-Weekly",
+                                    4=>"Monthly",
+                                    5=>"Quarterly",
+                                    3=>"Every Four Month",
+                                    4=>"Semi- Annual",
+                                    5=>"Yearly");
+
+    public $reminder_arr=array(1=>"Before 1 day",
+                                    2=>"Before 2 day",
+                                    3=>"Before 2 days",
+                                    4=>"Before 2 days",
+                                    5=>"Before 2 days",
+                                    6=>"Before 2 days",
+                                    7=>"Before 1 Week",
+                                    8=>"Before 8 days",
+                                    9=>"Before 9 days",
+                                    10=>"Before 10 days",
+                                    15=>"Before 2 week",
+                                    30=>"Before 1 Month");
+
+    public $month_arr=array(1=>"January",
+                            2=>"February",
+                            3=>"March",
+                            4=>"April",
+                            5=>"May",
+                            6=>"June",
+                            7=>"July",
+                            8=>"August",
+                            9=>"September",
+                            10=>"October",
+                            11=>"November",
+                            12=>"December");
+
+    public $site_type_arr=array(1=>"Airport",
+                                    2=>"Art Gallery & Museums",
+                                    3=>"Bank",
+                                    4=>"Boats Parking",
+                                    5=>"Car Dealership",
+                                    6=>"Collages & Universities",
+                                    7=>"Commercial Property",
+                                    8=>"Community Centre",
+                                    9=>"Construction Site",
+                                    10=>"Convention Center",
+                                    11=>"Cruise Ships",
+                                    12=>"Food Court",
+                                    13=>"Government Building",
+                                    14=>"High School",
+                                    15=>"Hospital",
+                                    16=>"Hotel/ Motels",
+                                    17=>"Malls & Shopping Centre",
+                                    18=>"Manufacturing Facility",
+                                    19=>"Metro & Subway Station",
+                                    20=>"Movie Theater",
+                                    21=>"Parking Lot",
+                                    22=>"Public Library",
+                                    23=>"Public Parking",
+                                    24=>"Public Self- Storage",
+                                    25=>"Residential & Commercial Property",
+                                    26=>"Residential Properties",
+                                    27=>"Resorts",
+                                    28=>"Retail Chains & Shopping Mall",
+                                    39=>"Retail Store",
+                                    30=>"Self Storage Facility",
+                                    31=>"Senior Rooms",
+                                    32=>"Sports Stadiums & Arena",
+                                    33=>"Super Store",
+                                    34=>"University",
+                                    35=>"Warehouse"
+                                );
+
+    public $user_type_arr=array(
+                                    1=>"Board Of Director", 
+                                    2=>"Customer",
+                                    3=>"Employee",
+                                    4=>"Landlord",
+                                    5=>"Leaseholder",
+                                    6=>"Sellers",
+                                    7=>"Service Provider",
+                                    8=>"Tenant",
+                                    9=>"Adminstrator");
+
+     public $user_role_arr=array(
+                                    1=>"Adminstrator", 
+                                    2=>"Manager",
+                                    3=>"Supervisor",
+                                    4=>"Clerk",
+                                    5=>"Viewer");
+
+    public $user_type_arr_old=array(
+                                    1=>"Landlord", 
+                                    2=>"Agent",
+                                    3=>"Caretaker",
+                                    4=>"Tenant",
+                                    5=>"Guest",
+                                    6=>"Maintenance Manager",
+                                    7=>"Accountant",
+                                    8=>"Cleaner",
+                                    9=>"Admin",
+                                    10=>"Human Resource",
+                                    11=>"Concierge & Security",
+                                    12=>"Prop. Manager",
+                                    13=>"Prop. Manager Staff",
+                                    14=>"Strata President",
+                                    15=>"Strata Members",
+                                    16=>"Realtors",
+                                    17=>"Mortgage Brokers",
+                                    18=>"Registered Contractors",
+                                    19=>"Suppliers",
+                                    20=>"Service Providers",
+                                    21=>"JOB Seekers",
+                                    22=>"Suite Seekers");
+     
     public $account_holder_arr=array(1=>"Administrator",
                                     2=>"Service Provider",
                                     3=>"Sellers",
@@ -35,6 +154,14 @@ class ArrayFunction{
                                     2=>"Medium",
                                     3=>"Low",
                                     4=>"Normal");
+
+    public $announcement_status_arr=array(
+                                    1=>"Active",
+                                    2=>"Expired",
+                                    3=>"Draft",
+                                    4=>"Canceled");
+
+    
     public $form_type_arr=array(1=>"Admission Form",
                                     2=>"Alumni Information Update Form",
                                     3=>"Attendance Form",
@@ -422,30 +549,7 @@ class ArrayFunction{
                 5=>"Under Investigation",
                 6=>"Completed");
 	
-	public $user_type_arr=array(
-				1=>"Landlord", 
-                2=>"Agent",
-                3=>"Caretaker",
-                4=>"Tenant",
-                5=>"Guest",
-                6=>"Maintenance Manager",
-                7=>"Accountant",
-                8=>"Cleaner",
-                9=>"Admin",
-                10=>"Human Resource",
-                11=>"Concierge & Security",
-                12=>"Prop. Manager",
-                13=>"Prop. Manager Staff",
-                14=>"Strata President",
-                15=>"Strata Members",
-                16=>"Realtors",
-                17=>"Mortgage Brokers",
-                18=>"Registered Contractors",
-                19=>"Suppliers",
-                20=>"Service Providers",
-                21=>"JOB Seekers",
-                22=>"Suite Seekers");
-                 
+	            
     public $Costing_method=array(
                 1=>"FIFO",
                 2=>"LIFO",
@@ -511,9 +615,10 @@ class ArrayFunction{
 						  13=>"Project Common Cost",
 						  14=>"Depreciation, Amortization & Depletion");
     
-	public $currency=array(1=>"Taka",
-					2=>"USD",
-					3=>"CAD");
+	public  $currency=array(1=>"USD",
+        					2=>"CAD",
+        					3=>"EURO");
+    
 	public $yes_no=array(1=>"Yes",2=>"No");
 
 	public $accounts_main_group=array(1=>"OWNERS EQUITY",

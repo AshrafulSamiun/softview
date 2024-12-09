@@ -88,11 +88,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
-	import DatePicker from 'vue2-datepicker';
-
-
-	
+	import {ref} from "vue";
 
 
     export default {

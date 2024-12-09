@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu as Menu;
+use Illuminate\Http\Request;
 use App\Models\Module as Module;
+use App\Models\Menu as Menu;
 
 
 class HomeController extends Controller

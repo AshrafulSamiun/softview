@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\ChartDetails;
-use App\ChartMaster;
-use App\Models\User;
-use Charts;
-use DB;
 use Illuminate\Http\Request;
+use Charts;
+use App\Models\User;
+use App\Models\ChartMaster;
+use App\Models\ChartDetails;
+use DB;
 
 class ChartController extends Controller
 {

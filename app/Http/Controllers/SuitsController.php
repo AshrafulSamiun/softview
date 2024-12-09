@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
+use Illuminate\Http\Request;
 use App\Models\Floor as Floor;
 use App\Models\Suits as Suits;
-use Illuminate\Http\Request;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class SuitsController extends Controller
 {

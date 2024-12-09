@@ -1326,7 +1326,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatePicker from 'vue2-datepicker';
 
 
@@ -1827,13 +1827,13 @@
             {
             	if(!this.form.custom_field_name)
             	{
-            		Swal("failed!","Please select Custom Field Name","warning");
+            		showAlert("failed!","Please select Custom Field Name","warning");
             		return;
             	}
 
             	if(!this.form.custom_field_type)
             	{
-            		Swal("failed!","Please select Custom Field Type","warning");
+            		showAlert("failed!","Please select Custom Field Type","warning");
             		return;
             	}
             	var custom_field_id="custom_field_"+this.form.custom_field_index;
@@ -2003,16 +2003,13 @@
 					       //success
 					     
 					
-							toast({
-							  type: 'success',
-							  title: 'Data Update Successfully'
-							});
+							showToast('Data Update Successfully', 'success');
 					
 					     this.form.reset ();
 					     this.fetchCustomerProfile();
 				    })
 				    .catch(()=>{
-					   Swal("failed!","there was some wrong","warning");
+					   showAlert("failed!","there was some wrong","warning");
 				
 				    });
             },

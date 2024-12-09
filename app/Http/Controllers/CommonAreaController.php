@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BuildingInfo as BuildingInfo;
-use App\Models\CommonArea;
-use App\Models\CommonAreaDetails;
+use Illuminate\Http\Request;
 use App\Models\Floor as Floor;
+use App\Models\company;
+use App\Models\customer;
+use App\Models\buildingInfo as BuildingInfo;
+use App\Models\BuildingPropertyDetails as BuildingPropertyDetails;
 use App\Models\SubroomsList as SubroomsList;
 use App\Models\SubroomsListDetails as SubroomsListDetails;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\CommonArea;
+use App\Models\CommonAreaDetails;
 
 class CommonAreaController extends Controller
 {
@@ -19,24 +22,39 @@ class CommonAreaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        $user_type                  = $user->user_type;
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
+        $data['company_arr']        =$company_arr;
 
-            return "10**200"; 
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->whereNull('company_id')
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
         }
+
+        $data['customer_arr']        =$customer_arr;
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
+                                    ->whereNull('company_name')
+                                    ->whereNull('customer_name')
                                     ->get(['id','building_no','building_name']);
 
         //===================Building==========================================
@@ -54,25 +72,34 @@ class CommonAreaController extends Controller
     }
 
 
-    public function CommonAreaList(Request $request)
+    public function CommonAreaList()
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
 
-            return "10**200"; 
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
         }
 
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
                                     ->get(['id','building_no','building_name']);
 
         //===================Building==========================================
@@ -84,7 +111,6 @@ class CommonAreaController extends Controller
 
         $floor_list              =Floor::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
                                     ->get(['id','floor_name']);
 
         //===================Building==========================================
@@ -95,15 +121,14 @@ class CommonAreaController extends Controller
         }
 
         //===================Building==========================================
+
        
-        $uom_arr=array(1=>'Square Feet',2=>'Square Meter',3=>'Square Yard');
+         $uom_arr=array(1=>'Square Feet',2=>'Square Meter',3=>'Square Yard');
 
         $sl=0;
         $common_area_list=CommonArea::where('status_active',1)
                                         ->where('project_id',$project_id)
-                                        ->where('company_name',$company_id)
                                         ->get();
-
         foreach ($common_area_list as $key => $value) {
 
             $data['common_area_list'][$key]['sl']                   =$sl+1;
@@ -114,7 +139,30 @@ class CommonAreaController extends Controller
             $data['common_area_list'][$key]['uom_string']           =$uom_arr[$value->single_subroom_uom];
             $data['common_area_list'][$key]['total_size_qty']       =$value->total_size_qty;
 
-        
+         
+
+
+            if($value->company_name>0)
+            {
+                $data['common_area_list'][$key]['company_name']     =$company_arr[$value->company_name];
+
+            }
+            else
+            {
+                $data['common_area_list'][$key]['company_name']      ="";
+
+            }
+
+            if($value->customer_name>0)
+            {
+                $data['common_area_list'][$key]['customer_name']     =$customer_arr[$value->customer_name];
+
+            }
+            else
+            {
+                $data['common_area_list'][$key]['customer_name']      ="";
+
+            }
 
             if($value->building_name>0)
             {
@@ -142,6 +190,8 @@ class CommonAreaController extends Controller
             $sl++;
 
         }
+
+       // $data['commercial_unit_list']        =$commercial_unit_list;
         
         return $data;
 
@@ -216,9 +266,11 @@ class CommonAreaController extends Controller
                         $subrooms_list_arr[$sl]['system_no']        ="";
                         $subrooms_list_arr[$sl]['property_name']    ="";
                         $subrooms_list_arr[$sl]['comments']         ="";
-                        $subrooms_list_arr[$sl]['company']          =false;
+                        $subrooms_list_arr[$sl]['main_company']     =false;
+                        $subrooms_list_arr[$sl]['sub_company']      =false;
+                        $subrooms_list_arr[$sl]['property_customer']=false;
                         $subrooms_list_arr[$sl]['landlord']         =false;
-                        $subrooms_list_arr[$sl]['leasholder']       =false;
+                        $subrooms_list_arr[$sl]['leasholder']        =false;
                         $subrooms_list_arr[$sl]['other_1']          =false;
                         $subrooms_list_arr[$sl]['other_2']          =false;
                         $subrooms_list_arr[$sl]['uom']              =1;
@@ -238,9 +290,11 @@ class CommonAreaController extends Controller
                     $subrooms_list_arr[$sl]['system_no']        ="";
                     $subrooms_list_arr[$sl]['property_name']    ="";
                     $subrooms_list_arr[$sl]['comments']         ="";
-                    $subrooms_list_arr[$sl]['company']          =false;
+                    $subrooms_list_arr[$sl]['main_company']     =false;
+                    $subrooms_list_arr[$sl]['sub_company']      =false;
+                    $subrooms_list_arr[$sl]['property_customer']=false;
                     $subrooms_list_arr[$sl]['landlord']         =false;
-                    $subrooms_list_arr[$sl]['leasholder']       =false;
+                    $subrooms_list_arr[$sl]['leasholder']        =false;
                     $subrooms_list_arr[$sl]['other_1']          =false;
                     $subrooms_list_arr[$sl]['other_2']          =false;
                     $subrooms_list_arr[$sl]['uom']              =1;
@@ -249,6 +303,7 @@ class CommonAreaController extends Controller
                     $sl++;
                 }
 
+               // $subrooms_list_check[$value->item_id]=$value->item_id;
             }
 
             $data['subrooms_list_arr']        =$subrooms_list_arr;
@@ -283,27 +338,15 @@ class CommonAreaController extends Controller
             'property_name'     => 'required',
             'single_subroom_uom'=> 'required',
             'total_size_qty'    => 'required',
-            'strata_lot_no'     => 'required',
             
         ]);
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
 
         $user_data = \Auth::user();
         $user_id=$user_data->id;
         $project_id=$user_data->project_id;
-        $request->merge(['user_id'      =>$user_id]);
-        $request->merge(['inserted_by'  =>$user_id]);
-        $request->merge(['project_id'   =>$project_id]);
-        $request->merge(['company_name' =>$company_id]);
-
+        $request->merge(['user_id' =>$user_id]);
+        $request->merge(['inserted_by' =>$user_id]);
+        $request->merge(['project_id' =>$project_id]);
         $subrooms_list              =SubroomsList::where('status_active',1)
                                     ->where('item_type',11)
                                     ->get(['id','suffix']);
@@ -323,12 +366,17 @@ class CommonAreaController extends Controller
                                     ->where('dtls.status_active', '=', 1)
                                     ->select('dtls.item_id',DB::raw('max(dtls.system_prefix) as system_prefix'))
                                     ->groupBy('dtls.item_id')
+                                    //->toSql();
                                     ->get();
 
         $common_area_prifix_arr=array();
         foreach ($common_areas_prifix as $key => $value) {
             $common_area_prifix_arr[$value->item_id]=$value->system_prefix;
-        }       
+        }
+
+        
+
+        
 
         $max_system_data = CommonArea::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from common_areas 
             where building_name=".$request->input('building_name')."  and project_id=".$project_id." ) 
@@ -348,6 +396,7 @@ class CommonAreaController extends Controller
         $request->merge(['system_no'               =>$system_no]);
         $request->merge(['system_prefix'           =>$max_system_prefix]);
 
+        //dd($max_system_prefix);die;
         DB::beginTransaction();
         $common_area_info= CommonArea::create($request->all());
 
@@ -378,7 +427,9 @@ class CommonAreaController extends Controller
                     'uom'                       =>$details['uom'],
                     'item_size'                 =>$details['item_size'],
                     'item_name'                 =>$details['item_name'],
-                    'company'                   =>$details['company'],
+                    'main_company'              =>$details['main_company'],
+                    'sub_company'               =>$details['sub_company'],
+                    'property_customer'         =>$details['property_customer'],
                     'landlord'                  =>$details['landlord'],
                     'leasholder'                 =>$details['leasholder'],
                     'other_1'                   =>$details['other_1'],
@@ -388,13 +439,17 @@ class CommonAreaController extends Controller
             }
                    
         } 
+      //  dd($data_subrooms_list_details);
 
         $RId1=true;
 
         if($data_subrooms_list_details)
         {
             $RId1=CommonAreaDetails::insert($data_subrooms_list_details);
-        }      
+        }
+
+
+       
 
         if($common_area_info  && $RId1 )
         {
@@ -430,8 +485,15 @@ class CommonAreaController extends Controller
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        $user_type                  = $user->user_type;
-        $data['user_type']          =$user_type;
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
+        }
+        $data['company_arr']        =$company_arr;
 
         $common_area=CommonArea::where('status_active',1)
                                     ->where('project_id',$project_id)
@@ -439,14 +501,56 @@ class CommonAreaController extends Controller
                                     ->first();
         $data['common_area_arr']=$common_area;                            
         $company_id     =$common_area->company_name;
+        $customer_id    =$common_area->customer_name;
         $building_id    =$common_area->building_name;
         $floor_id       =$common_area->floor_no;
+       // $commn_area_id  =$common_area->id;
+        //dd($company_id);die;
 
-        $building_list        =BuildingInfo::where('status_active',1)
+        //===================Customer==========================================
+        $customer_list_query        =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
-                                    ->get(['id','building_no','building_name']);
+                                    ->where('customer_type',1);
 
+        if($company_id)
+        {
+            $customer_list_query->where('company_id',$company_id);
+        }
+        else{
+
+            $customer_list_query ->whereNull('company_id');
+        }
+
+        $customer_list=$customer_list_query->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
+        }
+
+        $data['customer_arr']        =$customer_arr;
+
+
+
+
+        $building_list_query        =BuildingInfo::where('status_active',1)
+                                    ->where('project_id',$project_id);
+        if($company_id)
+        {
+            $building_list_query->where('company_name',$company_id);
+        }
+        else{
+            $building_list_query ->whereNull('company_name');
+        }
+
+        if($customer_id)
+        {
+            $building_list_query->where('customer_name',$customer_id);
+        }
+        else{
+            $building_list_query ->whereNull('customer_name');
+        }
+
+        $building_list=$building_list_query->get(['id','building_no','building_name']);
 
         //===================Building==========================================
 
@@ -481,6 +585,8 @@ class CommonAreaController extends Controller
         $data['floor_type']=$floor_arr[$floor_id]['floor_type'];
         $data['total_common_area']=$floor_arr[$floor_id]['total_common_area'];
 
+        //dd($floor_arr[8]['floor_type']);
+
         $data['floor_arr']        =$floor_arr;
 
         $building_info            =BuildingInfo::where('status_active',1)
@@ -513,7 +619,9 @@ class CommonAreaController extends Controller
             $subrooms_list_arr[$sl]['system_no']        =$value->system_no;
             $subrooms_list_arr[$sl]['property_name']    =$value->property_name;
             $subrooms_list_arr[$sl]['comments']         =$value->comments;
-            $subrooms_list_arr[$sl]['company']          =$value->company;
+            $subrooms_list_arr[$sl]['main_company']     =$value->main_company;
+            $subrooms_list_arr[$sl]['sub_company']      =$value->sub_company;
+            $subrooms_list_arr[$sl]['property_customer']=$value->property_customer;
             $subrooms_list_arr[$sl]['landlord']         =$value->landlord;
             $subrooms_list_arr[$sl]['leasholder']        =$value->leasholder;
             $subrooms_list_arr[$sl]['other_1']          =$value->other_1;
@@ -547,9 +655,11 @@ class CommonAreaController extends Controller
                         $subrooms_list_arr[$sl]['system_no']        ="";
                         $subrooms_list_arr[$sl]['property_name']    ="";
                         $subrooms_list_arr[$sl]['comments']         ="";
-                        $subrooms_list_arr[$sl]['company']          =false;
+                        $subrooms_list_arr[$sl]['main_company']     =false;
+                        $subrooms_list_arr[$sl]['sub_company']      =false;
+                        $subrooms_list_arr[$sl]['property_customer']=false;
                         $subrooms_list_arr[$sl]['landlord']         =false;
-                        $subrooms_list_arr[$sl]['leasholder']       =false;
+                        $subrooms_list_arr[$sl]['leasholder']        =false;
                         $subrooms_list_arr[$sl]['other_1']          =false;
                         $subrooms_list_arr[$sl]['other_2']          =false;
                         $subrooms_list_arr[$sl]['uom']              =1;
@@ -571,9 +681,11 @@ class CommonAreaController extends Controller
                     $subrooms_list_arr[$sl]['system_no']        ="";
                     $subrooms_list_arr[$sl]['property_name']    ="";
                     $subrooms_list_arr[$sl]['comments']         ="";
-                    $subrooms_list_arr[$sl]['company']          =false;
+                    $subrooms_list_arr[$sl]['main_company']     =false;
+                    $subrooms_list_arr[$sl]['sub_company']      =false;
+                    $subrooms_list_arr[$sl]['property_customer']=false;
                     $subrooms_list_arr[$sl]['landlord']         =false;
-                    $subrooms_list_arr[$sl]['leasholder']       =false;
+                    $subrooms_list_arr[$sl]['leasholder']        =false;
                     $subrooms_list_arr[$sl]['other_1']          =false;
                     $subrooms_list_arr[$sl]['other_2']          =false;
                     $subrooms_list_arr[$sl]['uom']              =1;
@@ -610,7 +722,6 @@ class CommonAreaController extends Controller
             'property_name'     => 'required',
             'single_subroom_uom'=> 'required',
             'total_size_qty'    => 'required',
-            'strata_lot_no'     => 'required',
             
         ]);
 
@@ -667,12 +778,14 @@ class CommonAreaController extends Controller
                         'uom'                       =>$details['uom'],
                         'item_size'                 =>$details['item_size'],
                         'item_name'                 =>$details['item_name'],
-                        'company'                   =>$details['company'],
+                        'main_company'              =>$details['main_company'],
+                        'sub_company'               =>$details['sub_company'],
+                        'property_customer'         =>$details['property_customer'],
                         'landlord'                  =>$details['landlord'],
-                        'leasholder'                =>$details['leasholder'],
+                        'leasholder'                 =>$details['leasholder'],
                         'other_1'                   =>$details['other_1'],
                         'other_2'                   =>$details['other_2'],
-                        'updated_by'                =>$user_id,
+                        'updated_by'               =>$user_id,
                     );
 
                     $subroomData=CommonAreaDetails::where('id',"=",$details['id'])->update($subrooms_list_details_update);
@@ -708,7 +821,9 @@ class CommonAreaController extends Controller
                         'uom'                       =>$details['uom'],
                         'item_size'                 =>$details['item_size'],
                         'item_name'                 =>$details['item_name'],
-                        'company'                   =>$details['company'],
+                        'main_company'              =>$details['main_company'],
+                        'sub_company'               =>$details['sub_company'],
+                        'property_customer'         =>$details['property_customer'],
                         'landlord'                  =>$details['landlord'],
                         'leasholder'                 =>$details['leasholder'],
                         'other_1'                   =>$details['other_1'],
@@ -728,6 +843,9 @@ class CommonAreaController extends Controller
         {
             $RId1=CommonAreaDetails::insert($data_subrooms_list_details);
         }
+
+
+
 
         if($data_common_area  && $RId1)
         {
@@ -793,222 +911,5 @@ class CommonAreaController extends Controller
         die;
 
         
-    }
-
-
-    public function post(Request $request,$id)
-    {
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>$request->input("posting_status"),
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=CommonArea::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-    public function adjust(Request $request, $id)
-    {
-         request()->validate([
-            'building_name'     => 'required',
-            'floor_no'          => 'required',
-            'property_name'     => 'required',
-            'single_subroom_uom'=> 'required',
-            'total_size_qty'    => 'required',
-            'strata_lot_no'     => 'required',
-            
-        ]);
-
-       
-
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id;
-        $request->merge(['user_id'          =>$user_id]);
-        $request->merge(['updated_by'       =>$user_id]);
-        $request->merge(['project_id'       =>$project_id]);
-        $request->merge(['posting_status'   =>3]);
-
-
-        $subrooms_list              =SubroomsList::where('status_active',1)
-                                    ->where('item_type',11)
-                                    ->get(['id','suffix']);
-        $subrooms_suffix_arr=array();
-        foreach($subrooms_list as $value)
-        {
-            $subrooms_suffix_arr[$value->id]=$value->suffix;
-        }
-
-
-        $common_areas_prifix = DB::table('common_areas as mst')
-                                    ->join('common_area_details as dtls','mst.id','=','dtls.master_id')
-                                    ->where('mst.project_id', '=', $project_id)
-                                    ->where('dtls.project_id', '=', $project_id)
-                                    ->where('mst.building_name', '=', $request->input('building_name'))
-                                    ->where('mst.status_active', '=', 1)
-                                    ->where('dtls.status_active', '=', 1)
-                                    ->select('dtls.item_id',DB::raw('max(dtls.system_prefix) as system_prefix'))
-                                    ->groupBy('dtls.item_id')
-                                    //->toSql();
-                                    ->get();
-
-        $common_area_prifix_arr=array();
-        foreach ($common_areas_prifix as $key => $value) {
-            $common_area_prifix_arr[$value->item_id]=$value->system_prefix;
-        }
-
-        DB::beginTransaction();
-        $data_common_area= CommonArea::find($id)->update($request->all());
-
-        foreach($request->subrooms_list_arr as $key=>$details)
-        {
-                      
-            if($details['item_size']>0)
-            {
-                if($details['id']!="")
-                {
-                    $subrooms_list_details_update= array(
-                        'property_name'             =>$details['property_name'],
-                        'comments'                  =>$details['comments'],
-                        'uom'                       =>$details['uom'],
-                        'item_size'                 =>$details['item_size'],
-                        'item_name'                 =>$details['item_name'],
-                        'company'                   =>$details['company'],
-                        'landlord'                  =>$details['landlord'],
-                        'leasholder'                =>$details['leasholder'],
-                        'other_1'                   =>$details['other_1'],
-                        'other_2'                   =>$details['other_2'],
-                        'updated_by'               =>$user_id,
-                    );
-
-                    $subroomData=CommonAreaDetails::where('id',"=",$details['id'])->update($subrooms_list_details_update);
-                    if( !$subroomData)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-
-                }
-                else
-                {
-                    if(empty($common_area_prifix_arr[$details['item_id']]))
-                    {
-                        $common_area_prifix_arr[$details['item_id']]=1;
-                    }
-                    else
-                    {
-                        $common_area_prifix_arr[$details['item_id']]+=1;
-                    }
-
-                    $detials_system_no=$subrooms_suffix_arr[$details['item_id']]."-".str_pad($common_area_prifix_arr[$details['item_id']], 3, 0, STR_PAD_LEFT);
-                    $data_subrooms_list_details[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'details_id'                =>$details['details_id'],
-                        'system_prefix'             =>$common_area_prifix_arr[$details['item_id']],
-                        'system_no'                 =>$detials_system_no,
-                        'property_name'             =>$details['property_name'],
-                        'comments'                  =>$details['comments'],
-                        'uom'                       =>$details['uom'],
-                        'item_size'                 =>$details['item_size'],
-                        'item_name'                 =>$details['item_name'],
-                        'company'                   =>$details['company'],
-                        'landlord'                  =>$details['landlord'],
-                        'leasholder'                =>$details['leasholder'],
-                        'other_1'                   =>$details['other_1'],
-                        'other_2'                   =>$details['other_2'],
-                        'inserted_by'               =>$user_id,
-                    );
-                }
-                
-            }
-                   
-        }
-
-
-        $RId1=true;
-
-        if(!empty($data_subrooms_list_details))
-        {
-            $RId1=CommonAreaDetails::insert($data_subrooms_list_details);
-        }
-
-
-
-
-        if($data_common_area  && $RId1)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-
-
-    public function repost(Request $request,$id)
-    {
-
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>4,
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=CommonArea::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
     }
 }

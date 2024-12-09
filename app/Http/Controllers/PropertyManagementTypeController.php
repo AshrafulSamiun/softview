@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Project as Project;
-use App\Models\PropertyManagementType as PropertyManagementType;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use App\Models\PropertyManagementType as PropertyManagementType;
+use App\Models\Project as Project;
 
 
 class PropertyManagementTypeController extends Controller
@@ -29,11 +29,11 @@ class PropertyManagementTypeController extends Controller
         {
     
             $data['ManagementType']['id']                   =$val->id;
-            $data['ManagementType']['strata_management']    =$val->strata_management;
-            $data['ManagementType']['leasehold_management'] =$val->leasehold_management;
-            $data['ManagementType']['free_hold_management'] =$val->free_hold_management;
-            $data['ManagementType']['coop_property']        =$val->coop_property;
-            $data['ManagementType']['property_management']  =$val->property_management;
+
+            $data['ManagementType']['security_guard']       =$val->security_guard;
+            $data['ManagementType']['concierge'] =$val->concierge;
+            $data['ManagementType']['concierge_security'] =$val->concierge_security;
+            $data['ManagementType']['artimis']        =$val->artimis;
             $sl++;
 
         }
@@ -66,12 +66,20 @@ class PropertyManagementTypeController extends Controller
         $request->merge(['project_id'       =>$project_id]);
         $request->merge(['user_id'          =>$user_id]);
 
+        $ManagementType                             =0;
+        if($request->security_guard==1)             $ManagementType=1;
+        else if($request->concierge==1)             $ManagementType=2;
+        else if($request->concierge_security==1)    $ManagementType=3;
+        else if($request->artimis==1)               $ManagementType=4;
+        else if($request->property_management==1)   $ManagementType=5;
+
+        $request->merge(['management_type'          =>$ManagementType]);
         DB::beginTransaction();
 
         $property_management_type_info= PropertyManagementType::create($request->all());
 
 
-        $user_project=Project::find($project_id)->update(array('project_status' => '99'));
+        $user_project=Project::find($project_id)->update(array('project_status' => '102'));
 
         if($property_management_type_info  && $user_project)
         {
@@ -118,7 +126,19 @@ class PropertyManagementTypeController extends Controller
     {
         $user_info  = \Auth::user();
         $user_id    = $user_info->id;
+        $project_id = $user_info->project_id;
+        $request->merge(['project_id'       =>$project_id]);
+        $request->merge(['user_id'          =>$user_id]);
         $request->merge(['updated_by'          =>$user_id]);
+        
+        $ManagementType                             =0;
+        if($request->security_guard==1)             $ManagementType=1;
+        else if($request->concierge==1)             $ManagementType=2;
+        else if($request->concierge_security==1)    $ManagementType=3;
+        else if($request->artimis==1)               $ManagementType=4;
+        else if($request->property_management==1)   $ManagementType=5;
+        
+        $request->merge(['management_type'          =>$ManagementType]);
         //dd($request->all());die;
         DB::beginTransaction();
 
@@ -126,7 +146,6 @@ class PropertyManagementTypeController extends Controller
         $property_management_type_info=PropertyManagementType::find($id)->update($request->all());
 
 
-        //$user_project=Project::find($project_id)->update(array('project_status' => '99'));
 
         if($property_management_type_info)
         {

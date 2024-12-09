@@ -1,43 +1,30 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-use App\Http\Controllers\Controller;
-use App\Models\Country as Country;
-use App\Models\Project;
-use App\Models\User;
-use App\Notifications\TwoFactorCode;
-use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Mail;
+use App\Models\User;
+use App\Models\Project;
+use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Auth;
 
+use App\Notifications\TwoFactorCode;
+use App\Models\Country as Country;
+use App\Models\SendCode as SendCode;
+use App\Models\loginInfo;
+use App\Classes\ArrayFunction as ArrayFunction;
+use Stevebauman\Location\Facades\Location;
+use Mail;
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
+    
 
     use RegistersUsers;
 
-    /**া
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
+    
     protected $redirectTo = '/login';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+    
     public function __construct()
     {
         $this->middleware('guest');
@@ -52,10 +39,10 @@ class RegisterController extends Controller
 
     public function showRegistrationForm()
     {
-
+        $ArrayFunction              =new ArrayFunction();
         //echo \Request::ip();die;
 
-         // dd($_SERVER['HTTP_USER_AGENT']) ;
+        // dd($_SERVER['HTTP_USER_AGENT']) ;
 
         $country=Country::where('status_active',1)->get();
 
@@ -67,39 +54,62 @@ class RegisterController extends Controller
         }
         $data['country_arr']        =$country_arr;
         $data['country_code_arr']   =$country_code_arr;
+        $data['service_plan_arr']   =$ArrayFunction->service_plan_arr;
         return view('auth.register',$data);
     }
 
 
 
-    protected function validator(array $data)
+    
+
+    
+    public function register(Request $request)
     {
-        return Validator::make($data, [
+
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required_with:password|same:password|min:8',
-            'captcha' => 'required|captcha',
         ]);
+       $user_project=Project::create([
+            'project_name' => $request->input('company_name'),
+            'project_status' => 107,
+        ]);
+
+
+        $userRaw=User::create([
+            'name'          => $request->input('name'),
+            'user_name'     => $request->input('user_name'),
+            'email'         => $request->input('email'),
+            'project_id'    => $user_project->id,
+            'user_type'     => $request->input('user_type'),
+            'project_type'  => 105,
+            'status_active' => 0,
+            'pin_code'      => rand(11111, 99999),
+            'password'      => bcrypt($request->input('password'))
+        ]);
+
+        // Log the user in
+        Auth::login($userRaw);
+
+        $userRaw->saveLoginInfo();
+        $userRaw->generateTwoFactorCode();
+        $userRaw->notify(new twoFactorCode());
+        return redirect("/verify");
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\Models\User
-     */
     protected function create(array $data)
     {
         
         $user_project=Project::create([
-            'project_name' => 'Temporary Project',
+            'project_name' => $data['company_name'],
             'project_status' => 105,
         ]);
 
 
         $userRaw=User::create([
             'name'          => $data['name'],
+            'user_name'     => $data['user_name'],
             'email'         => $data['email'],
             'project_id'    => $user_project->id,
             'user_type'     => $data['user_type'],
@@ -108,25 +118,18 @@ class RegisterController extends Controller
             'pin_code'      => rand(11111, 99999),
             'password'      => bcrypt($data['password']),
         ]);
-
-      
-
-        
-        
+       return $userRaw;
+       //dd($userRaw);
         $user=$userRaw->toArray();
         $userRaw->saveLoginInfo();
-        // Mail::send('emails.activation',$user, function ($message) use ($user){
-        //     $message->to($user['email']);
-        //     $message->subject('Activation Code');
-
-        //  });
+       
 
         $userRaw->generateTwoFactorCode();
-            $userRaw->notify(new twoFactorCode());
-            return redirect("/verify");
+        $userRaw->notify(new twoFactorCode());
+        return redirect("/verify");
         //return redirect()->to('/')->with('success',"We send a activation code to your email, Please check");
        // Mail::to($data['email'])->send(new WelcomeMail());
-        return $userRaw;
+        
     }
 
 

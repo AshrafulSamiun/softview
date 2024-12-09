@@ -2114,7 +2114,7 @@ export default {
 
           var response_data = response.data.split("**");
           if (response_data[0] == 1) {
-            Swal(
+            showAlert(
                 'Posted!',
                 'Your Data has been Posted.',
                 'success'
@@ -2125,7 +2125,7 @@ export default {
           }
 
         }).catch(() => {
-          Swal("failed!", "there was some wrong", "warning");
+          showAlert("failed!", "there was some wrong", "warning");
         });
 
       })
@@ -2148,7 +2148,7 @@ export default {
 
           var response_data = response.data.split("**");
           if (response_data[0] == 1) {
-            Swal(
+            showAlert(
                 'Posted!',
                 'Your Data has been Reposted.',
                 'success'
@@ -2158,7 +2158,7 @@ export default {
           }
 
         }).catch(() => {
-          Swal("failed!", "there was some wrong", "warning");
+          showAlert("failed!", "there was some wrong", "warning");
         });
 
       })
@@ -2186,7 +2186,7 @@ export default {
           });
         }
       }).catch(() => {
-        Swal("failed!", "there was some wrong", "warning");
+        showAlert("failed!", "there was some wrong", "warning");
       });
 
     },
@@ -3087,7 +3087,7 @@ export default {
         this.form.delete('/BuildingInfos/' + this.form.id).then(() => {
 
           if (result.value) {
-            Swal(
+            showAlert(
                 'Deleted!',
                 'Your Data has been deleted.',
                 'success'
@@ -3097,7 +3097,7 @@ export default {
           }
 
         }).catch(() => {
-          Swal("failed!", "there was some wrong", "warning");
+          showAlert("failed!", "there was some wrong", "warning");
         });
 
       })
@@ -3133,13 +3133,13 @@ export default {
 
       if (this.form.dependent_building == false && this.form.independent_building == false) {
 
-        Swal("Warning!", "Please Select Dependency Class", "warning");
+        showAlert("Warning!", "Please Select Dependency Class", "warning");
         return;
 
       }
       if (this.form.residential == false && this.form.commercial == false && this.form.residential_commercial == false) {
 
-        Swal("Warning!", "Please Select Property Type", "warning");
+        showAlert("Warning!", "Please Select Property Type", "warning");
         return;
 
       }

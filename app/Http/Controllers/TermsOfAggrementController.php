@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project as Project;
-use App\Models\TermsOfAggrement as TermsOfAggrement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\TermsOfAggrement as TermsOfAggrement;
+use App\Models\Project as Project;
 
 
 class TermsOfAggrementController extends Controller
@@ -20,23 +21,11 @@ class TermsOfAggrementController extends Controller
         
         $project_id                         = \Auth::user()->project_id;
 
-        $TermsOfAggrement_data              =TermsOfAggrement::where('project_id',$project_id)->where('status_active',1)->get();
-        $data['terms_of_aggrement_data']    =array();
 
         $project_info = Project::find($project_id);
         $project_type = $project_info->project_status;
         $data['project_status']=$project_type;
-        foreach($TermsOfAggrement_data as $key=>$val)
-        {
-            $data['terms_of_aggrement_data']['id']                          =$val->id;
-            $data['terms_of_aggrement_data']['diclaration']                 =$val->diclaration;
-            $data['terms_of_aggrement_data']['full_name']                   =$val->full_name;
-            $data['terms_of_aggrement_data']['position']                    =$val->position;
-            $data['terms_of_aggrement_data']['office_phone']                =$val->office_phone;
-            $data['terms_of_aggrement_data']['mobile']                      =$val->mobile;
-            $data['terms_of_aggrement_data']['email']                       =$val->email;
-            $data['terms_of_aggrement_data']['location']                    =$val->location;
-        }
+        
 
         return $data;
     }
@@ -59,15 +48,7 @@ class TermsOfAggrementController extends Controller
      */
      public function store(Request $request)
     {
-        request()->validate([
-            'diclaration'                   => 'required',
-            'full_name'                     => 'required',
-            'position'                      => 'required',
-            'office_phone'                  => 'required',
-            'mobile'                        => 'required',
-            'email'                         => 'required',
-            'location'                      => 'required',            
-        ]);
+        
 
 
 
@@ -79,13 +60,11 @@ class TermsOfAggrementController extends Controller
 
         DB::beginTransaction();
 
-        $terms_of_condition_insert=TermsOfAggrement::create($request->all());
-
-        $user_project=Project::find($project_id)->update(array('project_status' => '95'));
+        $user_project=Project::find($project_id)->update(array('project_status' => '98'));
 
 
 
-        if( $terms_of_condition_insert)
+        if( $user_project)
         {
            DB::commit();
            return 1;
@@ -130,32 +109,20 @@ class TermsOfAggrementController extends Controller
      */
     public function update(Request $request, $id)
     {
-        request()->validate([
-            'diclaration'                   => 'required',
-            'full_name'                     => 'required',
-            'position'                      => 'required',
-            'office_phone'                  => 'required',
-            'mobile'                        => 'required',
-            'email'                         => 'required',
-            'location'                      => 'required',            
-        ]);
+       
 
         $user_data                              = \Auth::user();
         $user_id                                =$user_data->id;
         $project_id                             =$user_data->project_id;
-        $request->merge(['updated_by'          =>$user_id]);
-        $request->merge(['project_id'           =>$project_id]);
-
-
+       
 
         DB::beginTransaction();
-
-        $service_contact_update=TermsOfAggrement::find($id)->update($request->all());
+        $user_project=Project::find($project_id)->update(array('project_status' => '99'));
 
        
 
 
-        if( $service_contact_update)
+        if( $user_project)
         {
            DB::commit();
            return 1;

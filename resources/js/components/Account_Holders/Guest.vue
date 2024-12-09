@@ -635,7 +635,7 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import {ref} from "vue";
 import VueTimepicker from 'vue2-timepicker';
 import 'vue2-timepicker/dist/VueTimepicker.css';
 //import { jsPDF } from "jspdf";
@@ -848,14 +848,11 @@ methods: {
                 }
                 else{
 
-                    toast({
-                        type: 'danger',
-                        title: 'Invalid Operation'
-                    });
+                    showToast('Invalid Operation', 'error');
                 }
             })
             .catch(()=>{
-               Swal("failed!","there was some wrong","warning");
+               showAlert("failed!","there was some wrong","warning");
         
             });
     },
@@ -887,10 +884,7 @@ methods: {
             var response_data=data.split("**");
             if(response_data[0]==1)
             {
-                 toast({
-                    type: 'success',
-                    title: 'Data Save successfully'
-                });
+                 showToast('Data Save Successfully', 'success');
 
                 if(type==1)
                 {
@@ -943,7 +937,7 @@ methods: {
               this.form.delete('/AccountHolderguest/'+this.form.id).then(()=>{
                 
                   if(result.value) {
-                       Swal(
+                       showAlert(
                         'Deleted!',
                         'Your Company has been deleted.',
                         'success'
@@ -953,7 +947,7 @@ methods: {
                   }            
 
               }).catch(()=>{
-                Swal("failed!","there was some wrong","warning");
+                showAlert("failed!","there was some wrong","warning");
           });
        
       })

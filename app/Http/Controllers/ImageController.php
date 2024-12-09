@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FileUpload;
 use Illuminate\Http\Request;
+use App\Models\FileUpload;
 use Intervention\Image\Facades\Image;
 
 class ImageController extends Controller
@@ -63,7 +63,26 @@ class ImageController extends Controller
        return "1**".$image->id;
      }
 
+   public function photo_upload(Request $request)
+   {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('uploads', $filename, 'public');
+
+            $image_arr= new FileUpload();
+            $image_arr->image_name = $filename;
+            $image_arr->save();
+
+            return response()->json(['path' => "/storage/$path", 'filename' => $filename, 'image_id' => $image_arr->id]);
+        }
+
+        return response()->json(['error' => 'File upload failed'], 400);
+    }
     
 
     public function updatePhoto(Request $request)
@@ -82,7 +101,7 @@ class ImageController extends Controller
       // $image->save();
 
        return "1**".$photo_image_id;
-     }
+   }
 }
 
 

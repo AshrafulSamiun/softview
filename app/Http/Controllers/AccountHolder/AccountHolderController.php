@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AccountHolder;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\AccountHolder;
-use App\Models\AccountHolderSuffix;
-use App\Models\Country as Country;
-use App\Models\industrySector;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\industrySector;
+use App\Models\Country as Country;
+use App\Models\AccountHolderSuffix;
+use App\Models\AccountHolder;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Mail;
+
 
 
 class AccountHolderController extends Controller
@@ -21,10 +23,8 @@ class AccountHolderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-       
-        $company_id=$request->session()->get('company_id');
         $user=\Auth::user();
         $project_id                 = $user->project_id;
 
@@ -148,14 +148,6 @@ class AccountHolderController extends Controller
      */
     public function store(Request $request)
     {
-
-        $company_id=$request->session()->get('company_id');
- 
-
-       if (is_null($company_id)) 
-       { 
-        return "10**22**21";
-       }
         request()->validate([
 
             'account_type'                  =>"required",
@@ -355,7 +347,7 @@ class AccountHolderController extends Controller
         DB::beginTransaction();
         $account_holder_info= AccountHolder::find($id)->update($request->all());
 
-        $userRaw=User::where('account_holder_id', $id)->where('user_type', $request->input('account_type'))->update([
+        $userRaw=User::where('account_holder_id', $id)->update([
             'name'          => $request->input('first_name')." ".$request->input('middle_name')." ".$request->input('last_name'),
             'email'         => $request->input('email'),
             'user_type'     => $request->input('account_type'),
@@ -384,19 +376,6 @@ class AccountHolderController extends Controller
      */
     public function destroy($id)
     {
-        $AccountHolder_delete=AccountHolder::find($id)->update(array('is_deleted' => 1,'status_active' => 0));
-        $User_delete=User::where('account_holder_id',$id)->update(array('status_active' => 0));
-
-        if($AccountHolder_delete  && $User_delete)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return 10;
-        }
-        die;
+        //
     }
 }

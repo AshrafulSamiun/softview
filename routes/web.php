@@ -11,10 +11,7 @@
 |
 */
 
-//Route::get('/', 'HomeController@index')->name('home');
-/*Route::get('/', function () {
-    return view('home');
-});*/
+
 
 //========================Test Link===================================
 use App\Mail\WelcomeMail;
@@ -26,16 +23,23 @@ Route:: get ('/email', function () {
 
 //===========================End Test Link=============================
 
-
+Route::middleware('web')->group(function () {
+   // Route::get('/register', [RegisterController::class, 'create']);
+    Route::post('/register', [RegisterController::class, 'create']);
+});
 
 Auth::routes();
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
 Route::get('user/activation/{user_id}', 'Auth\RegisterController@userActivation');
 
-Route:: get ('/', function () {
-   return view('web_index');
-   // return view('auth.login');
+
+Route:: get ('/about-us', function () {
+   return view('about_us');
 });
+Route::get('/', 'HomeRouteController@home_menu');
+Route::get('/about-us', 'HomeRouteController@about_us')->name('about-us');
+Route::get('/plan', 'HomeRouteController@plan')->name('plan');
+Route::get('/contact-us', 'HomeRouteController@contact_us')->name('contact-us');
 
 
 Route:: get ('/multiform', function () {
@@ -67,7 +71,15 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::get('OpenFiles','OpenFileController@index');
 	Route::post('OpenFiles','OpenFileController@open_files');
 	Route::resource('Users','UserController');
+	Route::get('UserTypeData/{user_type}','UserController@UserTypeData');
 	Route::resource('UserPrivileges','UserPrivilegeController');
+	Route::get('UserPrivilegeList','UserPrivilegeController@UserPrivilegeList');
+	Route::post('UserPrivilegePost/{id}','UserPrivilegeController@post');
+	Route::post('UserPrivilegeVoid/{id}','UserPrivilegeController@void');
+	Route::post('UserPrivilegeReject/{id}','UserPrivilegeController@reject');
+	Route::post('adjustUserPrivilege/{id}','UserPrivilegeController@adjust');
+	Route::post('UserPrivilegeRepost/{id}','UserPrivilegeController@repost');
+
 	Route::resource('UserProfiles','UserProfileController');
 	Route::get('UserPermission/{menu_name}','UserPrivilegeController@UserPermission');
 	Route::get('/ProjectUser','UserController@project_user');
@@ -75,9 +87,31 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 
 	Route::post('/image/store', 'ImageController@store');
 	Route::post('/image/update', 'ImageController@update');
-	Route::get('all-chart', 'ChartController@all_chart');
+	Route::post('/upload-photo', 'ImageController@photo_upload');
 
+
+
+	Route::get('all-chart', 'ChartController@all_chart');
 	Route::resource('AccountSetups','AccountSetupController');
+	
+	Route::resource('Calendars','CalendarController');
+	//Route::get('CalendarData/{year}','CalendarController@Calendar');
+	Route::get('CalendarList/{year}','CalendarController@CalendarLists');
+ 	Route::post('CalendarPost/{id}','CalendarController@post');
+	Route::post('adjustCalendar/{id}','CalendarController@adjust');
+	Route::post('CalendarRepost/{id}','CalendarController@repost');
+
+	Route::resource('AllertCentres','AllertCentreController');
+	Route::resource('SiteDashboards','SiteDashboardController');
+
+ 	Route::resource('JobSites','profile\JobSiteController');
+ 	Route::get('JobSiteList','profile\JobSiteController@JobSiteLists');
+ 	Route::post('JobSitePost/{id}','profile\JobSiteController@post');
+	Route::post('adjustJobSite/{id}','profile\JobSiteController@adjust');
+	Route::post('JobSiteRepost/{id}','profile\JobSiteController@repost');
+
+
+
 	Route::resource('CustomerPropertys','CustomerPropertyController');
 	Route::get('loadCustomerByCompany/{company_id}','CustomerPropertyController@loadCustomerByCompany');
 	Route::get('loadFloorByBuilding/{building_id}','FloorController@loadFloorByBuilding');
@@ -92,18 +126,8 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::resource('CoaSettings','CoaSettingController');
 	Route::resource('ChartOfAccounts','ChartOfAccountController');
 
-
-
-	Route::resource('Periods','PeriodController');
-	Route::post('PeriodPost/{id}','PeriodController@post');
-	Route::post('adjustPeriod/{id}','PeriodController@adjust');
-	Route::post('PeriodRepost/{id}','PeriodController@repost');
 	Route::resource('PostingJobs','PostingJobsController');
-
-	
 	Route::resource('PostingHousingRental','PostingHousingRentalController');
-
-
 
 	Route::get('provience_by_country/{country}', 'provienceController@get_provience_by_country');
 	Route::get('Dashboard/', 'DashboardController@index')->name('dashboard');
@@ -111,9 +135,6 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::resource('UserCompanies','UserCompanyController');
 	Route::resource('BuildingInfos','BuildingInfoController');
 	Route::get('BuildingInfoLits','BuildingInfoController@BuildingInfoLits');
-	Route::post('BuildingInfoPost/{id}','BuildingInfoController@post');
-	Route::post('adjustBuildingInfo/{id}','BuildingInfoController@adjust');
-	Route::post('BuildingInfoRepost/{id}','BuildingInfoController@repost');
 
 
 	Route::resource('PropertyManagementTypes','PropertyManagementTypeController');
@@ -121,11 +142,12 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::resource('userServiceContacts','userServiceContactController');
 	Route::resource('TermsOfAggrements','TermsOfAggrementController');
 	Route::resource('DocumentSubmitions','DocumentSubmitionController');
+	Route::resource('DocumentSubmitions','DocumentSubmitionController');
 	Route::resource('AccountActivations','AccountActivationController');
-
-	
 	Route::resource('AccountContactPersons','AccountContactPersonController');
+	
 
+	Route::post('RegistrationInstruction','AccountActivationController@registration_instruction');
 
 	Route::resource('Countries','CountryController');
 	Route::resource('proviences','provienceController');
@@ -141,75 +163,48 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 
 
 
+
 	Route::resource('Floors','FloorController');
 	Route::get('FloorLists','FloorController@FloorLists');
-	Route::post('FloorPost/{id}','FloorController@post');
-	Route::post('adjustFloor/{id}','FloorController@adjust');
-	Route::post('FloorRepost/{id}','FloorController@repost');
-
-
 
 	Route::resource('ResidentialSuites','ResidentialSuiteController');
 	Route::get('ResidentialSuitesLists','ResidentialSuiteController@ResidentialSuitesLists');
 	Route::get('loadSuiteByFloor/{floor_id}/{suite_no}','ResidentialSuiteController@loadSuiteByFloor');
 	Route::get('FloorDataByBuilding/{building_id}','ResidentialSuiteController@FloorDataByBuilding');
-	Route::post('ResidentialSuitePost/{id}','ResidentialSuiteController@post');
-	Route::post('adjustResidentialSuite/{id}','ResidentialSuiteController@adjust');
-	Route::post('ResidentialSuiteRepost/{id}','ResidentialSuiteController@repost');
-
-
-
 	Route::get('UnitFloorDataByBuilding/{building_id}','CommercialUnitController@FloorDataByBuilding');
 
 	Route::get('loadUnitByFloor/{floor_id}/{unit_no}','CommercialUnitController@loadUnitByFloor');
+
 	Route::resource('CommercialUnits','CommercialUnitController');
 	Route::get('CommercialUnitLits','CommercialUnitController@CommercialUnitLits');
-	Route::post('CommercialUnitPost/{id}','CommercialUnitController@post');
-	Route::post('adjustCommercialUnit/{id}','CommercialUnitController@adjust');
-	Route::post('CommercialUnitRepost/{id}','CommercialUnitController@repost');
 
 
 	Route::resource('SupportingRooms','SupportingRoomController');
 	Route::get('SupportingRoomLists','SupportingRoomController@SupportingRoomLists');
 	Route::get('subroomFloorByBuilding/{building_id}','SupportingRoomController@subroomFloorByBuilding');
 	Route::get('loadSubroomsByFloor/{building_id}','SupportingRoomController@loadSubroomsByFloor');
-	Route::post('SupportingRoomPost/{id}','SupportingRoomController@post');
-	Route::post('adjustSupportingRoom/{id}','SupportingRoomController@adjust');
-	Route::post('SupportingRoomRepost/{id}','SupportingRoomController@repost');
 
 	Route::resource('MailRooms','MailRoomController');
 	Route::get('MailRoomLits','MailRoomController@MailRoomLits');
 	//Route::get('CommercialUnitLits','MailRoomController@CommercialUnitLits');
 	Route::get('MailRoomFloorByBuilding/{building_id}','MailRoomController@MailRoomFloorByBuilding');
 	Route::get('loadMailBoxByFloor/{floor_id}/{room_no}','MailRoomController@loadMailBoxByFloor');
-	Route::post('MailRoomPost/{id}','MailRoomController@post');
-	Route::post('adjustMailRoom/{id}','MailRoomController@adjust');
-	Route::post('MailRoomRepost/{id}','MailRoomController@repost');
 
 	Route::resource('ParkingLots','ParkingLotController');
 	Route::get('ParkingFloorDataByBuilding/{building_id}','ParkingLotController@ParkingFloorDataByBuilding');
 	Route::get('loadParkingLotByFloor/{floor_id}','ParkingLotController@loadParkingLotByFloor');
 	Route::get('ParkingLotsList','ParkingLotController@ParkingLotsList');
-	Route::post('ParkingLotPost/{id}','ParkingLotController@post');
-	Route::post('adjustParkingLot/{id}','ParkingLotController@adjust');
-	Route::post('ParkingLotRepost/{id}','ParkingLotController@repost');
 
 
 	Route::resource('BikeLots','BikeLotController');
 	Route::get('BikeFloorDataByBuilding/{building_id}','BikeLotController@BikeFloorDataByBuilding');
 	Route::get('loadBikeLotByFloor/{floor_id}','BikeLotController@loadBikeLotByFloor');
 	Route::get('BikeLotsList','BikeLotController@BikeLotsList');
-	Route::post('BikeLotPost/{id}','BikeLotController@post');
-	Route::post('adjustBikeLot/{id}','BikeLotController@adjust');
-	Route::post('BikeLotRepost/{id}','BikeLotController@repost');
 
 	Route::resource('StorageLots','StorageLotController');
 	Route::get('StorageFloorDataByBuilding/{building_id}','StorageLotController@StorageFloorDataByBuilding');
 	Route::get('loadStorageLotByFloor/{floor_id}','StorageLotController@loadStorageLotByFloor');
 	Route::get('StorageLotsList','StorageLotController@StorageLotsList');
-	Route::post('StorageLotPost/{id}','StorageLotController@post');
-	Route::post('adjustStorageLot/{id}','StorageLotController@adjust');
-	Route::post('StorageLotRepost/{id}','StorageLotController@repost');
 
 	Route::resource('PropertyAttributions','PropertyAttributionController');
 	Route::get('PropertyAttributionsList','PropertyAttributionController@PropertyAttributionsList');
@@ -223,11 +218,6 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::get('CommonAreaList','CommonAreaController@CommonAreaList');
 	Route::get('CommonAreaFloorDataByBuilding/{building_id}','CommonAreaController@FloorDataByBuilding');
 	Route::get('loadCommonAreaByFloor/{floor_id}','CommonAreaController@loadCommonAreaByFloor');
-	Route::post('CommonAreaPost/{id}','CommonAreaController@post');
-	Route::post('adjustCommonArea/{id}','CommonAreaController@adjust');
-	Route::post('CommonAreaRepost/{id}','CommonAreaController@repost');
-
-
 
 	Route::resource('AccountHolders','AccountHolderController');
 	Route::get('AccountHolderLists','AccountHolderController@AccountHolderLists');
@@ -279,7 +269,7 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 
 
 
-   /*=========================Sales =============================================================*/
+   /*=========================Sales ===================================================================*/
 	Route::resource('SalesOffers','Sales\SalesOfferController');
 	Route::get('SalesOfferList','Sales\SalesOfferController@SalesOfferList');
 	Route::post('SalesOfferPost/{id}','Sales\SalesOfferController@post');
@@ -303,81 +293,6 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::resource('SaleDirectPayments','Sales\DirectPaymentController');
 	Route::get('SaleDirectPaymentList','Sales\DirectPaymentController@DirectPaymentList');
 
-
-
-	Route::resource('AccountHoldersBank','AccountHolder\AccountHolderBankController');
-	Route::get('AccountHolderBankLists','AccountHolder\AccountHolderBankController@AccountHolderBankLists');
-
-	Route::resource('AccountHolderBoardOfDirector','AccountHolder\AccountHolderBoardOfDirectorController');
-	Route::get('AccountHolderBoardOfDirectorLists','AccountHolder\AccountHolderBoardOfDirectorController@AccountHolderBoardOfDirectorLists');
-
-
-	Route::resource('AccountHoldersClient','AccountHolder\AccountHolderClientController');
-	Route::get('AccountHolderClientLists','AccountHolder\AccountHolderClientController@AccountHolderClientLists');
-	
-	Route::resource('AccountHolderCreditCardCompany','AccountHolder\AccountHolderCreditCardCompanyController');
-	Route::get('AccountHolderCreditCardCompanyLists','AccountHolder\AccountHolderCreditCardCompanyController@AccountHolderCreditCardCompanyLists');
-
-
-	Route::resource('AccountHolderCustomer','AccountHolder\AccountHolderCustomerController');
-	Route::get('AccountHolderCustomerLists','AccountHolder\AccountHolderCustomerController@AccountHolderCustomerLists');
-
-
-	Route::resource('AccountHolderDonor','AccountHolder\AccountHolderDonorController');
-	Route::get('AccountHolderDonorLists','AccountHolder\AccountHolderDonorController@AccountHolderDonorLists');
-
-
-	Route::resource('AccountHolderEmployee','AccountHolder\AccountHolderEmployeeController');
-	Route::get('AccountHolderEmployeeLists','AccountHolder\AccountHolderEmployeeController@AccountHolderEmployeeLists');
-
-
-	Route::resource('AccountHolderGovernment','AccountHolder\AccountHolderGovernmentController');
-	Route::get('AccountHolderGovernmentLists','AccountHolder\AccountHolderGovernmentController@AccountHolderGovernmentLists');
-
-
-	Route::resource('AccountHolderInvestor','AccountHolder\AccountHolderInvestorController');
-	Route::get('AccountHolderInvestorLists','AccountHolder\AccountHolderInvestorController@AccountHolderInvestorLists');
-
-	Route::resource('AccountHolderLandlord','AccountHolder\AccountHolderLandlordController');
-	Route::get('AccountHolderLandlordLists','AccountHolder\AccountHolderLandlordController@AccountHolderLandlordLists');
-	
-	Route::resource('AccountHolderLeaseholder','AccountHolder\AccountHolderLeaseholderController');
-	Route::get('AccountHolderLeaseholderLists','AccountHolder\AccountHolderLeaseholderController@AccountHolderLeaseholderLists');
-
-
-	Route::resource('AccountHolderPrivateLoanLender','AccountHolder\AccountHolderPrivateLoanLenderController');
-	Route::get('AccountHolderPrivateLoanLenderLists','AccountHolder\AccountHolderPrivateLoanLenderController@AccountHolderPrivateLoanLenderLists');
-	
-	
-	Route::resource('AccountHolderSeller','AccountHolder\AccountHolderSellerController');
-	Route::get('AccountHolderSellerLists','AccountHolder\AccountHolderSellerController@AccountHolderSellerLists');
-
-
-	Route::resource('AccountHolderServiceProvider','AccountHolder\AccountHolderServiceProviderController');
-	Route::get('AccountHolderServiceProviderLists','AccountHolder\AccountHolderServiceProviderController@AccountHolderServiceProviderLists');
-
-
-
-	Route::resource('AccountHolderShareholder','AccountHolder\AccountHolderShareholderController');
-	Route::get('AccountHolderShareholderLists','AccountHolder\AccountHolderShareholderController@AccountHolderShareholderLists');
-	
-	Route::resource('AccountHolderStudent','AccountHolder\AccountHolderStudentController');
-	Route::get('AccountHolderStudentLists','AccountHolder\AccountHolderStudentController@AccountHolderStudentLists');
-	
-	
-	Route::resource('AccountHolderTenant','AccountHolder\AccountHolderTenantController');
-	Route::get('AccountHolderTenantLists','AccountHolder\AccountHolderTenantController@AccountHolderTenantLists');
-
-
-	Route::resource('AccountHolderVisitor','AccountHolder\AccountHolderVisitorController');
-	Route::get('AccountHolderVisitorLists','AccountHolder\AccountHolderVisitorController@AccountHolderVisitorLists');
-
-
-	Route::resource('AccountHolderVolunteer','AccountHolder\AccountHolderVolunteerController');
-	Route::get('AccountHolderVolunteerLists','AccountHolder\AccountHolderVolunteerController@AccountHolderVolunteerLists');
-
-
-
 	Route::resource('FormEntrys','OperatingModule\FormEntryController');
 	Route::get('FormEntryList','OperatingModule\FormEntryController@FormEntryList');
 	Route::post('FormEntrysrPost/{id}','OperatingModule\FormEntryController@post');
@@ -385,6 +300,180 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::post('FormEntrysRepost/{id}','OperatingModule\FormEntryController@repost');
 
 	Route::resource('MaintenanceRooms','MaintenanceRoomController');
+
+
+
+
+	//=========================Message============================================
+
+	Route::get('AdminMessages', 'MessageAdminController@index')->name('AdminMessages'); 
+	Route::get('UserMessages', 'MessageAdminController@index')->name('UserMessages');  
+	Route::get('AdminInbox', 'MessageAdminInboxController@index')->name('AdminInbox'); 
+	Route::post('/adminDelete/{id}', 'MessageAdminInboxController@adminDelete'); 
+	Route::resource('AdminNew','MessageAdminNewController');
+	Route::get('AdminMessageView', 'MessageAdminMessageViewController@index')->name('AdminMessageView'); 
+
+	//=========================Announcement=======================================================
+
+   Route::resource('Announcements','Information\AnnouncementController');
+	Route::get('AnnouncementList/{type}','Information\AnnouncementController@AnnouncementList');
+	Route::post('AnnouncementPost/{id}','Information\AnnouncementController@post');
+	Route::post('adjustAnnouncement/{id}','Information\AnnouncementController@adjust');
+	Route::post('AnnouncementRepost/{id}','Information\AnnouncementController@repost');
+
+
+	//======================Account Holder===============================================
+
+	Route::resource('AccountHoldersBank','AccountHolder\AccountHolderBankController');
+	Route::get('AccountHolderBankLists','AccountHolder\AccountHolderBankController@AccountHolderBankLists');
+	Route::post('AccountHoldersBankPost/{id}','AccountHolder\AccountHolderBankController@post');
+	Route::post('adjustAccountHoldersBank/{id}','AccountHolder\AccountHolderBankController@adjust');
+	Route::post('AccountHoldersBankRepost/{id}','AccountHolder\AccountHolderBankController@repost');
+	Route::post('AccountHoldersBankVoid/{id}','AccountHolder\AccountHolderBankController@void');
+	Route::post('AccountHoldersBankReject/{id}','AccountHolder\AccountHolderBankController@reject');
+	Route::get('AccountHolderBankPostingType/{id}','AccountHolder\AccountHolderBankController@list_by_posting_type');
+	Route::get('AccountHolderBankPostingStatus','AccountHolder\AccountHolderBankController@posting_status');
+	Route::get('AccountHoldersBankPrintPdf/{id}','AccountHolder\AccountHolderBankController@pdf_print');
+	Route::get('AccountHoldersBankPrintAll/{type}/{style}','AccountHolder\AccountHolderBankController@pdf_print_all');
+
+
+
+
+	Route::resource('AccountHolderBoardOfDirector','AccountHolder\AccountHolderBoardOfDirectorController');
+	Route::get('AccountHolderBoardOfDirectorLists','AccountHolder\AccountHolderBoardOfDirectorController@AccountHolderBoardOfDirectorLists');
+	Route::post('BoardOfDirectorPost/{id}','AccountHolder\AccountHolderBoardOfDirectorController@post');
+	Route::post('adjustBoardOfDirector/{id}','AccountHolder\AccountHolderBoardOfDirectorController@adjust');
+	Route::post('BoardOfDirectorRepost/{id}','AccountHolder\AccountHolderBoardOfDirectorController@repost');
+	Route::post('BoardOfDirectorVoid/{id}','AccountHolder\AccountHolderBoardOfDirectorController@void');
+	Route::post('BoardOfDirectorReject/{id}','AccountHolder\AccountHolderBoardOfDirectorController@reject');
+	Route::get('BoardOfDirectorPostingType/{id}','AccountHolder\AccountHolderBoardOfDirectorController@list_by_posting_type');
+	Route::get('BoardOfDirectorPostingStatus','AccountHolder\AccountHolderBoardOfDirectorController@posting_status');
+	Route::get('BoardOfDirectorPrintPdf/{id}','AccountHolder\AccountHolderBoardOfDirectorController@pdf_print');
+	Route::get('AccountHoldersBoardOfDirectorPrintAll/{type}/{style}','AccountHolder\AccountHolderBoardOfDirectorController@pdf_print_all');
+	
+
+	Route::resource('AccountHoldersClient','AccountHolder\AccountHolderClientController');
+	Route::get('AccountHolderClientLists','AccountHolder\AccountHolderClientController@AccountHolderClientLists');
+	Route::post('AccountHoldersClientPost/{id}','AccountHolder\AccountHolderClientController@post');
+	Route::post('adjustAccountHoldersClient/{id}','AccountHolder\AccountHolderClientController@adjust');
+	Route::post('AccountHoldersClientRepost/{id}','AccountHolder\AccountHolderClientController@repost');
+	Route::post('AccountHoldersClientVoid/{id}','AccountHolder\AccountHolderClientController@void');
+	Route::post('AccountHoldersClientReject/{id}','AccountHolder\AccountHolderClientController@reject');
+	Route::get('AccountHoldersClientPostingType/{id}','AccountHolder\AccountHolderClientController@list_by_posting_type');
+	Route::get('AccountHoldersClientPostingStatus','AccountHolder\AccountHolderClientController@posting_status');
+	Route::get('AccountHoldersClientPrintPdf/{id}','AccountHolder\AccountHolderClientController@pdf_print');
+	Route::get('AccountHoldersAccountHoldersClientPrintAll/{type}/{style}','AccountHolder\AccountHolderClientController@pdf_print_all');
+	
+	Route::resource('AccountHolderCreditCardCompany','AccountHolder\AccountHolderCreditCardCompanyController');
+	Route::get('AccountHolderCreditCardCompanyLists','AccountHolder\AccountHolderCreditCardCompanyController@AccountHolderCreditCardCompanyLists');
+	Route::post('PurchaseOfferPost/{id}','Purchase\PurchaseOfferController@post');
+	Route::post('adjustPurchaseOffer/{id}','Purchase\PurchaseOfferController@adjust');
+	Route::post('PurchaseOfferRepost/{id}','Purchase\PurchaseOfferController@repost');
+
+	Route::resource('AccountHolderCustomer','AccountHolder\AccountHolderCustomerController');
+	Route::get('AccountHolderCustomerLists','AccountHolder\AccountHolderCustomerController@AccountHolderCustomerLists');
+	Route::post('PurchaseOfferPost/{id}','Purchase\PurchaseOfferController@post');
+	Route::post('adjustPurchaseOffer/{id}','Purchase\PurchaseOfferController@adjust');
+	Route::post('PurchaseOfferRepost/{id}','Purchase\PurchaseOfferController@repost');
+
+	Route::resource('AccountHolderDonor','AccountHolder\AccountHolderDonorController');
+	Route::get('AccountHolderDonorLists','AccountHolder\AccountHolderDonorController@AccountHolderDonorLists');
+	Route::post('DonorPost/{id}','Purchase\AccountHolderDonorController@post');
+	Route::post('adjustDonor/{id}','Purchase\AccountHolderDonorController@adjust');
+	Route::post('DonorRepost/{id}','Purchase\AccountHolderDonorController@repost');
+
+	Route::resource('AccountHolderEmployee','AccountHolder\AccountHolderEmployeeController');
+	Route::get('AccountHolderEmployeeLists','AccountHolder\AccountHolderEmployeeController@AccountHolderEmployeeLists');
+	Route::post('EmployeePost/{id}','Purchase\AccountHolderEmployeeController@post');
+	Route::post('adjustEmployee/{id}','Purchase\AccountHolderEmployeeController@adjust');
+	Route::post('EmployeeRepost/{id}','Purchase\AccountHolderEmployeeController@repost');
+
+	Route::resource('AccountHolderGovernment','AccountHolder\AccountHolderGovernmentController');
+	Route::get('AccountHolderGovernmentLists','AccountHolder\AccountHolderGovernmentController@AccountHolderGovernmentLists');
+	Route::post('GovernmentPost/{id}','Purchase\AccountHolderGovernmentController@post');
+	Route::post('adjustGovernment/{id}','Purchase\AccountHolderGovernmentController@adjust');
+	Route::post('GovernmentRepost/{id}','Purchase\AccountHolderGovernmentController@repost');
+
+	Route::resource('AccountHolderInvestor','AccountHolder\AccountHolderInvestorController');
+	Route::get('AccountHolderInvestorLists','AccountHolder\AccountHolderInvestorController@AccountHolderInvestorLists');
+	Route::post('InvestorPost/{id}','Purchase\AccountHolderInvestorController@post');
+	Route::post('adjustInvestor/{id}','Purchase\AccountHolderInvestorController@adjust');
+	Route::post('InvestorRepost/{id}','Purchase\AccountHolderInvestorController@repost');
+
+	Route::resource('AccountHolderLandlord','AccountHolder\AccountHolderLandlordController');
+	Route::get('AccountHolderLandlordLists','AccountHolder\AccountHolderLandlordController@AccountHolderLandlordLists');
+	Route::post('LandlordPost/{id}','Purchase\AccountHolderLandlordController@post');
+	Route::post('adjustLandlord/{id}','Purchase\AccountHolderLandlordController@adjust');
+	Route::post('LandlordRepost/{id}','Purchase\AccountHolderLandlordController@repost');
+
+
+	Route::resource('AccountHolderLeaseholder','AccountHolder\AccountHolderLeaseholderController');
+	Route::get('AccountHolderLeaseholderLists','AccountHolder\AccountHolderLeaseholderController@AccountHolderLeaseholderLists');
+	Route::post('LeaseholderPost/{id}','Purchase\AccountHolderLeaseholderController@post');
+	Route::post('adjustLeaseholder/{id}','Purchase\AccountHolderLeaseholderController@adjust');
+	Route::post('LeaseholderRepost/{id}','Purchase\AccountHolderLeaseholderController@repost');
+
+	Route::resource('AccountHolderPrivateLoanLender','AccountHolder\AccountHolderPrivateLoanLenderController');
+	Route::get('AccountHolderPrivateLoanLenderLists','AccountHolder\AccountHolderPrivateLoanLenderController@AccountHolderPrivateLoanLenderLists');
+	Route::post('PrivateLoanPost/{id}','Purchase\AccountHolderPrivateLoanLenderController@post');
+	Route::post('adjustPrivateLoan/{id}','Purchase\AccountHolderPrivateLoanLenderController@adjust');
+	Route::post('PrivateLoanRepost/{id}','Purchase\AccountHolderPrivateLoanLenderController@repost');
+	
+	Route::resource('AccountHolderSeller','AccountHolder\AccountHolderSellerController');
+	Route::get('AccountHolderSellerLists','AccountHolder\AccountHolderSellerController@AccountHolderSellerLists');
+	Route::post('SellerPost/{id}','Purchase\AccountHolderSellerController@post');
+	Route::post('adjustSeller/{id}','Purchase\AccountHolderSellerController@adjust');
+	Route::post('SellerRepost/{id}','Purchase\AccountHolderSellerController@repost');
+
+	Route::resource('AccountHolderServiceProvider','AccountHolder\AccountHolderServiceProviderController');
+	Route::get('AccountHolderServiceProviderLists','AccountHolder\AccountHolderServiceProviderController@AccountHolderServiceProviderLists');
+	Route::post('ServiceProviderPost/{id}','Purchase\AccountHolderServiceProviderController@post');
+	Route::post('adjustServiceProvider/{id}','Purchase\AccountHolderServiceProviderController@adjust');
+	Route::post('ServiceProviderRepost/{id}','Purchase\AccountHolderServiceProviderController@repost');
+
+
+	Route::resource('AccountHolderShareholder','AccountHolder\AccountHolderShareholderController');
+	Route::get('AccountHolderShareholderLists','AccountHolder\AccountHolderShareholderController@AccountHolderShareholderLists');
+	Route::post('ShareholderPost/{id}','Purchase\AccountHolderShareholderController@post');
+	Route::post('adjustShareholder/{id}','Purchase\AccountHolderShareholderController@adjust');
+	Route::post('ShareholderRepost/{id}','Purchase\AccountHolderShareholderController@repost');
+
+
+	Route::resource('AccountHolderStudent','AccountHolder\AccountHolderStudentController');
+	Route::get('AccountHolderStudentLists','AccountHolder\AccountHolderStudentController@AccountHolderStudentLists');
+	Route::post('StudentPost/{id}','Purchase\AccountHolderStudentController@post');
+	Route::post('adjustStudent/{id}','Purchase\AccountHolderStudentController@adjust');
+	Route::post('StudentRepost/{id}','Purchase\AccountHolderStudentController@repost');
+	
+	Route::resource('AccountHolderTenant','AccountHolder\AccountHolderTenantController');
+	Route::get('AccountHolderTenantLists','AccountHolder\AccountHolderTenantController@AccountHolderTenantLists');
+	Route::post('TenantPost/{id}','Purchase\AccountHolderTenantLists@post');
+	Route::post('adjustTenant/{id}','Purchase\AccountHolderTenantLists@adjust');
+	Route::post('TenantRepost/{id}','Purchase\AccountHolderTenantLists@repost');
+
+	Route::resource('AccountHolderVisitor','AccountHolder\AccountHolderVisitorController');
+	Route::get('AccountHolderVisitorLists','AccountHolder\AccountHolderVisitorController@AccountHolderVisitorLists');
+	Route::post('VisitorPost/{id}','Purchase\AccountHolderVisitorController@post');
+	Route::post('adjustVisitor/{id}','Purchase\AccountHolderVisitorController@adjust');
+	Route::post('VisitorRepost/{id}','Purchase\AccountHolderVisitorController@repost');
+
+	Route::resource('AccountHolderVolunteer','AccountHolder\AccountHolderVolunteerController');
+	Route::get('AccountHolderVolunteerLists','AccountHolder\AccountHolderVolunteerController@AccountHolderVolunteerLists');
+	Route::post('VolunteerPost/{id}','Purchase\AccountHolderVolunteerController@post');
+	Route::post('adjustVolunteer/{id}','Purchase\AccountHolderVolunteerController@adjust');
+	Route::post('VolunteerRepost/{id}','Purchase\AccountHolderVolunteerController@repost');
+
+
+
+
+
+
+
+
+
+
+
+
 
 	Route::resource('Parkings','ParkingController');
 	Route::resource('Lockers','LockersController');

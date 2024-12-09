@@ -282,7 +282,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	import DatatableFactory from 'vuejs-datatable';	
 	Vue.use(DatatableFactory);
 
@@ -442,16 +442,13 @@
 					      $('.modal.in').modal('hide');
 					      $('.modal-backdrop').remove() ;
 					
-							toast({
-							  type: 'success',
-							  title: 'Data Update Successfully'
-							});
+							showToast('Data Update Successfully', 'success');
 					
 					     this.form.reset ();
 					     this.fetchUsers();
 				    })
 				    .catch(()=>{
-					   Swal("failed!","there was some wrong","warning");
+					   showAlert("failed!","there was some wrong","warning");
 				
 				    });
             },
@@ -497,7 +494,7 @@
                       this.form.delete('/Users/'+id).then(()=>{
                         
                           if(result.value) {
-                               Swal(
+                               showAlert(
                                 'Deleted!',
                                 'Your file has been deleted.',
                                 'success'
@@ -506,7 +503,7 @@
                           }            
 
                       }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                   });
                
               })

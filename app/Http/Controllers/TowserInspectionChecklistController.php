@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\TowerInspectionList as TowerInspectionList;
 use Illuminate\Http\Request;
+use App\Models\TowerInspectionList as TowerInspectionList;
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class TowserInspectionChecklistController extends Controller
 {

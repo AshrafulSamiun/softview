@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\BuildingInfo as BuildingInfo;
-use App\Models\BuildingPropertyDetails as BuildingPropertyDetails;
+use Illuminate\Http\Request;
 use App\Models\Floor as Floor;
-use App\Models\SafetyDeviceEquipment;
-use App\Models\SafetyItemList as SafetyItemList;
+use App\Models\company;
+use App\Models\customer;
+use App\Models\buildingInfo as BuildingInfo;
+use App\Models\BuildingPropertyDetails as BuildingPropertyDetails;
 use App\Models\SubroomsList as SubroomsList;
 use App\Models\SubroomsListDetails as SubroomsListDetails;
-use Illuminate\Http\Request;
+use App\Models\SafetyItemList as SafetyItemList;
+use App\Models\SafetyDeviceEquipment;
 use Illuminate\Support\Facades\DB;
 
+
+
+
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class FloorController extends Controller
 {
@@ -21,7 +26,7 @@ class FloorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $user=\Auth::user();
         $project_id                 = $user->project_id;
@@ -37,19 +42,35 @@ class FloorController extends Controller
             $ksl++;
         }
 
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
+        $data['company_arr']        =$company_arr;
 
-            return  20;
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->whereNull('company_id')
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
         }
+
+        $data['customer_arr']        =$customer_arr;
+
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
-                                   
+                                    ->whereNull('company_name')
+                                    ->whereNull('customer_name')
                                     ->get(['id','building_no','building_name']);
 
         $building_arr=array();
@@ -98,24 +119,34 @@ class FloorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function FloorLists(Request $request)
+    public function FloorLists()
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
         }
-        else {
 
-            return  20;
+
+        //===================Customer==========================================
+        $customer_list              =customer::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->where('customer_type',1)
+                                    ->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
         }
+
 
         $building_list              =BuildingInfo::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id)
                                     ->get(['id','building_no','building_name']);
 
         //===================Building==========================================
@@ -126,7 +157,7 @@ class FloorController extends Controller
         }
 
       
-          
+
         //===================Building==========================================
 
        
@@ -136,8 +167,6 @@ class FloorController extends Controller
         $Floor_list=Floor::where('status_active',1)
                                         ->where('project_id',$project_id)
                                         ->get();
-
-                                         // dd($building_arr);
          foreach ($Floor_list as $key => $value) {
 
             $data['Floor_list'][$key]['sl']                  =$sl+1;
@@ -147,7 +176,30 @@ class FloorController extends Controller
             $data['Floor_list'][$key]['floor_no']            =$value->floor_no;
             $data['Floor_list'][$key]['system_no']             =$value->system_no;
          
+          
 
+
+            if($value->company_name>0)
+            {
+                $data['Floor_list'][$key]['company_name']     =$company_arr[$value->company_name];
+
+            }
+            else
+            {
+                $data['Floor_list'][$key]['company_name']      ="";
+
+            }
+
+            if($value->customer_name>0)
+            {
+                $data['Floor_list'][$key]['customer_name']     =$customer_arr[$value->customer_name];
+
+            }
+            else
+            {
+                $data['Floor_list'][$key]['customer_name']      ="";
+
+            }
 
             if($value->building_name>0)
             {
@@ -226,10 +278,9 @@ class FloorController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'building_name'         => 'required',
-            'floor_no'              => 'required',
-            'floor_name'            => 'required',
-            'strata_lot_no'         => 'required',
+            'building_name' => 'required',
+            'floor_no' => 'required',
+            'floor_name' => 'required',
             
         ]);
 
@@ -240,22 +291,13 @@ class FloorController extends Controller
         $request->merge(['inserted_by' =>$user_id]);
         $request->merge(['project_id' =>$project_id]);
 
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return  20;
-        }
-
-        $request->merge(['company_name' =>$company_id]);
+        
 
         $max_system_data = Floor::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from floors 
-            where building_name=".$request->input('building_name')."  and project_id=".$project_id." ) and building_name=".$request->input('building_name')."
+            where building_name=".$request->input('building_name')." and project_id=".$project_id." ) and building_name=".$request->input('building_name')."
              and project_id=".$project_id)
+               // ->toSql();
                ->get(['system_prefix']);
-               
        // dd($max_system_data);die;
         if(count($max_system_data)>0)
         {
@@ -823,13 +865,20 @@ class FloorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+     public function edit($id)
     {
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
-        $user_type                  = $user->user_type;
-        $data['user_type']              =$user_type;
+        //===================Company==========================================
+        $company_list               =company::where('status_active',1)
+                                    ->where('project_id',$project_id)
+                                    ->get();
+        $company_arr=array();
+        foreach ($company_list as $key => $value) {
+            $company_arr[$value->id]=$value->legal_name;
+        }
+        $data['company_arr']        =$company_arr;
 
         $floor_list_query=Floor::where('status_active',1)
                                     ->where('project_id',$project_id)
@@ -837,16 +886,54 @@ class FloorController extends Controller
                                     ->first();
         $data['floor_list_arr']=$floor_list_query;                            
         $company_id     =$floor_list_query->company_name;
+        $customer_id    =$floor_list_query->customer_name;
         $building_id    =$floor_list_query->building_name;
         $floor_no       =$floor_list_query->floor_no;
         $floor_id       =$floor_list_query->id;
         //dd($company_id);die;
 
-       
-        $building_list_query        =BuildingInfo::where('status_active',1)
+        //===================Customer==========================================
+        $customer_list_query        =customer::where('status_active',1)
                                     ->where('project_id',$project_id)
-                                    ->where('company_name',$company_id);
-            
+                                    ->where('customer_type',1);
+
+        if($company_id)
+        {
+            $customer_list_query->where('company_id',$company_id);
+        }
+        else{
+
+            $customer_list_query ->whereNull('company_id');
+        }
+
+        $customer_list=$customer_list_query->get();
+        $customer_arr=array();
+        foreach ($customer_list as $key => $value) {
+            $customer_arr[$value->id]=$value->legal_name;
+        }
+
+        $data['customer_arr']        =$customer_arr;
+
+
+
+
+        $building_list_query        =BuildingInfo::where('status_active',1)
+                                    ->where('project_id',$project_id);
+        if($company_id)
+        {
+            $building_list_query->where('company_name',$company_id);
+        }
+        else{
+            $building_list_query ->whereNull('company_name');
+        }
+
+        if($customer_id)
+        {
+            $building_list_query->where('customer_name',$customer_id);
+        }
+        else{
+            $building_list_query ->whereNull('customer_name');
+        }
 
         $building_list=$building_list_query->get(['id','building_no','building_name']);
 
@@ -922,7 +1009,7 @@ class FloorController extends Controller
         {
             if($value->item_type==1)
             {
-                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl1]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl1]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl1]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl1]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl1]['item_id']      =$value->item_id;
@@ -933,7 +1020,7 @@ class FloorController extends Controller
             }
             else if($value->item_type==2)
             {
-                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl2]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl2]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl2]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl2]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl2]['item_id']      =$value->item_id;
@@ -944,7 +1031,7 @@ class FloorController extends Controller
             }
              else if($value->item_type==3)
             {
-                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl3]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl3]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl3]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl3]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl3]['item_id']      =$value->item_id;
@@ -955,7 +1042,7 @@ class FloorController extends Controller
             }
              else if($value->item_type==4)
             {
-                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl4]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl4]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl4]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl4]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl4]['item_id']      =$value->item_id;
@@ -966,7 +1053,7 @@ class FloorController extends Controller
             }
              else if($value->item_type==5)
             {
-                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl5]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl5]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl5]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl5]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl5]['item_id']      =$value->item_id;
@@ -977,7 +1064,7 @@ class FloorController extends Controller
             }
              else if($value->item_type==6)
             {
-                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl6]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl6]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl6]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl6]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$value->property_no][$sl6]['item_id']      =$value->item_id;
@@ -988,7 +1075,7 @@ class FloorController extends Controller
             }
              else if($value->item_type==7)
             {
-                $subrooms_list_details_arr[$value->item_type][$sl7]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$sl7]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl7]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl7]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$sl7]['item_id']      =$value->item_id;
@@ -999,7 +1086,7 @@ class FloorController extends Controller
             }
             else if($value->item_type==8)
             {
-                $subrooms_list_details_arr[$value->item_type][$sl8]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$sl8]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl8]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl8]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$sl8]['item_id']      =$value->item_id;
@@ -1010,7 +1097,7 @@ class FloorController extends Controller
             }
              else if($value->item_type==9)
             {
-                $subrooms_list_details_arr[$value->item_type][$sl9]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$sl9]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl9]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl9]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$sl9]['item_id']      =$value->item_id;
@@ -1021,7 +1108,7 @@ class FloorController extends Controller
             }
             else if($value->item_type==10)
             {
-                $subrooms_list_details_arr[$value->item_type][$sl10]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$sl10]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl10]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl10]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$sl10]['item_id']      =$value->item_id;
@@ -1032,7 +1119,7 @@ class FloorController extends Controller
             }
              else if($value->item_type==11)
             {
-                $subrooms_list_details_arr[$value->item_type][$sl11]['id']           =$value->id;
+                $subrooms_list_details_arr[$value->item_type][$sl11]['id']           =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl11]['master_id']    =$value->master_id;
                 $subrooms_list_details_arr[$value->item_type][$sl11]['item_type']    =$value->item_type;
                 $subrooms_list_details_arr[$value->item_type][$sl11]['item_id']      =$value->item_id;
@@ -1114,986 +1201,20 @@ class FloorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
-        request()->validate([
-            'building_name'         => 'required',
-            'floor_no'              => 'required',
-            'floor_name'            => 'required',
-            'strata_lot_no'         => 'required',
+         request()->validate([
+            'floor_name' => 'required',
+            'status_active' => 'required',
             
         ]);
-
         $user_data = \Auth::user();
         $user_id=$user_data->id;
         $project_id=$user_data->project_id;
-        $request->merge(['user_id'          =>$user_id]);
-        $request->merge(['project_id'       =>$project_id]);
-        $request->merge(['updated_by'       =>$user_id]);
-        DB::beginTransaction();
+        $request->merge(['user_id' =>$user_id]);
+        $request->merge(['updated_by' =>$user_id]);
+        $request->merge(['project_id' =>$project_id]);
+        Floor::find($id)->update($request->all());
         
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return  20;
-        }
-
-        $floor_info= Floor::find($id)->update($request->all());
-
-        foreach($request->subrooms_list_details_arr as $key=>$Subroom_type)
-        {
-            if($key>0 && $key<=6 && $Subroom_type!=null)
-            {
-
-                foreach($Subroom_type as $key1=>$subroom_qty)
-                {
-
-                    foreach($subroom_qty as $key2=>$details)
-                    {
-
-                       
-                        if($details['item_qty']>0)
-                        {
-                            if($details['id']!="")
-                            {
-                                // dd($details);
-                                $subrooms_list_details_data= array(
-                                    
-                                    'item_type'                 =>$key,
-                                    'item_id'                   =>$details['item_id'],
-                                    'property_no'               =>$key1,
-                                    'item_name'                 =>$details['item_name'],
-                                    'item_qty'                  =>$details['item_qty'],
-                                    'updated_by'                =>$user_id,
-                                );
-
-                                $subrooms_data=SubroomsListDetails::where('id',"=",$details['id'])->update($subrooms_list_details_data);
-                                if( !$subrooms_data)
-                                {
-                                    DB::rollBack();
-                                    return 110;
-                                    die;
-                                }
-                            }
-                            else 
-                            {
-                                $data_subrooms_list_details[]= array(
-                                    'project_id'                =>$project_id,
-                                    'master_id'                 =>$floor_info->id,
-                                    'item_type'                 =>$key,
-                                    'item_id'                   =>$details['item_id'],
-                                    'property_no'               =>$key1,
-                                    'item_name'                 =>$details['item_name'],
-                                    'item_qty'                  =>$details['item_qty'],
-                                    'inserted_by'               =>$user_id,
-                                );
-                            }
-                            
-                            
-                        }
-                    }
-                }
-            }
-            else if($key>6 && $Subroom_type!=null)
-            {
-
-                foreach($Subroom_type as $key1=>$details)
-                {
-                        
-                    if($details['item_qty']>0)
-                    {
-                        
-                        if($details['id']!="")
-                        {
-                            $subrooms_list_details_data= array(
-                                
-                                'item_type'                 =>$key,
-                                'item_id'                   =>$details['item_id'],
-                                'property_no'               =>NULL,
-                                'item_name'                 =>$details['item_name'],
-                                'item_qty'                  =>$details['item_qty'],
-                                'updated_by'                =>$user_id,
-                            );
-
-                            $subrooms_data=SubroomsListDetails::where('id',"=",$details['id'])->update($subrooms_list_details_data);
-                            if( !$subrooms_data)
-                            {
-                                DB::rollBack();
-                                return 100;
-                                die;
-                            }
-                        }
-                        else 
-                        {
-
-                            $data_subrooms_list_details[]= array(
-                                'project_id'                =>$project_id,
-                                'master_id'                 =>$floor_info->id,
-                                'item_type'                 =>$key,
-                                'item_id'                   =>$details['item_id'],
-                                'property_no'               =>NULL,
-                                'item_name'                 =>$details['item_name'],
-                                'item_qty'                  =>$details['item_qty'],
-                                'inserted_by'               =>$user_id,
-                            );
-                         }   
-                    }
-                    
-                }
-            }
-        } 
-
-       
-
-    
-
-        // Safety Item====================================================
-
-        foreach($request->fire_extinguisher_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>1,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-
-        foreach($request->smoke_detecter_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>2,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->sprinkler_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>3,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->water_valve_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>4,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->gfci_breaker_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>5,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->sump_pump_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>6,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->emergency_bell_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>7,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->emergency_light_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->first_aid_station_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>9,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->first_aid_box_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>10,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-        foreach($request->aed_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>11,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->external_service_provider_details_arr as $key=>$details)
-        {
-            if($details['id_no']!="")
-            {
-                if($details['schedule_date'])
-                {
-                    $schedule_date                               =date("Y-m-d",strtotime($details['schedule_date']));
-                }
-                else $schedule_date="";
-
-                if($details['schedule_date'])
-                {
-                    $schedule_date                               =date("Y-m-d",strtotime($details['schedule_date']));
-                }
-                else $schedule_date="";
-
-                if($details['id'])
-                {
-                    $external_service_provider_data= array(
-                        
-                        'id_no'                     =>$details['id_no'],
-                        'account_no'                =>$details['account_no'],
-                        'website'                   =>$details['website'],
-                        'schedule_date'             =>$schedule_date,
-                        'expected_due_date'         =>$schedule_date,
-                        'billing_cycle'             =>$details['billing_cycle'],
-                        'bill_delivery_method'      =>$details['bill_delivery_method'],
-                        'payment_method'            =>$details['payment_method'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $ExternalService=ExternalServiceProvider::where('id',"=",$details['id'])->update($external_service_provider_data);
-                    if( !$ExternalService)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else
-                {
-                    $data_external_service_provider[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'reference_id'              =>$details['reference_id'],
-                        'item_name'                 =>$details['item_name'],
-                        'page_id'                   =>1,
-                        'id_no'                     =>$details['id_no'],
-                        'account_no'                =>$details['account_no'],
-                        'website'                   =>$details['website'],
-                        'schedule_date'             =>$schedule_date,
-                        'expected_due_date'         =>$schedule_date,
-                        'billing_cycle'             =>$details['billing_cycle'],
-                        'bill_delivery_method'      =>$details['bill_delivery_method'],
-                        'payment_method'            =>$details['payment_method'],
-                        'inserted_by'               =>$user_id,
-                    );
-                }
-                
-            }
-        }
-
-
-        
-        $RId1=true;
-        $RId2=true;
-        $RId3=true;
-        $RId4=true;
-        $RId5=true;
-        $RId6=true;
-
-        if(!empty($data_subrooms_list_details))
-        {
-            $RId1=SubroomsListDetails::insert($data_subrooms_list_details);
-        }
-        if(!empty($data_safety_device_equipment))
-        {
-            $RId2=SafetyDeviceEquipment::insert($data_safety_device_equipment);
-        }
-
-
-        if($floor_info  && $RId1 && $RId2 && $RId3 && $RId4 && $RId5 && $RId6)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
+        return ['message'=>'update successfully'];
     }
 
     /**
@@ -2106,1069 +1227,5 @@ class FloorController extends Controller
     {
          Floor::find($id)->delete();
         return ['message'=>'Module deleted'];
-    }
-
-
-
-
-    public function post(Request $request,$id)
-    {
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>$request->input("posting_status"),
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=Floor::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-
-    public function adjust(Request $request, $id)
-    {
-        request()->validate([
-            'building_name'         => 'required',
-            'floor_no'              => 'required',
-            'floor_name'            => 'required',
-            'strata_lot_no'         => 'required',
-            
-        ]);
-        
-        $user_info  = \Auth::user();
-        $project_id = $user_info->project_id;
-        $user_id    = $user_info->id;
-        $request->merge(['project_id'       =>$project_id]);
-        $request->merge(['updated_by'       =>$user_id]);
-        $request->merge(['posting_status'   =>3]);
-
-
-        DB::beginTransaction();
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-        }
-        else {
-
-            return  20;
-        }
-
-        $floor_info= Floor::find($id)->update($request->all());
-
-        foreach($request->subrooms_list_details_arr as $key=>$Subroom_type)
-        {
-            if($key>0 && $key<=6 && $Subroom_type!=null)
-            {
-
-                foreach($Subroom_type as $key1=>$subroom_qty)
-                {
-
-                    foreach($subroom_qty as $key2=>$details)
-                    {
-
-                       
-                        if($details['item_qty']>0)
-                        {
-                            if($details['id']!="")
-                            {
-                                // dd($details);
-                                $subrooms_list_details_data= array(
-                                    
-                                    'item_type'                 =>$key,
-                                    'item_id'                   =>$details['item_id'],
-                                    'property_no'               =>$key1,
-                                    'item_name'                 =>$details['item_name'],
-                                    'item_qty'                  =>$details['item_qty'],
-                                    'updated_by'                =>$user_id,
-                                );
-
-                                $subrooms_data=SubroomsListDetails::where('id',"=",$details['id'])->update($subrooms_list_details_data);
-
-                                if( !$subrooms_data)
-                                {
-                                    DB::rollBack();
-                                    return 110;
-                                    die;
-                                }
-                            }
-                            else 
-                            {
-                                $data_subrooms_list_details[]= array(
-                                    'project_id'                =>$project_id,
-                                    'master_id'                 =>$floor_info->id,
-                                    'item_type'                 =>$key,
-                                    'item_id'                   =>$details['item_id'],
-                                    'property_no'               =>$key1,
-                                    'item_name'                 =>$details['item_name'],
-                                    'item_qty'                  =>$details['item_qty'],
-                                    'inserted_by'               =>$user_id,
-                                );
-                            }
-                            
-                            
-                        }
-                    }
-                }
-            }
-            else if($key>6 && $Subroom_type!=null)
-            {
-
-                foreach($Subroom_type as $key1=>$details)
-                {
-                        
-                    if($details['item_qty']>0)
-                    {
-                        
-                        if($details['id']!="")
-                        {
-                            $subrooms_list_details_data= array(
-                                
-                                'item_type'                 =>$key,
-                                'item_id'                   =>$details['item_id'],
-                                'property_no'               =>NULL,
-                                'item_name'                 =>$details['item_name'],
-                                'item_qty'                  =>$details['item_qty'],
-                                'updated_by'                =>$user_id,
-                            );
-
-                            $subrooms_data=SubroomsListDetails::where('id',"=",$details['id'])->update($subrooms_list_details_data);
-                            if( !$subrooms_data)
-                            {
-                                DB::rollBack();
-                                return 100;
-                                die;
-                            }
-                        }
-                        else 
-                        {
-
-                            $data_subrooms_list_details[]= array(
-                                'project_id'                =>$project_id,
-                                'master_id'                 =>$floor_info->id,
-                                'item_type'                 =>$key,
-                                'item_id'                   =>$details['item_id'],
-                                'property_no'               =>NULL,
-                                'item_name'                 =>$details['item_name'],
-                                'item_qty'                  =>$details['item_qty'],
-                                'inserted_by'               =>$user_id,
-                            );
-                         }   
-                    }
-                    
-                }
-            }
-        } 
-
-       
-
-    
-
-        // Safety Item====================================================
-
-        foreach($request->fire_extinguisher_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>1,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-
-        foreach($request->smoke_detecter_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>2,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->sprinkler_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>3,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->water_valve_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>4,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->gfci_breaker_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>5,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->sump_pump_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>6,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->emergency_bell_details_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>7,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->emergency_light_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>8,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->first_aid_station_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>9,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-        foreach($request->first_aid_box_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>10,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-        foreach($request->aed_arr as $key=>$details)
-        {
-            if($details['serial_no']!="")
-            {
-                if($details['expiry_date'])
-                {
-                    $expiry_date                               =date("Y-m-d",strtotime($details['expiry_date']));
-                }
-                else $expiry_date="";
-
-                if($details['renew_date'])
-                {
-                    $renew_date                               =date("Y-m-d",strtotime($details['renew_date']));
-                }
-                else $renew_date="";
-
-                if($details['due_on'])
-                {
-                    $due_on                               =date("Y-m-d",strtotime($details['due_on']));
-                }
-                else $due_on="";
-
-                if($details['id']!="")
-                {
-                    $safety_device_equipment_data= array(
-                        
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $SafetyDevice=SafetyDeviceEquipment::where('id',"=",$details['id'])->update($safety_device_equipment_data);
-                    if( !$SafetyDevice)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else{
-
-                    $data_safety_device_equipment[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'item_id'                   =>$details['item_id'],
-                        'reference_id'              =>$details['reference_id'],
-                        'reference_name'            =>$details['reference_name'],
-                        'page_id'                   =>11,
-                        'item_id'                   =>$details['item_id'],
-                        'name'                      =>$details['name'],
-                        'floor_no'                  =>$details['floor_no'],
-                        'serial_no'                 =>$details['serial_no'],
-                        'expiry_date'               =>$expiry_date,
-                        'renew_date'                =>$renew_date,
-                        'due_on'                    =>$due_on,
-                        'cicle'                     =>$details['cicle'],
-                        'inserted_by'               =>$user_id,
-                    );
-
-                }
-            }
-        }
-
-
-        foreach($request->external_service_provider_details_arr as $key=>$details)
-        {
-            if($details['id_no']!="")
-            {
-                if($details['schedule_date'])
-                {
-                    $schedule_date                               =date("Y-m-d",strtotime($details['schedule_date']));
-                }
-                else $schedule_date="";
-
-                if($details['schedule_date'])
-                {
-                    $schedule_date                               =date("Y-m-d",strtotime($details['schedule_date']));
-                }
-                else $schedule_date="";
-
-                if($details['id'])
-                {
-                    $external_service_provider_data= array(
-                        
-                        'id_no'                     =>$details['id_no'],
-                        'account_no'                =>$details['account_no'],
-                        'website'                   =>$details['website'],
-                        'schedule_date'             =>$schedule_date,
-                        'expected_due_date'         =>$schedule_date,
-                        'billing_cycle'             =>$details['billing_cycle'],
-                        'bill_delivery_method'      =>$details['bill_delivery_method'],
-                        'payment_method'            =>$details['payment_method'],
-                        'updated_by'                =>$user_id,
-                    );
-
-                    $ExternalService=ExternalServiceProvider::where('id',"=",$details['id'])->update($external_service_provider_data);
-                    if( !$ExternalService)
-                    {
-                        DB::rollBack();
-                        return 10;
-                        die;
-                    }
-                }
-                else
-                {
-                    $data_external_service_provider[]= array(
-                        'project_id'                =>$project_id,
-                        'master_id'                 =>$id,
-                        'reference_id'              =>$details['reference_id'],
-                        'item_name'                 =>$details['item_name'],
-                        'page_id'                   =>1,
-                        'id_no'                     =>$details['id_no'],
-                        'account_no'                =>$details['account_no'],
-                        'website'                   =>$details['website'],
-                        'schedule_date'             =>$schedule_date,
-                        'expected_due_date'         =>$schedule_date,
-                        'billing_cycle'             =>$details['billing_cycle'],
-                        'bill_delivery_method'      =>$details['bill_delivery_method'],
-                        'payment_method'            =>$details['payment_method'],
-                        'inserted_by'               =>$user_id,
-                    );
-                }
-                
-            }
-        }
-
-
-        
-        $RId1=true;
-        $RId2=true;
-        $RId3=true;
-        $RId4=true;
-        $RId5=true;
-        $RId6=true;
-
-        if(!empty($data_subrooms_list_details))
-        {
-            $RId1=SubroomsListDetails::insert($data_subrooms_list_details);
-        }
-        if(!empty($data_safety_device_equipment))
-        {
-            $RId2=SafetyDeviceEquipment::insert($data_safety_device_equipment);
-        }
-
-
-        if($floor_info  && $RId1 && $RId2 && $RId3 && $RId4 && $RId5 && $RId6)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
-    }
-
-
-    public function repost(Request $request,$id)
-    {
-
-        $user_data = \Auth::user();
-        $user_id=$user_data->id;
-        $project_id=$user_data->project_id; 
-
-        if($request->session()->has('company_avaibale'))
-        {
-            $company_id=$request->session()->get('company_id');
-            $currency_id=$request->session()->get('currency_id');
-        }
-        else {
-
-            return "10**200"; 
-        }
-
-        DB::beginTransaction();
-
-        $update_data= array(
-                            'posting_status'            =>4,
-                            'updated_by'                =>$user_id,
-                        );
-      
-        $buildingInfo=floor::where('id',"=",$id)->update($update_data);
-
-        if($buildingInfo)
-        {
-           DB::commit();
-           return "1**$id**";
-        }
-        else
-        {
-            DB::rollBack();
-            return back()->withInput();
-        }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project as Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Project as Project;
 
 class AccountActivationController extends Controller
 {
@@ -19,6 +19,34 @@ class AccountActivationController extends Controller
         $project_id         = $user_info->project_id;
         $project_activation =Project::where('id',$project_id)->get();
         $data['project_activation']=$project_activation;
+        return $data;
+
+    }
+
+
+    public function registration_instruction(Request $request)
+    {
+        $user_info          = \Auth::user();
+        $project_id         = $user_info->project_id;
+        $project_activation =Project::where('id',$project_id)->first();
+        if($project_activation->project_status==105)
+        {
+            DB::beginTransaction();
+            $user_project=Project::find($project_id)->update(array('project_status' => 104));
+
+            if($user_project)
+            {
+               DB::commit();
+               return redirect()->route('dashboard');
+            }
+            else
+            {
+                DB::rollBack();
+                return back()->withInput();
+            }
+        }
+
+        return redirect()->route('dashboard');
         return $data;
 
     }

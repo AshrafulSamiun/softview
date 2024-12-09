@@ -1,5 +1,3 @@
-
-
  
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -11,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'BMS Property Management') }}</title>
+    <title>{{ config('app.name', 'ARTEMIS SECURITIES') }}</title>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -32,7 +30,7 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'BMS Property Management') }}
+                        {{ config('app.name', 'ARTEMIS SECURITIES') }}
                     </a>
                 </div>
 

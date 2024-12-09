@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\Country as Country;
-use App\Models\Customer as Customer;
-use App\Models\CustomerProperty as CustomerProperty;
-use App\Models\CustomField as CustomField;
-use App\Models\CustomFieldData as CustomFieldData;
-use App\Models\KeyPosition as keyPosition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Country as Country;
+use App\Models\keyPositionLavel as keyPositionLavel;
+use App\Models\customer as Customer;
+use App\Models\CustomerProperty as CustomerProperty;
+use App\Models\keyPosition as keyPosition;
+use App\Models\CustomField as CustomField;
+use App\Models\CustomFieldData as CustomFieldData;
 
+
+use App\Classes\ArrayFunction as ArrayFunction;
 
 class CustomerSellerController extends Controller
 {
@@ -40,7 +42,7 @@ class CustomerSellerController extends Controller
         $data['country_arr']        =$country_arr;
 
 
-        $key_position_lavel=KeyPositionLevel::where('status_active',1)
+        $key_position_lavel=keyPositionLavel::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('page_id',5)
                                     ->get();
@@ -236,7 +238,7 @@ class CustomerSellerController extends Controller
 
         if($data_key_position)
         {
-            $RId2=KeyPosition::insert($data_key_position);
+            $RId2=keyPosition::insert($data_key_position);
         }
 
         if($data_custom_field)
@@ -362,7 +364,7 @@ class CustomerSellerController extends Controller
         }
 
         // =======================================key position data=================================================
-        $key_position_lavel=KeyPositionLevel::where('status_active',1)
+        $key_position_lavel=keyPositionLavel::where('status_active',1)
                                     ->where('page_id',5)
                                     ->get();
         $data["key_position_data_arr"]=array();
@@ -381,7 +383,7 @@ class CustomerSellerController extends Controller
                
         }
 
-        $keyPosition_data   =KeyPosition::where('status_active',1)
+        $keyPosition_data   =keyPosition::where('status_active',1)
                                     ->where('project_id',$project_id)
                                     ->where('master_id',$id)
                                     ->where('page_id',5)
@@ -572,7 +574,7 @@ class CustomerSellerController extends Controller
                         'updated_by'                =>$user_id,
                     ); 
 
-                    $RId4=KeyPosition::where('id',"=",$details['id'])->update($key_position_data);
+                    $RId4=keyPosition::where('id',"=",$details['id'])->update($key_position_data);
 
                 }
                 else
@@ -602,7 +604,7 @@ class CustomerSellerController extends Controller
 
         if(!empty($data_key_position))
         {
-            $RId2=KeyPosition::insert($data_key_position);
+            $RId2=keyPosition::insert($data_key_position);
         }
 
         if($data_custom_field)
@@ -692,7 +694,7 @@ class CustomerSellerController extends Controller
                     'updated_by'                =>$user_id,
                 ); 
 
-                $RId4=KeyPosition::where('id',"=",$details['id'])->update($key_position_data);
+                $RId4=keyPosition::where('id',"=",$details['id'])->update($key_position_data);
 
             }
                 

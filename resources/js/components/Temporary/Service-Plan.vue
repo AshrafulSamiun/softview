@@ -5,6 +5,8 @@
 
             <div class="form-card">
                 <h1 class="page-head"> Service Plan</h1>
+                <button   type="button" class="action-button">Service Plan</button>
+
                 <div class="form-folder">
                     <h3><i class="fa fa-hand-point-right"></i> Charging Period:</h3>
                     <div class="form-holder">
@@ -228,7 +230,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	
 
 	

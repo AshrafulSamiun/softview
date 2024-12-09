@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Classes\ArrayFunction as ArrayFunction;
 use App\Models\RulesPolicy as RulesPolicy;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class RulesPolicyController extends Controller

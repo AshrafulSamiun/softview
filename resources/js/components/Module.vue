@@ -214,7 +214,7 @@ import VueProgressBar from 'vue-progressbar';
 							     this.fetchModules();
 						    })
 						    .catch(()=>{
-							   Swal("failed!","there was some wrong","warning");
+							   showAlert("failed!","there was some wrong","warning");
 						
 						    });
             },
@@ -251,7 +251,7 @@ import VueProgressBar from 'vue-progressbar';
                       this.form.delete('/Modules/'+id).then(()=>{
                         
                           if(result.value) {
-                               Swal(
+                               showAlert(
                                 'Deleted!',
                                 'Your file has been deleted.',
                                 'success'
@@ -260,7 +260,7 @@ import VueProgressBar from 'vue-progressbar';
                           }            
 
                       }).catch(()=>{
-                        Swal("failed!","there was some wrong","warning");
+                        showAlert("failed!","there was some wrong","warning");
                   });
                
               })

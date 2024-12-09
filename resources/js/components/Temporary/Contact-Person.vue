@@ -11,21 +11,22 @@
                         <div class="row">
                             <div class="col-md-3 col-sm-6 col-xs-12"> 
                                 <div class="form-box-outer">
-                                    <div class="form-check-inline" align="left" v-for="(contact_person,index) in contact_person_arr" v-if="index>0">
-                                        <button type="button" class="btn btn-secondary"
-                                        :class="{ 'action-button': contact_person_data[index] }"
+                                    <div class="form-check-inline" align="left" v-for="(contact_person,index) in contact_person_arr" v-if="index>0"  style=" padding-bottom:10px;">
+                                        <button type="button" class="btn btn-secondary" style="width:150px"
+                                        :class="{ 'btn-success': contact_person_data[index] }"
 
                                          @click.prevent="addContactPerson(index)" >{{contact_person}}</button>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-3 col-sm-6 col-xs-12"> 
-                                <div class="form-box-outer">
+                                <div class="form-box-outer" style="position:relative">
                                     <h4>Full Name</h4>
 
                                     <input v-model="form.full_name" 
                                         type="text" 
-                                        name="full_name" 
+                                        name="full_name"
+                                        @keyup="check_contack_type" 
                                         placeholder="Type Full Name" 
                                         :class="{ 'is-invalid': form.errors.has('full_name') }"/>
                                           <has-error :form="form" field="full_name"></has-error>
@@ -39,7 +40,12 @@
                                          placeholder="Type Job Title" 
                                         :class="{ 'is-invalid': form.errors.has('job_title') }"/>
                                           <has-error :form="form" field="job_title"></has-error> 
+                                    <div style="position:absolute; bottom:10px;right:10px;">
+                                    <button :disabled="form.busy" v-show="!editmode" type="submit" class="btn btn-primary float-right">Save</button>
+                                    <button :disabled="form.busy" v-show="editmode" type="submit" class="btn btn-primary float-right">Update</button>
+                                    </div>
                                 </div>
+
                             </div>
                             <div class="col-md-3 col-sm-6 col-xs-12">
                                 <div class="form-box-outer">
@@ -137,13 +143,7 @@
                             <hr>
                         </div>
                     </div>
-                    <div class="form-folder">
-                        <h3><i class="fa fa-hand-point-right"></i> Contact Person Details: 
-                           
-                            <button :disabled="form.busy" v-show="!editmode" type="submit" class="btn btn-primary float-right">Save</button>
-                            <button :disabled="form.busy" v-show="editmode" type="submit" class="action-button float-right">Update</button>
-                        </h3>
-                    </div>
+                    
                 </div>
             </div>
             <button type="button" @click="next_setp" class="next action-button">Next <i class="fa fa-angle-right"></i></button>
@@ -153,7 +153,7 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+	import {ref} from "vue";
 	
 
 	
@@ -237,8 +237,6 @@
             		this.form.fax_no 			=this.contact_person_data[type].fax_no;
             		this.form.id 				=this.contact_person_data[type].id;
 
-
-
             	}
             	else 
             	{
@@ -255,42 +253,6 @@
                 let uri = '/AccountContactPersons';
                 window.axios.get(uri).then((response) => {
                 	this.contact_person_data					=response.data.contact_person_data;
-                	/*this.form.strata_management 				= response.data.company_data.strata_management;
-                	this.form.leasehold_management 				= response.data.company_data.leasehold_management;
-                	this.form.free_hold_management 				= response.data.company_data.free_hold_management;
-                	this.form.strata_management 				= response.data.company_data.strata_management;
-                	this.form.coop_property 					= response.data.company_data.coop_property;
-                	this.form.property_management 				= response.data.company_data.property_management;
-                	this.form.id 								= response.data.company_data.id;
-
-                	this.form.full_name 						= response.data.company_data.full_name;
-                	this.form.business_registration_number 		= response.data.company_data.business_registration_number;
-                	this.form.registration_date 				= response.data.company_data.registration_date;
-                	this.form.business_registration_city 		= response.data.company_data.business_registration_city;
-                	this.form.business_registration_state 		= response.data.company_data.business_registration_state;
-                	this.form.country 				= response.data.company_data.country;
-                	this.form.business_license_no 				= response.data.company_data.business_license_no;
-
-                	this.form.issued_by 						= response.data.company_data.issued_by;
-                	this.form.license_country 					= response.data.company_data.license_country;
-                	this.form.expirey_date 						= response.data.company_data.expirey_date;
-                	this.form.head_office_email 				= response.data.company_data.head_office_email;
-                	this.form.head_office_fax_no 				= response.data.company_data.head_office_fax_no;
-                	this.form.head_office_cell_phone 			= response.data.company_data.headphone;
-                	this.form.head_office_website 				= response.data.company_data.head_office_website;
-
-
-                	this.form.contact_person_email 				= response.data.company_data.contact_person_email;
-                	this.form.contact_person_fax_no 			= response.data.company_data.contact_person_fax_no;
-                	this.form.contact_person_cell_phone 		= response.data.company_data.contact_person_cell_phone;
-                	this.form.contact_person_website 			= response.data.company_data.contact_person_website;
-
-                	this.form.business_number 					= response.data.company_data.business_number;
-                	this.form.emp_identification_number 		= response.data.company_data.emp_identification_number;
-                	this.form.payroll 							= response.data.company_data.payroll;
-                	this.form.sales_tax 						= response.data.company_data.sales_tax;
-                	this.form.income_tax 						= response.data.company_data.income_tax;
-                	this.form.import_and_export 				= response.data.company_data.import_and_export;*/
                 	
                 	if(this.form.id){
                 		this.editmode=true;
@@ -301,7 +263,18 @@
                 });   
             },
 
-          
+            check_contack_type()
+            {
+                if(!this.form.contact_person_id)
+                {
+                    toast({
+                        type: 'warning',
+                        title: 'Please select contact Type.'
+                    });
+                    this.form.full_name="";
+                    return;
+                } 
+            },
          
        
 
@@ -331,6 +304,14 @@
             createContactPerson()
             {
 
+                if(!this.form.contact_person_id)
+                {
+                toast({
+                        type: 'warning',
+                        title: 'Please select contact Type.'
+                    });
+                    return;
+                } 
         	    this.form.post('/AccountContactPersons') .then(({ data }) => { 
                
 					

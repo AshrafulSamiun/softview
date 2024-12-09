@@ -1,18 +1,19 @@
 <?php   
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AccountHolder;
 
-use App\Classes\ArrayFunction as ArrayFunction;
-use App\Models\AccountHolderCreditCardCompany;
-use App\Models\AccountHolderSuffix;
-use App\Models\Country as Country;
-use App\Models\industrySector;
-use App\Models\User;
-use App\Rules\UniqueEmailInTwoTables;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\industrySector;
+use App\Models\Country as Country;
+use App\Models\AccountHolderSuffix;
+use App\Models\AccountHolderClient;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Mail;
+
 
 
 class AccountHolderCreditCardCompanyController extends Controller
@@ -22,11 +23,12 @@ class AccountHolderCreditCardCompanyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $company_id=$request->session()->get('company_id');
         $user=\Auth::user();
         $project_id                 = $user->project_id;
+        $user_type                  = $user->user_type;
+        $data['user_type']          =$user_type;
 
         $ArrayFunction              =new ArrayFunction();
         $account_holder_arr         =$ArrayFunction->account_holder_arr;
@@ -63,6 +65,8 @@ class AccountHolderCreditCardCompanyController extends Controller
 
         $user=\Auth::user();
         $project_id                 = $user->project_id;
+        $user_type                  = $user->user_type;
+        $data['user_type']          =$user_type;
         $ArrayFunction              =new ArrayFunction();
 
         
@@ -90,7 +94,7 @@ class AccountHolderCreditCardCompanyController extends Controller
 
 
         $sl=0;
-        $account_holder_list=AccountHolderCreditCardCompany::where('status_active',1)
+        $account_holder_list=AccountHolderClient::where('status_active',1)
                                         ->where('project_id',$project_id)
                                         ->get();   
                                         //dd($account_holder_list);die;
@@ -101,9 +105,9 @@ class AccountHolderCreditCardCompanyController extends Controller
             $data['account_holder_list'][$key]['system_no']             =$value->system_no;
             $data['account_holder_list'][$key]['email']                 =$value->email;
             $data['account_holder_list'][$key]['cell_phone']            =$value->cell_phone;  
-            $data['account_holder_list'][$key]['credit_card_company_name']            =$value->credit_card_company_name; 
-            $data['account_holder_list'][$key]['card_type']            =$value->card_type; 
-            $data['account_holder_list'][$key]['account_alert']            =$value->account_alert; 
+            $data['account_holder_list'][$key]['client_name']            =$value->client_name; 
+            $data['account_holder_list'][$key]['client_type']            =$value->client_type; 
+            $data['account_holder_list'][$key]['account_manager_name']            =$value->account_manager_name; 
             $data['account_holder_list'][$key]['chart_of_acocounts']            =$value->chart_of_acocounts;  
             $data['account_holder_list'][$key]['acount_status']            =$value->acount_status; 
             $data['account_holder_list'][$key]['account_type_string']   =$account_holder_arr[$value->account_type]; 
@@ -136,22 +140,12 @@ class AccountHolderCreditCardCompanyController extends Controller
      */
     public function store(Request $request)
     {
-
-        $company_id=$request->session()->get('company_id');
- 
-
-       if (is_null($company_id)) 
-       { 
-        return "10**22**21";
-       }
         request()->validate([
 
             'account_type'                  =>"required",
-           'credit_card_company_name'                    =>"required",
-            'card_type'                   =>"required", 
-            'account_alert'                   =>"required",
-            'payment_due_remainders'                   =>"required",
-            'credit_limit'                   =>"required",
+            'client_name'                    =>"required",
+            'client_type'                   =>"required", 
+            'account_manager_name'                   =>"required",
             'chart_of_acocounts'               =>"required", 
             'account_creation_date'              =>"required",
             'acount_status'      =>"required", 
@@ -162,20 +156,10 @@ class AccountHolderCreditCardCompanyController extends Controller
             'country'                       =>"required",
             'office_phone'                       =>"required",
             'zip_code'                      =>"required",
-           // 'email'                         =>"required",
+            'email'                         =>"required",
             'fax_no'                        =>"required",
             'cell_phone'                    =>"required",
             'website'                       =>"required",
-            'account_holder_portal'                        =>"required",
-            'account_holder_dedicated_file'                =>"required",
-            'account_holder_title_name'                 =>"required",
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                new UniqueEmailInTwoTables(),
-            ],
-            
             
         ]);
 
@@ -187,7 +171,6 @@ class AccountHolderCreditCardCompanyController extends Controller
         $request->merge(['inserted_by' =>$user_id]);
         $request->merge(['project_id' =>$project_id]);
         $account_type=$request->input('account_type');
-        $request->merge(['company_id' =>$company_id]);
 
         $account_creation_date                          =date("Y-m-d",strtotime($request->input('account_creation_date')));
         $request->merge(['account_creation_date'             =>$account_creation_date]);
@@ -201,7 +184,7 @@ class AccountHolderCreditCardCompanyController extends Controller
         $account_prifix=$account_fuffix_details->prifix;
         
 
-        $max_system_data = AccountHolderCreditCardCompany::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from account_holder_credit_card_companies 
+        $max_system_data = AccountHolderClient::whereRaw("system_prefix=(select max(system_prefix) as system_prefix from account_holder_clients 
             where account_type=".$account_type."  and project_id=".$project_id." ) 
             and account_type=".$account_type."  and project_id=".$project_id)->get(['system_prefix']);
 
@@ -221,13 +204,12 @@ class AccountHolderCreditCardCompanyController extends Controller
 
         //dd($max_system_prefix);die;
         DB::beginTransaction();
-        $account_holder_info= AccountHolderCreditCardCompany::create($request->all());
+        $account_holder_info= AccountHolderClient::create($request->all());
 
         $userRaw=User::create([
-            'name'          => $request->input('credit_card_company_name'),
+            'name'          => $request->input('client_name'),
             'email'         => $request->input('email'),
             'project_id'    => $project_id,
-            'company_id'    => $company_id,
             'user_type'     => $request->input('account_type'),
             'account_holder_id'=>$account_holder_info->id,
             'project_type'  => 94,
@@ -243,7 +225,7 @@ class AccountHolderCreditCardCompanyController extends Controller
         {
             DB::commit();
             Mail::send('emails.activation',$user, function ($message) use ($user){
-                $message->to('mahbub2107@gmail.com');
+                $message->to('a.i.bhouiyan@gmail.com');
                 $message->subject('Activation Code');
             });
            return "1**$account_holder_info->id**$system_no";
@@ -296,7 +278,7 @@ class AccountHolderCreditCardCompanyController extends Controller
         $data['account_holder_arr'] =$account_holder_arr;
 
         $data['industry_sector_arr']        =$industry_sector_arr;
-        $account_holder_list=AccountHolderCreditCardCompany::where('status_active',1)
+        $account_holder_list=AccountHolderClient::where('status_active',1)
                                         ->where('id',$id)
                                         ->first();
 
@@ -317,11 +299,9 @@ class AccountHolderCreditCardCompanyController extends Controller
         request()->validate([
 
             'account_type'                  =>"required",
-            'credit_card_company_name'                    =>"required",
-            'card_type'                   =>"required", 
-            'account_alert'                   =>"required",
-            'payment_due_remainders'                   =>"required",
-            'credit_limit'                   =>"required",
+            'client_name'                    =>"required",
+            'client_type'                   =>"required", 
+            'account_manager_name'                   =>"required",
             'chart_of_acocounts'               =>"required", 
             'account_creation_date'              =>"required",
             'acount_status'      =>"required", 
@@ -332,20 +312,10 @@ class AccountHolderCreditCardCompanyController extends Controller
             'country'                       =>"required",
             'office_phone'                       =>"required",
             'zip_code'                      =>"required",
-            //'email'                         =>"required",
+            'email'                         =>"required",
             'fax_no'                        =>"required",
             'cell_phone'                    =>"required",
             'website'                       =>"required",
-            'account_holder_portal'                        =>"required",
-            'account_holder_dedicated_file'                =>"required",
-            'account_holder_title_name'                 =>"required",
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                new UniqueEmailInTwoTables(),
-            ],
-            
             
         ]);
 
@@ -360,10 +330,10 @@ class AccountHolderCreditCardCompanyController extends Controller
 
         //dd($max_system_prefix);die;
         DB::beginTransaction();
-        $account_holder_info= AccountHolderCreditCardCompany::find($id)->update($request->all());
+        $account_holder_info= AccountHolderClient::find($id)->update($request->all());
 
-        $userRaw=User::where('account_holder_id', $id)->where('user_type', $request->input('account_type'))->update([
-            'name'          => $request->input('credit_card_company_name'),
+        $userRaw=User::where('account_holder_id', $id)->update([
+            'name'          => $request->input('client_name'),
             'email'         => $request->input('email'),
             'user_type'     => $request->input('account_type'),
         ]);
@@ -391,19 +361,6 @@ class AccountHolderCreditCardCompanyController extends Controller
      */
     public function destroy($id)
     {
-        $AccountHolder_delete=AccountHolderCreditCardCompany::find($id)->update(array('is_deleted' => 1,'status_active' => 0));
-        $User_delete=User::where('account_holder_id',$id)->where('user_type',14)->update(array('status_active' => 0));
-
-        if($AccountHolder_delete  && $User_delete)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return 10;
-        }
-        die;
+        //
     }
 }

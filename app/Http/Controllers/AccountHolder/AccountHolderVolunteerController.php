@@ -1,17 +1,20 @@
 <?php   
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AccountHolder;
 
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Classes\ArrayFunction as ArrayFunction;
+use App\Models\industrySector;
+use App\Models\Country as Country;
 use App\Models\AccountHolderSuffix;
 use App\Models\AccountHolderVolunteer;
-use App\Models\Country as Country;
-use App\Models\industrySector;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Mail;
+
 
 
 class AccountHolderVolunteerController extends Controller
@@ -22,11 +25,12 @@ class AccountHolderVolunteerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $company_id=$request->session()->get('company_id');
         $user=\Auth::user();
         $project_id                 = $user->project_id;
+        $user_type                  = $user->user_type;
+        $data['user_type']          =$user_type;
 
         $ArrayFunction              =new ArrayFunction();
         $account_holder_arr         =$ArrayFunction->account_holder_arr;
@@ -171,15 +175,6 @@ class AccountHolderVolunteerController extends Controller
      */
     public function store(Request $request)
     {
-        $company_id=$request->session()->get('company_id');
- 
-
-        if (is_null($company_id)) 
-        { 
-         return "10**22**21";
-        }
-
-
         request()->validate([
 
             'account_type'=>"required",
@@ -222,9 +217,6 @@ class AccountHolderVolunteerController extends Controller
             'account_creation_date'=>"required",
             'acount_status'=>"required",
             'comments'=>"required",
-            'account_holder_portal'                        =>"required",
-            'account_holder_dedicated_file'                =>"required",
-            'account_holder_title_name'                 =>"required",
             
         ]);
 
@@ -236,7 +228,6 @@ class AccountHolderVolunteerController extends Controller
         $request->merge(['inserted_by' =>$user_id]);
         $request->merge(['project_id' =>$project_id]);
         $account_type=$request->input('account_type');
-        $request->merge(['company_id' =>$company_id]);
 
         $account_creation_date                          =date("Y-m-d",strtotime($request->input('account_creation_date')));
         $request->merge(['account_creation_date'             =>$account_creation_date]);
@@ -276,7 +267,6 @@ class AccountHolderVolunteerController extends Controller
             'name'          => $request->input('volunteer_name'),
             'email'         => $request->input('volunteer_email'),
             'project_id'    => $project_id,
-            'company_id'    => $company_id,
             'user_type'     => $request->input('account_type'),
             'account_holder_id'=>$account_holder_info->id,
             'project_type'  => 94,
@@ -325,6 +315,8 @@ class AccountHolderVolunteerController extends Controller
     {
         $user=\Auth::user();
         $project_id                 = $user->project_id;
+        $user_type                  = $user->user_type;
+        $data['user_type']          =$user_type;
         $ArrayFunction              =new ArrayFunction();
         $account_holder_arr         =$ArrayFunction->account_holder_arr;
         $industry_selctor_list      =industrySector::where('status_active',1)
@@ -403,9 +395,6 @@ class AccountHolderVolunteerController extends Controller
                 'account_creation_date'=>"required",
                 'acount_status'=>"required",
                 'comments'=>"required",
-                'account_holder_portal'                        =>"required",
-                 'account_holder_dedicated_file'                =>"required",
-                'account_holder_title_name'                 =>"required",
             
             
             
@@ -424,7 +413,7 @@ class AccountHolderVolunteerController extends Controller
         DB::beginTransaction();
         $account_holder_info= AccountHolderVolunteer::find($id)->update($request->all());
 
-        $userRaw=User::where('account_holder_id', $id)->where('user_type', $request->input('account_type'))->update([
+        $userRaw=User::where('account_holder_id', $id)->update([
             'name'          => $request->input('volunteer_name'),
             'email'         => $request->input('volunteer_email'),
             'user_type'     => $request->input('account_type'),
@@ -453,20 +442,7 @@ class AccountHolderVolunteerController extends Controller
      */
     public function destroy($id)
     {
-        $AccountHolder_delete=AccountHolderVolunteer::find($id)->update(array('is_deleted' => 1,'status_active' => 0));
-        $User_delete=User::where('account_holder_id',$id)->where('user_type',23)->update(array('status_active' => 0));
-
-        if($AccountHolder_delete  && $User_delete)
-        {
-           DB::commit();
-           return "1**$id";
-        }
-        else
-        {
-            DB::rollBack();
-            return 10;
-        }
-        die;
+        //
     }
 }
  

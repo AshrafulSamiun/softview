@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
-    use HasFactory;
-
      protected $fillable = ['project_id','company_id','company_type','entry_form','unique_no','system_prefix','transaction_no','purchase_type','seller_id','seller_id','seller_account_no',
     'service_provider_account_no','service_provider_id','customer_id','customer_account_no','schedule_delivery_date','delivery_location',
     'delivery_instruction','delivery_contact_person_name','delivery_contact_person_email','delivery_contact_person_phone',
