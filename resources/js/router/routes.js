@@ -1,4 +1,5 @@
 import Hello from '../components/Temporary/Hello.vue'
+import Dashboard from '../components/Dashboard.vue';
 import Building from '../components/Property/Building.vue';
 import AccountPeriod from '../components/New/AccountPeriod.vue';
 import OpenFile from '../components/OpenFiles.vue';
@@ -9,36 +10,42 @@ import Bank from '../components/Account_Holders/Bank.vue';
 import BoardofDirector from '../components/Account_Holders/BoardofDirector.vue';
 import Client from '../components/Account_Holders/Client.vue';
 
-import registration_instruction from '../components/Temporary/Registration-Instruction.vue';
+import TempAccountNo from '../components/Temporary/AccountNo.vue';
 import tempCompanyProfile from '../components/Temporary/Company-Profile.vue';
 import businessType from '../components/Temporary/Management-Type.vue';
+import industryType from '../components/Temporary/Industry-Type.vue';
+
 import tempContactPerson from '../components/Temporary/Contact-Person.vue';
 import tempServicePlan from '../components/Temporary/Service-Plan.vue';
 import tempServiceContact from '../components/Temporary/Service-Contact.vue';
 import tempTermCondition from '../components/Temporary/Term-Condition.vue';
 import tempdeclaration from '../components/Temporary/Declaration.vue';
-import ShopingCard from '../components/Temporary/Shoping-Card.vue';
-import tempActivationStatus from '../components/Temporary/Activation-Status.vue';
+//import ShopingCard from '../components/Temporary/Shoping-Card.vue';
+//import tempActivationStatus from '../components/Temporary/Activation-Status.vue';
 
+
+//===================Transaction==============================================================
+import PurchaseOffer from '../components/Transactions/Purchase-Offer.vue';
 
 export const routes = [
 
     //============================Temp user============================================================================================
    
 
-    { name: 'Registration-Instruction',       path: '/Registration-Instruction',      component: registration_instruction },
+    { name: 'Temp-AccountNo',                 path: '/Temp-AccountNo',                component: TempAccountNo },
     { name: 'Temp-BusinessType',              path: '/Temp-BusinessType',             component: businessType},
+    { name: 'Temp-IndustryType',              path: '/Temp-IndustryType',             component: industryType},
     { name: 'Temp-CompanyProfile',            path: '/Temp-CompanyProfile',           component: tempCompanyProfile },
     { name: 'Temp-ContactsPersons',           path: '/Temp-ContactsPersons',          component: tempContactPerson },
     { name: 'Temp-ServicePlan',               path: '/Temp-ServicePlan',              component: tempServicePlan },
     { name: 'Temp-ServiceContract',           path: '/Temp-ServiceContract',          component: tempServiceContact },
     { name: 'Temp-TermsOfAgreement',          path: '/Temp-TermsOfAgreement',         component: tempTermCondition},
-    { name: 'Temp-Declaration',               path: '/Temp-Declaration',              component: tempdeclaration },
-    { name: 'Temp-ShoppingCard',              path: '/Temp-ShoppingCard',             component: ShopingCard },
-    { name: 'Temp-ActivationStatus',          path: '/Temp-ActivationStatus',         component: tempActivationStatus },
+    { name: 'Temp-Declaration',               path: '/Temp-Declaration',              component: tempServicePlan },
+    { name: 'Temp-ShoppingCard',              path: '/Temp-ShoppingCard',             component: tempServicePlan },
+    { name: 'Temp-ActivationStatus',          path: '/Temp-ActivationStatus',         component: tempServicePlan },
 
     // ============================New=============================================================================
-  
+    { name: '/',                              path: '/',                              component: Dashboard },
     { name: 'Calendar',                       path: '/Calendar',                      component: Calendar },
     { name: 'Company-Profile',                path: '/Company-Profile',               component: Hello },
     { name: 'Customer-Property',              path: '/Customer-Property',             component: Hello },
@@ -76,6 +83,7 @@ export const routes = [
     { name: 'Open-File',                      path: '/Open-File',                     component: OpenFile },
     { name: 'AlertCentres',                   path: '/AlertCentres',                  component: AlertCentres },
     //=======================================Transaction=================================================================================
+    { name: 'Purchase-Offer',                 path: '/Purchase-Offer',                component: PurchaseOffer },
     { name: 'Purchase',                       path: '/Purchase',                      component: Hello },
     { name: 'Sales',                          path: '/Sales',                         component: Hello },
     { name: 'Forms',                          path: '/Forms',                         component: Hello },

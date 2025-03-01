@@ -116,7 +116,7 @@ class AccountContactPersonController extends Controller
             $RId1=keyPosition::insert($data_key_position);
         }
 
-        $user_project=Project::find($project_id)->update(array('project_status' => '99'));
+        $user_project=Project::find($project_id)->update(array('project_status' => '102'));
 
         if($user_project  && $RId1)
          {

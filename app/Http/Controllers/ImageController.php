@@ -77,7 +77,7 @@ class ImageController extends Controller
             $image_arr= new FileUpload();
             $image_arr->image_name = $filename;
             $image_arr->save();
-
+            //dd(asset('storage/uploads/' . $filename));
             return response()->json(['path' => "/storage/$path", 'filename' => $filename, 'image_id' => $image_arr->id]);
         }
 

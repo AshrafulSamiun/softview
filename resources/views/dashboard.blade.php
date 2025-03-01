@@ -11,7 +11,7 @@
     
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SOFT VIEW</title>
-    <link href="{!! asset('img/logo.png') !!}" rel="icon">
+    <link href="{!! asset('assets/img/icon/logo.png') !!}" rel="icon">
 
     <!------------CSS-------------->
     <link href="css/main.css" rel="stylesheet">
@@ -122,6 +122,44 @@
     text-align: left;
   }
 
+  .custom-btn {
+       /* background-color: #007bff;
+        color: white;
+        border-radius: 10px;
+        width: 120px;
+        height: 50px;
+*/       display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+       
+        margin: 0 10px 10px 10px;
+    }
+    .custom-btn .details {
+        color: #2D7BFC;
+        font-size: 12px;
+        margin-top: -5px;
+        box-shadow: 0px 3px 2px 0px #00000026;
+        width: 100%;
+        height: 23px;
+        padding-top: 5px;
+        border-radius: 5px 0px 0px 0px;
+        opacity: 0px;
+        cursor: pointer;
+         font-weight: 500;
+
+    }
+    .custom-btn button {
+        padding: 5px 10px !important;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .custom-btn .details .active{
+        color: red;
+        font-weight: 700;
+    }
+
 </style>
 <script type="text/javascript">
     
@@ -190,10 +228,10 @@
     
 
   <!----------Header Area-------->  
-  <section class="app-header header-shadow" style="margin-bottom: 10px !important">
-      <div class="app-header__logo">
-          <div class="logo-src">
-              <img src="assets/img/logo.png" alt="" height="" width="40" style="vertical-align:top !important" />
+    <section class="app-header header-shadow" style="margin-bottom: 10px !important">
+        <div class="app-header__logo">
+            <div class="logo-src">
+                <img src="assets/img/logo.png" alt="" height="" width="40" style="vertical-align:top !important" />
                
                     @if(session()->has('company_name'))
                        <b> {{session()->get('company_name')}} </b>
@@ -202,7 +240,7 @@
                      <b> {{$project_name}}</b>
                    @endif
              
-          </div>
+            </div>
 
           <div class="text-right" >
               
@@ -211,7 +249,7 @@
                   <i class="fa-solid fa-bars"></i>
               </li>
           </div>
-      </div>
+        </div>
        
       <div class="app-header__mobile-menu">
           <div>
@@ -235,53 +273,60 @@
       <div class="app-header__content">
          <!--  <div class="div-redinet">
           </div> -->
-          <div class="app-header-left">
+            <div class="app-header-left mx-auto">
+                <div class="d-flex gap-3 p-3 ">
+                    
+                    <div class="text-center custom-btn">
+                        <button class="btn btn-primary " ><i class="fa-duotone fa-solid fa-bullhorn"></i>&nbsp;Announcements(252)</button>
+                        <div class="details">Details</div>
+                    </div>
+                    <div class="text-center custom-btn">
+                        <button class="btn btn-primary" ><i class="fa-solid fa-video"></i>&nbsp;VDC(2)</button>
+                
+                        <div class="details">Details</div>
+                    </div>
+
+
+                    <div class="text-center custom-btn">
+                        <button class="btn btn-primary" ><i class="fa-sharp fa-solid fa-envelope-circle-check"></i>&nbsp;     Emails
+                        </button>
+                
+                        <div class="details">Details</div>
+                    </div>
+
+                    <div class="text-center custom-btn">
+                         <button class="btn btn-primary" ><i class="fa-solid fa-phone"></i>&nbsp;Phone(30)</button>  
+                
+                        <div class="details">Details</div>
+                    </div>
+                    
+
+                    <div class="text-center custom-btn">
+                        <button class="btn btn-primary" ><i class="fa fa-tasks"></i>&nbsp;Tasks(30)</button>
+                
+                        <div class="details">Details</div>
+                    </div>
+                </div>
               
-              
-             <!--  <div class="search-wrapper active">
-                  <div class="input-holder">
-                      <input type="text" class="search-input" placeholder="Type to search">
-                      <button class="search-icon"><span></span></button>
-                  </div>
-              </div> -->
-          </div>
+             
+            </div>
          
           <div class="app-header-right">
               <div class="header-btn-lg pr-0">
                   <div class="widget-content p-0">
                       <div class="widget-content-wrapper">
-                          <div class="widget-content-left">
+                          <div class="widget-content-left d-flex flex-row mb-3">
 
-                              <div class="btn-group">
-
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-solid fa-building-columns"></i>&nbsp;Site</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa fa-exclamation-triangle"></i>&nbsp;Alert Codes(252)</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-duotone fa-solid fa-bullhorn"></i>&nbsp;Announcements(252)</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-solid fa-file-invoice-dollar"></i>&nbsp;Memos(30)</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa fa-tasks"></i>&nbsp;Tasks(30)</button>
-                                  
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-solid fa-video"></i>&nbsp;VDC(2)</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-solid fa-circle-exclamation"></i>&nbsp;Notices(35)</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-solid fa-box-tissue"></i>&nbsp;Complaints(35)</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-solid fa-person-falling-burst"></i>&nbsp;Incedents(35)</button>
-                                  <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-solid fa-envelope"></i>&nbsp;SMS(30)</button>
-                                  
-                                  
-                                   <button class="btn btn-primary" style="margin-right:10px;padding: 2px 5px !important;"><i class="fa-sharp fa-solid fa-envelope-circle-check"></i>&nbsp;Emails
-                                   </button>
-                              </div>
-                              <div class="btn-group">
-                                  
-                                  <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
-                                      <button type="button" tabindex="0" class="dropdown-item">User Account</button>
-                                      <button type="button" tabindex="0" class="dropdown-item">Settings</button>
-                                      <button type="button" tabindex="0" class="dropdown-item">Messages</button>
-                                      <button type="button" tabindex="0" class="dropdown-item">Notifications</button>
-                                      <div tabindex="-1" class="dropdown-divider"></div>
-                                      <button type="button" tabindex="0" class="dropdown-item">
-                                        <a class="dropdown-item" href="/logout"><i class="fa fa-logout"></i> Log Out</a></i></button>
+                              
+                              <div class="search-wrapper">
+                                  <div class="input-holder">
+                                      <input type="text" class="search-input"  placeholder="Type to search">
+                                      <button class="search-icon"><span></span></button>
                                   </div>
+                                  <button class="close"></button>
                               </div>
+                              
+
                           </div>
                           
                           <div class="widget-content-right header-user-info ml-3">
@@ -293,165 +338,164 @@
                   </div>
               </div>        
       </div>
-  </section>        
+    </section>        
          
   <!----------Sidebar and Panel Area--------> 
-  <div class="app-main" id="app">
-    
+    <div class="app-main" id="app">
+
       <!----------Sidebar--------> 
         
-       <section class="app-sidebar sidebar-shadow"> 
+        <section class="app-sidebar sidebar-shadow"> 
 
 
-          <div class="scrollbar-sidebar" style="overflow: scroll;" >
+            <div class="scrollbar-sidebar" style="overflow: scroll;" >
               
-              <div class="app-sidebar__inner">
+                <div class="app-sidebar__inner">
 
-                  <ul class="vertical-nav-menu" >
+                    <ul class="vertical-nav-menu" >
                       
-                      @foreach ($menu as $mid => $m_value)
-                          @if($m_value->rootMenu==0 && $m_value->position==1)
-                              <li class="app-sidebar__heading" id="first_level_{{$mid}}" >
-                                  @if(!empty($lavel_one_arr[$m_value->id]))
-                                    <a class="text-capitalize" href="#">
+                        @foreach ($menu as $mid => $m_value)
+                            @if($m_value->rootMenu==0 && $m_value->position==1)
+                                <li class="app-sidebar__heading" id="first_level_{{$mid}}" >
+                                    @if(!empty($lavel_one_arr[$m_value->id]))
+                                        <a class="text-capitalize" href="#">
                                       
-                                        <i class="{{$m_value->class}}" aria-hidden="true"></i> &nbsp;&nbsp; 
-
-                                    
-                                      {{$m_value->menuName}} 
-                                     
-                                         <i class="metismenu-state-icon fa fa-angle-down"></i>
-                                     
-                                    </a>
-
-
-                                    <ul class="second_level" >
-                                        @foreach($lavel_one_arr[$m_value->id] as $l1_id=>$la_value)
-                                            <li class="">
-                                                @if(!empty($lavel_two_arr[$l1_id]))
-                                                    <a class="text-capitalize" href="#">{{$la_value['menuName']}} 
-                                                        <i class="metismenu-state-icon fa fa-angle-down"></i>
-                                                    </a>
-                                                    <ul class="third_level_ul">
-                                                        @foreach($lavel_two_arr[$l1_id] as $l2_id=>$lb_value)
-
-                                                            <li>
-                                                                @if(!empty($lavel_three_arr[$l2_id]))
-                                                                  <a class="text-capitalize" href="#">{{$lb_value['menuName']}}
-                                                                      <i class="metismenu-state-icon fa fa-angle-down"></i>
-                                                                  </a>
-                                                                  <ul>
-                                                                      @foreach($lavel_three_arr[$l2_id] as $l3_id=>$lc_value)
-
-                                                                          <li>
-                                                                              <router-link :to="{ path: '/{{$lc_value['menuRoute']}}'}" class="router-link text-capitalize" >
-                                                                                  <p>{{ $lc_value['menuName']}}</p>
-                                                                              </router-link>
-                                                                          </li>
-                                                                      @endforeach
-                                                                  </ul>
-                                                              @else
-                                                                  <router-link :to="{ path: '/{{$lb_value['menuRoute']}}'}"
-                                                                  class="router-link text-capitalize" >
-                                                                  
-                                                                      <p>{{ $lb_value['menuName']}}</p>
-                                                                  </router-link>
-                                                              @endif
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                   
-                                                    <router-link :to="{ path: '/{{$la_value['menuRoute']}}'}"
-                                                                  class="router-link text-capitalize" >
-                                                  
-                                                      <p>{{ $la_value['menuName']}}</p>
-                                                  </router-link>
-                                                @endif
-
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                  @else
-                                    <router-link :to="{ path: '/{{$m_value->menuRoute}}'}"
-                                                                  class="router-link text-capitalize" >
-                                                  
-                                        <p><i class="{{$m_value->class}}" aria-hidden="true"></i> &nbsp;&nbsp;{{ $m_value->menuName}}</p>
-                                    </router-link>
-                                  @endif
+                                            <i class="{{$m_value->class}}" aria-hidden="true"></i> &nbsp;&nbsp; 
+                                        
+                                                {{$m_value->menuName}} 
+                                         
+                                            <i class="metismenu-state-icon fa fa-angle-down"></i>
+                                         
+                                        </a>
 
 
-                              </li>
+                                        <ul class="second_level" >
+                                            @foreach($lavel_one_arr[$m_value->id] as $l1_id=>$la_value)
+                                                <li class="">
+                                                    @if(!empty($lavel_two_arr[$l1_id]))
+                                                        <a class="text-capitalize" href="#">{{$la_value['menuName']}} 
+                                                            <i class="metismenu-state-icon fa fa-angle-down"></i>
+                                                        </a>
+                                                        <ul class="third_level_ul">
+                                                            @foreach($lavel_two_arr[$l1_id] as $l2_id=>$lb_value)
+
+                                                                <li>
+                                                                    @if(!empty($lavel_three_arr[$l2_id]))
+                                                                      <a class="text-capitalize" href="#">{{$lb_value['menuName']}}
+                                                                          <i class="metismenu-state-icon fa fa-angle-down"></i>
+                                                                      </a>
+                                                                      <ul>
+                                                                          @foreach($lavel_three_arr[$l2_id] as $l3_id=>$lc_value)
+
+                                                                              <li>
+                                                                                  <router-link :to="{ path: '/{{$lc_value['menuRoute']}}'}" class="router-link text-capitalize" >
+                                                                                      <p>{{ $lc_value['menuName']}}</p>
+                                                                                  </router-link>
+                                                                              </li>
+                                                                          @endforeach
+                                                                      </ul>
+                                                                  @else
+                                                                      <router-link :to="{ path: '/{{$lb_value['menuRoute']}}'}"
+                                                                      class="router-link text-capitalize" >
+                                                                      
+                                                                          <p>{{ $lb_value['menuName']}}</p>
+                                                                      </router-link>
+                                                                  @endif
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @else
+                                                       
+                                                        <router-link :to="{ path: '/{{$la_value['menuRoute']}}'}"
+                                                                      class="router-link text-capitalize" >
+                                                      
+                                                          <p>{{ $la_value['menuName']}}</p>
+                                                      </router-link>
+                                                    @endif
+
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <router-link :to="{ path: '/{{$m_value->menuRoute}}'}"
+                                                                      class="router-link text-capitalize" >
+                                                      
+                                            <p><i class="{{$m_value->class}}" aria-hidden="true"></i> &nbsp;&nbsp;{{ $m_value->menuName}}</p>
+                                        </router-link>
+                                    @endif
+
+
+                                </li>
                               
 
-                          @endif
+                            @endif
 
-                      @endforeach
-                      
-                  </ul>
+                        @endforeach
+                          
+                    </ul>
 
-              </div>
-          </div>
-      </section>  
+                </div>
+            </div>
+        </section>  
       <!----------Main Panel Area--------> 
-      <div class="app-main__outer" >
+        <div class="app-main__outer" >
 
-          <section class="app-main__inner" >
+            <section class="app-main__inner" >
            
 
-            <div class="row">
-                  <div class="col-md-12 " >
-                    <div class="main-card mb-3 card " style="display: none;" ><!-- style="display: none" -->
-                      @if(session()->has('legal_name'))
-                        <div class="card-header" style="color:#2955C8;; font-size:20px">
-                             Company Name:{{session()->get('legal_name')}} -- Account No: {{session()->get('account_no')}}
+                <div class="row">
+                      <div class="col-md-12 " >
+                        <div class="main-card mb-3 card " style="display: none;" ><!-- style="display: none" -->
+                          @if(session()->has('legal_name'))
+                            <div class="card-header" style="color:#2955C8;; font-size:20px">
+                                 Company Name:{{session()->get('legal_name')}} -- Account No: {{session()->get('account_no')}}
+                            </div>
+                          @endif
                         </div>
-                      @endif
-                    </div>
-                  </div>
-            </div>
-              <!----------Page Title Area--------> 
-              
-             
-              <div class="row"  style="min-height:800px" >
-                  <div class="col-md-12 col-xl-12">
-                     <router-view>
-                       
-                      
-
-
-                     </router-view>
-                      
-
-                  </div>
-              </div>
-              
-             
-          </section>
-
-          <!----------Footer Area--------> 
-          <section class="app-wrapper-footer">
-              <div class="app-footer">
-                  <div class="app-footer__inner">
-                      <div class="app-footer-right">
-                          <ul class="nav">
-                              <li class="nav-item d-flex align-items-center">
-                                  Design and Developed By:
-                                  <a href="https://www.bms.com.ca" target="blank" class="nav-link">
-                                      BMS-Building Management System
-                                  </a>
-                              </li>
-                          </ul>
                       </div>
-                  </div>
-              </div>
-          </section> 
+                </div>
+                <!----------Page Title Area--------> 
+              
+             
+                <div class="row"  style="min-height:800px" >
+                    <div class="col-md-12 col-xl-12">
+                         <router-view>
+                           
+                          
 
-      </div>
+
+                         </router-view>
+                          
+
+                    </div>
+                </div>
+              
+             
+            </section>
+
+            <!----------Footer Area--------> 
+            <section class="app-wrapper-footer">
+                <div class="app-footer">
+                    <div class="app-footer__inner">
+                        <div class="app-footer-right">
+                            <ul class="nav">
+                                <li class="nav-item d-flex align-items-center">
+                                  Design and Developed By:
+                                    <a href="https://www.bms.com.ca" target="blank" class="nav-link">
+                                      Soft-View
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section> 
+
+        </div>
 
 
 
-  </div>
+    </div>
 
   
 </div>

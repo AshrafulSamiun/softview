@@ -64,9 +64,9 @@ Route::get('refresh_captcha', 'Auth\RegisterController@refresh_captcha')->name('
 
 Route::group(['middleware' => ['auth', 'twofactor']], function () { 
 
-
-	Route::post('register_step_tow','RegisterController@register_step_tow')->name('register_step_tow');
-
+	Route::resource('userDashboards','userDashboardController');
+	Route::get('/userIncubate','AccountCrospondentController@userIncubate');
+	Route::resource('AccountCrospondents','AccountCrospondentController');
 	Route::get('/userIncubate','DashboardController@userIncubate');
 	Route::get('OpenFiles','OpenFileController@index');
 	Route::post('OpenFiles','OpenFileController@open_files');
@@ -91,7 +91,7 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 
 
 
-	Route::get('all-chart', 'ChartController@all_chart');
+	//Route::get('all-chart', 'ChartController@all_chart');
 	Route::resource('AccountSetups','AccountSetupController');
 	
 	Route::resource('Calendars','CalendarController');
@@ -138,6 +138,7 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 
 
 	Route::resource('PropertyManagementTypes','PropertyManagementTypeController');
+	Route::resource('IndustryType','IndustryTypeController');
 	Route::resource('UserServicePlans','UserServicePlanController');
 	Route::resource('userServiceContacts','userServiceContactController');
 	Route::resource('TermsOfAggrements','TermsOfAggrementController');
@@ -503,9 +504,6 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 
 
 });
-
-
-
 
 
 Route::get('api/rootMenu-dropdown', 'ApiController@rootMenuDropDownData');

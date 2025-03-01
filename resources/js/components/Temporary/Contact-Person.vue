@@ -1,210 +1,145 @@
 <template>
-	<fieldset>
+    <fieldset>
         <form @submit.prevent="editmode ? updateContactPerson() : createContactPerson()" @keydown="form.onKeydown($event)">
             <div class="form-card">
                 <h1 class="page-head">Contacts Persons</h1>
                 <div class="form-folder">
-                    <h3><i class="fa fa-hand-point-right"></i> Contact Person Details: 
-                        
-                    </h3>
+                   
                     <div class="form-holder">
                         <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xs-12"> 
-                                <div class="form-box-outer">
-                                    <div class="form-check-inline" align="left" v-for="(contact_person,index) in contact_person_arr" v-if="index>0"  style=" padding-bottom:10px;">
-                                        <button type="button" class="btn btn-secondary" style="width:150px"
-                                        :class="{ 'btn-success': contact_person_data[index] }"
-
-                                         @click.prevent="addContactPerson(index)" >{{contact_person}}</button>
-                                    </div>
-                                </div>
+                            <div class="col-md-1  col-sm-3 col-xs-12">
+                                
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12"> 
-                                <div class="form-box-outer" style="position:relative">
-                                    <h4>Full Name</h4>
+                            <div class="col-md-10 col-sm-9 col-xs-12">
+                                <table class="table table_narrow">
+                                            
+                                    <thead>
+                                        <tr class="header" >
+                                            <td scope="col"  >Name</td>
+                                            <td scope="col" >Position</td>
+                                            <td scope="col"  >Email</td>
+                                            <td scope="col"  >Phone Number</td>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody style="border:none">
+                                        <template v-for="(key_management,index) in form.key_management_list_arr" >
+                                            <tr style="background-color: #e7e8e7">
 
-                                    <input v-model="form.full_name" 
-                                        type="text" 
-                                        name="full_name"
-                                        @keyup="check_contack_type" 
-                                        placeholder="Type Full Name" 
-                                        :class="{ 'is-invalid': form.errors.has('full_name') }"/>
-                                          <has-error :form="form" field="full_name"></has-error>
+                                                <td >
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Type Name"
+                                                        v-bind:id="'key_management_name_'+index"
+                                                        name="key_management_name[]" 
+                                                        v-model="key_management.key_position_name"/>
+                                                </td>
+                                                <td scope="row" >{{key_management.reference_value}}</td>
+                                                
+                                                
+                                                <td >
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Type Email"
+                                                        v-bind:id="'key_position_email_'+index"
+                                                        name="key_position_email[]" 
+                                                        v-model="key_management.email"/>
+                                                </td>
 
-                                          
-                                          <input v-model="form.id" type="hidden" name="id">
-                                    <h4>Job Title</h4>
-                                    <input v-model="form.job_title" 
-                                        type="text" 
-                                        name="job_title" 
-                                         placeholder="Type Job Title" 
-                                        :class="{ 'is-invalid': form.errors.has('job_title') }"/>
-                                          <has-error :form="form" field="job_title"></has-error> 
-                                    <div style="position:absolute; bottom:10px;right:10px;">
-                                    <button :disabled="form.busy" v-show="!editmode" type="submit" class="btn btn-primary float-right">Save</button>
-                                    <button :disabled="form.busy" v-show="editmode" type="submit" class="btn btn-primary float-right">Update</button>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12">
-                                <div class="form-box-outer">
-                                    <h4>Address</h4>
-                                    <label class="fieldlabels">Street Number / Name :</label> 
-                                    <input v-model="form.street_number" 
-                                        type="text" 
-                                        name="street_number" 
-                                        placeholder="Type Street Number / Name"
-                                        :class="{ 'is-invalid': form.errors.has('street_number') }"/>
-                                         <has-error :form="form" field="street_number"></has-error>
-                                    <label class="fieldlabels">City:</label> 
-                                    <input v-model="form.city" 
-                                            type="text" 
-                                            name="city" 
-                                            placeholder="Type City"
-                                            :class="{ 'is-invalid': form.errors.has('city') }"/>
-                                             <has-error :form="form" field="city"></has-error> 
-                                    <div class="row">
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <label class="fieldlabels">State/ Province:</label> 
-                                             
-                                            <input v-model="form.state" 
-                                                type="text" 
-                                                name="state" 
-                                                placeholder="Type State/ Province" 
-                                                :class="{ 'is-invalid': form.errors.has('state') }"/>
-                                                 <has-error :form="form" field="state"></has-error>
-                                           
-                                        </div>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <label class="fieldlabels">Country:</label> 
-                                            <select v-model="form.country"  name="country" class="custom-select" :class="{ 'is-invalid': form.errors.has('country') }">
-                                                    <option disabled value="">--Select-- </option>
-                                                    <option v-for="(country,index) in countries" :value="index">{{country}}</option>
-                                            </select>
-                                           
-                                        </div>
-                                        <div class="col-md-5 col-sm-6 col-xs-12">
-                                            <label class="fieldlabels">Postal Code:</label> 
-                                            <input v-model="form.post_code" 
-                                                type="text" 
-                                                name="post_code" 
-                                                placeholder="Type Postal Code" 
-                                                :class="{ 'is-invalid': form.errors.has('post_code') }"/>
-                                                 <has-error :form="form" field="post_code"></has-error> 
-                                        </div>
-                                        <div class="col-md-7 col-sm-6 col-xs-12">
-                                            <label class="fieldlabels">P.O Box:</label> 
-                                            <input v-model="form.po_box" 
-                                                type="text" 
-                                                name="po_box" 
-                                                placeholder="Type P.O Box" 
-                                                :class="{ 'is-invalid': form.errors.has('po_box') }"/>
-                                                 <has-error :form="form" field="po_box"></has-error> 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12">
-                                <div class="form-box-outer">
-                                    <h4>Contacts</h4>
-                                    <label class="fieldlabels">Ph. Office:</label> 
-                                    <input v-model="form.office_phone" 
-                                        type="text" 
-                                        name="office_phone" 
-                                        placeholder="Type Ph. Office" 
-                                        :class="{ 'is-invalid': form.errors.has('office_phone') }"/>
-                                         <has-error :form="form" field="office_phone"></has-error> 
-                                    <label class="fieldlabels">Ph. Mobile:</label> 
-                                    <input v-model="form.mobile" 
-                                        type="text" 
-                                        name="mobile" 
-                                        placeholder="Type Ph. Mobile" 
-                                        :class="{ 'is-invalid': form.errors.has('mobile') }"/>
-                                         <has-error :form="form" field="mobile"></has-error>
-                                    <label class="fieldlabels">Fax:</label> 
-                                    <input v-model="form.fax_no" 
-                                        type="text" 
-                                        name="fax_no" 
-                                        placeholder="Fax" 
-                                        :class="{ 'is-invalid': form.errors.has('fax_no') }"/>
-                                         <has-error :form="form" field="fax_no"></has-error> 
-
-                                    <label class="fieldlabels">Email Address:</label> 
-                                    <input v-model="form.email" 
-                                        type="email" 
-                                        name="email" 
-                                        placeholder="Type Email Address"
-                                        :class="{ 'is-invalid': form.errors.has('email') }"/>
-                                         <has-error :form="form" field="email"></has-error>
-
-                                </div>
-                            </div>
-                            <hr>
+                                              
+                                                <td>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Type Phone Number"
+                                                        v-bind:id="'key_position_office_phone_'+index"
+                                                        name="key_position_office_phone[]" 
+                                                        v-model="key_management.office_phone"/>
+                                                </td>                                                        
+                                                                                               
+                                            </tr>
+                                                                                                      
+                                        </template>
+                                       
+                                    </tbody>
+                                </table> 
+                            </div>                               
                         </div>
                     </div>
+
+
                     
                 </div>
             </div>
-            <button type="button" @click="next_setp" class="next action-button">Next <i class="fa fa-angle-right"></i></button>
-            <button type="button" @click="previous_step" class="previous action-button-previous"><i class="fa fa-angle-left"></i> Previous</button>
+            <button type="button" @click="previous_step" class="btn btn-primary"><i class="fa fa-angle-left"></i> Previous</button>
+            <button :disabled="form.busy" v-show="!editmode" type="submit" class="btn btn-primary">Save</button>
+            <button :disabled="form.busy" v-show="editmode" type="submit" class="btn btn-primary">Update</button>
+             <button type="button" @click="next_setp" class="btn btn-primary">Next <i class="fa fa-angle-right"></i></button>
+            
         </form>
     </fieldset>
 </template>
+<style>
 
+    .table_narrow td{
+        padding: .1rem .5rem !important;
+    }
+
+    .table_narrow th,.table_narrow .header td{
+        font-size:13px !important;
+        vertical-align:middle !important;
+        color: rgb(255, 255, 255) !important;
+        text-align:center !important;
+        border:1px solid #fff !important;
+    }
+
+    .table_narrow tbody td{
+        font-size:13px !important;
+    }
+    .table_narrow thead tr,.table_narrow .header 
+    {
+        background: rgba(45, 123, 252, 1) !important;
+    }
+
+    .table_narrow input{
+
+        font-size: 12px !important;
+        height: 30px !important;
+        margin:5px 0  !important;
+    }  
+
+</style>
 <script>
-	import {ref} from "vue";
-	
-
-	
-
-
+    import {ref} from "vue";
+    
     export default {
         name:'list-product-categories',
        
         data(){
             return{
-            	editmode:false,
-				filter: '',
-				display_form:false,
-            	form:new Form({
-            		
-                  	id:'',
-                  	full_name:'',
-                  	job_title:'',
-                  	street_number:'',
-                  	city:'',
-                  	state:'',
-                  	country:'',
-                  	post_code:'',
-                  	po_box:'',
-                  	office_phone:'',
-                  	mobile:'',
-                  	email:'',
-                  	fax_no:'',
-                  	contact_person_id:'',
-                  	
-            	}),
-            	contact_person_data:[],
-            	countries:'',
-            	contact_person_arr:['Select Contact Person','Business Director','General Manager','Property Manager','System Admin','Accounting Manager','Accounts Payable','Emergency Contact'],
+                editmode:false,
+                filter: '',
+                display_form:false,
+                form:new Form({                     
+                    key_management_list_arr:[],
+                    
+                }),
       
-			}
+            }
         },
-		
-		created: function()
+        
+        created: function()
         {
-        	
+            
             this.user_menu_name = this.$route.name;
             this.fetchContactPerson();
            
         },
-		
-	    methods: {
+        
+        methods: {
 
-	    	previous_step()
+            previous_step()
             {
-                let route = this.$router.resolve({ path: "/Temp-CompanyProfile" });
+                let route = this.$router.resolve({ path: "/Temp-IndustryType" });
                 //alert(route.href);
                 window.open(route.href,'_self');
                 return;
@@ -217,116 +152,63 @@
                 return;
             },
 
-            addContactPerson(type)
-            {
-            	this.form.reset();
-            	if(this.contact_person_data[type])
-            	{
-            		this.editmode=true;
-            		this.form.full_name			=this.contact_person_data[type].full_name;
-            		this.form.job_title			=this.contact_person_data[type].job_title;
-            		this.form.street_number		=this.contact_person_data[type].street_number;
-            		this.form.city 				=this.contact_person_data[type].city;
-            		this.form.state 			=this.contact_person_data[type].state;
-            		this.form.country 			=this.contact_person_data[type].country;
-            		this.form.post_code 		=this.contact_person_data[type].post_code;
-            		this.form.po_box 			=this.contact_person_data[type].po_box;
-            		this.form.office_phone 		=this.contact_person_data[type].office_phone;
-            		this.form.mobile 			=this.contact_person_data[type].mobile;
-            		this.form.email 			=this.contact_person_data[type].email;
-            		this.form.fax_no 			=this.contact_person_data[type].fax_no;
-            		this.form.id 				=this.contact_person_data[type].id;
-
-            	}
-            	else 
-            	{
-            		this.editmode=false;
-
-            	}
-				this.form.contact_person_id=type;
-				this.display_form=true;
-            },
+           
 
 
-	        fetchContactPerson()
+            fetchContactPerson()
             {
                 let uri = '/AccountContactPersons';
                 window.axios.get(uri).then((response) => {
-                	this.contact_person_data					=response.data.contact_person_data;
-                	
-                	if(this.form.id){
-                		this.editmode=true;
-                	}
+                    
+                    for(let i=0; i<response.data.key_position_lavel_arr.length; i++){
 
-                	this.countries 								=response.data.country_arr;
-                	
+                        this.form.key_management_list_arr.push({
+                            'id'                :response.data.key_position_lavel_arr[i].id,
+                            'reference_id'      :response.data.key_position_lavel_arr[i].reference_id,
+                            'reference_value'   :response.data.key_position_lavel_arr[i].reference_value,
+                            'email'             :response.data.key_position_lavel_arr[i].email,
+                            'office_phone'      :response.data.key_position_lavel_arr[i].office_phone,
+                            'editable'          :response.data.key_position_lavel_arr[i].editable,
+                            'key_position_name' :response.data.key_position_lavel_arr[i].key_position_name,
+                        }); 
+                    }
+                    
+                    this.editmode=response.data.editmode;                   
                 });   
-            },
-
-            check_contack_type()
-            {
-                if(!this.form.contact_person_id)
-                {
-                    toast({
-                        type: 'warning',
-                        title: 'Please select contact Type.'
-                    });
-                    this.form.full_name="";
-                    return;
-                } 
-            },
-         
-       
+            },      
 
             updateContactPerson()
             {
-				//alert(this.form.id);
-		        this.form.put('/AccountContactPersons/'+this.form.id)
-				    .then(()=>{
-					       //success
-					     
-					
-							toast({
-							  type: 'success',
-							  title: 'Data Update Successfully'
-							});
-					
-					     	this.form.reset ();
-							this.display_form=false;
-							this.fetchContactPerson();
-				    })
-				    .catch(()=>{
-					   Swal("failed!","there was some wrong","warning");
-				
-				    });
+                //alert(this.form.id);
+                this.form.put('/AccountContactPersons/'+this.form.id)
+                    .then(()=>{
+                           //success
+                    
+                            showToast('Data Update Successfully', 'success');
+                    
+                            this.form.reset ();
+                            this.display_form=false;
+                            this.fetchContactPerson();
+                    })
+                    .catch(()=>{
+                       showToast("there was some wrong","warning");
+                
+                    });
             },
             
             createContactPerson()
             {
 
-                if(!this.form.contact_person_id)
-                {
-                toast({
-                        type: 'warning',
-                        title: 'Please select contact Type.'
-                    });
-                    return;
-                } 
-        	    this.form.post('/AccountContactPersons') .then(({ data }) => { 
-               
-					
-					toast({
-						type: 'success',
-						title: 'Data Save successfully'
-					});
+                this.form.post('/AccountContactPersons') .then(({ data }) => { 
+                    showToast('Data Save Successfully', 'success');
 
-					this.form.reset ();
-					this.display_form=false;
-					this.fetchContactPerson();
-        	    })
+                    this.form.reset ();
+                    this.display_form=false;
+                    this.fetchContactPerson();
+                })
             }
-	    }
+        }
     
     }  
-	
+    
 </script>

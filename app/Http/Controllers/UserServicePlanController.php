@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\UserServicePlanDetails as UserServicePlanDetails;
 use App\Models\UserServicePlan as UserServicePlan;
 use App\Models\servicePlan as servicePlan;
+use App\Models\ServicePlanGroup as ServicePlanGroup;
+use App\Models\ServicePlanSubgroup as ServicePlanSubgroup;
 use App\Models\Project as Project;
 use App\Models\PropertyManagementType as PropertyManagementType;
 use App\Classes\ArrayFunction as ArrayFunction;
@@ -20,63 +22,62 @@ class UserServicePlanController extends Controller
      */
     public function index()
     {
-        $user_info              = \Auth::user();
-        $project_id             = $user_info->project_id;
-        $user_id                = $user_info->id;
-        $ArrayFunction          =new ArrayFunction();
-        $currency               =$ArrayFunction->currency;
-        $data['currency_arr']   =$currency;
+        $user_info                      = \Auth::user();
+        $project_id                     = $user_info->project_id;
+        $user_id                        = $user_info->id;
+        $ArrayFunction                  =new ArrayFunction();
+        $currency                       =$ArrayFunction->currency;
+        $data['currency_arr']           =$currency;
+        $data['sales_tax_rate']         =9/100;
+        $data['conversion_rate_arr']   =array(
+                                            1=>"1",
+                                            2=>".7",
+                                            3=>".67"
+                                        );
+
+
+        $service_group_sql=ServicePlanGroup::where('status_active', '=', 1)           
+                                            ->get();
+
+        $service_group_arr=array();
+        foreach($service_group_sql as $key=>$value)
+        {
+            $service_group_arr[$value->id]['name']              =$value->name;
+            $service_group_arr[$value->id]['subgroup_available']=$value->subgroup_available;
+        }
+
+
+        $service_subgroup_sql=ServicePlanSubgroup::where('status_active', '=', 1)           
+                                            ->get();
+
+        $service_subgroup_arr=array();
+        $subgroup_group=array();
+        foreach($service_subgroup_sql as $key=>$value)
+        {
+            $service_subgroup_arr[$value->service_group_id][$value->id]['name']=$value->name;
+            $service_subgroup_arr[$value->service_group_id][$value->id]['quantity_applicable']  =$value->quantity_applicable;
+            $service_subgroup_arr[$value->service_group_id][$value->id]['default_quantity']     =$value->default_quantity;
+            if($value->default_quantity>0)
+                $service_subgroup_arr[$value->service_group_id][$value->id]['checked']          =true;
+            else 
+                $service_subgroup_arr[$value->service_group_id][$value->id]['checked']          =false;
+
+            $subgroup_group[$value->id]=$value->service_group_id;
+
+        }
+
+
         $master_service_plan    =UserServicePlan::where('status_active', '=', 1)
                                             ->where('project_id', '=', $project_id)
                                             ->first();
-        $management_type_sql    =PropertyManagementType::where('status_active', '=', 1)
-                                            ->where('project_id', '=', $project_id)
-                                            ->first();
+       
 
-        if($management_type_sql->security_guard==1)
-            $management_type=1;
-
-        else if($management_type_sql->concierge==1)
-            $management_type=2;
-        else if($management_type_sql->concierge_security==1)
-            $management_type=3;
-        else if($management_type_sql->artimis==1)
-            $management_type=4;
-        else if($management_type_sql->property_management==1)
-            $management_type=5;
-        else 
-            $management_type=0;
-        
-        $data['management_type']=$management_type;
-
-
-        $service_plan = servicePlan::where('status', '=', 1)
-                                ->get();
-        foreach ($service_plan as $key => $value) {
-            if($value->rate_applicable==0)
-            {
-                $master_plan_arr[$value->type_of_service]=$value->plan_name;
-            }
-        }
 
         $service_plan_details_arr=array();
-        foreach ($service_plan as $key => $value) {
-            if($value->rate_applicable==1)
-            {
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['plan_id']                =$value->id;
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['id']                     ="";
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['plan_name']              =$value->plan_name;
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['rate_applicable']        =$value->rate_applicable;
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['rate']                   =$value->rate;
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['amount']                 =$value->rate;
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['slno']                   =$value->slno;
-                $servicePlan_arr[$value->type_of_service][$value->plan_name][$value->management_type]['checked']                =false;
-                $service_plan_details_arr[$value->id]['type_of_service']=$value->type_of_service;
-                $service_plan_details_arr[$value->id]['plan_name']=$value->plan_name;
-                $service_plan_details_arr[$value->id]['management_type']=$value->management_type;
-            }               
-        }
+        
 
+
+        $servicePlan_arr=array();
         if(!empty($master_service_plan))
         {
             $data['update_master_data_arr'] =$master_service_plan;
@@ -88,14 +89,23 @@ class UserServicePlanController extends Controller
                                     ->where('master_id', '=', $master_service_plan->id)
                                     ->get();
 
-          
+            $check_plan_update=array();
+            $check_subgroup_update=array();
             foreach($service_plan_details as $m=>$mvalue)
             {
 
-                $servicePlan_arr[$service_plan_details_arr[$mvalue->plan_id]['type_of_service']][$service_plan_details_arr[$mvalue->plan_id]['plan_name']][$service_plan_details_arr[$mvalue->plan_id]['management_type']]['id']=$mvalue->id;
+                $master_plan_arr[$mvalue->subgroup_id][$master_service_plan->service_type]['plan_id']       =$mvalue->plan_id;
+                $master_plan_arr[$mvalue->subgroup_id][$master_service_plan->service_type]['id']            =$mvalue->id;
+                $master_plan_arr[$mvalue->subgroup_id][$master_service_plan->service_type]['amount']        =$mvalue->amount;
+                $master_plan_arr[$mvalue->subgroup_id][$master_service_plan->service_type]['rate']          =$mvalue->rate;
+                $master_plan_arr[$mvalue->subgroup_id][$master_service_plan->service_type]['rate_applicable']=$mvalue->rate_applicable;
+                $master_plan_arr[$mvalue->subgroup_id][$master_service_plan->service_type]['quantity']      =$mvalue->quantity;
 
-                 $servicePlan_arr[$service_plan_details_arr[$mvalue->plan_id]['type_of_service']][$service_plan_details_arr[$mvalue->plan_id]['plan_name']][$service_plan_details_arr[$mvalue->plan_id]['management_type']]['amount']=$mvalue->amount;
-                 $servicePlan_arr[$service_plan_details_arr[$mvalue->plan_id]['type_of_service']][$service_plan_details_arr[$mvalue->plan_id]['plan_name']][$service_plan_details_arr[$mvalue->plan_id]['management_type']]['checked']=true;
+
+                $service_subgroup_arr[$subgroup_group[$mvalue->subgroup_id]][$mvalue->subgroup_id]['default_quantity']     =$mvalue->quantity;
+
+                $check_plan_update[$mvalue->plan_id]=$mvalue->plan_id;
+                $check_subgroup_update[$mvalue->subgroup_id]=$mvalue->subgroup_id;
                  
             }
 
@@ -104,9 +114,45 @@ class UserServicePlanController extends Controller
         { 
             $data['update_master_data_arr'] =array();
         }
+
+
+
+        $service_plan = servicePlan::where('status_active', '=', 1)//->where('subgroup_id', '=', 9)
+                                ->get();
+        foreach ($service_plan as $key => $value) {
+
+            if(!in_array($value->id,$check_plan_update))
+            {
+
+                if(in_array($value->subgroup_id,$check_subgroup_update))
+                {
+
+                    $quantity=$service_subgroup_arr[$subgroup_group[$value->subgroup_id]][$value->subgroup_id]['default_quantity'];
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['plan_id']         =$value->id;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['id']              ="";
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['amount']          =$value->amount*$quantity;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['rate']            =$value->amount;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['rate_applicable'] =$value->rate_applicable;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['quantity']        =$quantity;
+                }
+                else
+                {
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['plan_id']         =$value->id;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['id']              ="";
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['amount']          =$value->amount;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['rate']            =$value->amount;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['rate_applicable'] =$value->rate_applicable;
+                    $master_plan_arr[$value->subgroup_id][$value->plan_type]['quantity']        =1;
+                }
+
+            }
+            
+        }
         
-        $data['service_plan_arr']   =$servicePlan_arr;
-        $data['master_plan_arr']    =$master_plan_arr;
+        $data['service_plan_arr']       =$servicePlan_arr;
+        $data['master_plan_arr']        =$master_plan_arr;
+        $data['service_subgroup_arr']   =$service_subgroup_arr;
+        $data['service_group_arr']      =$service_group_arr;
            
         return $data;
     }
@@ -133,8 +179,7 @@ class UserServicePlanController extends Controller
         $quantitys=$request->quantity;
         $rates=$request->rate;
         $amounts=$request->amount;
-        $rate_applicables=$request->rate_applicable;
-        $service_enables=$request->service_enable;
+       
 
 
         $user_info  = \Auth::user();
@@ -147,27 +192,36 @@ class UserServicePlanController extends Controller
 
         $UserServicePlan= UserServicePlan::create($request->all());
 
-        foreach($request->service_plan_arr as $key=>$service_details)
+        foreach($request->service_subgroup_arr as $key=>$service_group)
         {
-            if($key>0)
+            foreach($service_group as $subgroup_id=>$service_subgroup_details)
             {
-                foreach($service_details as $key1=>$plan_details)
+                if($key>0 && $service_subgroup_details['checked'])
                 {
-                    foreach($plan_details as $key2=>$details)
+                   
+                    if(!empty($request->master_plan_arr[$subgroup_id]))
                     {
-                        if($details['checked']){
-                            $data[]= array(
-                                'master_id'         =>$UserServicePlan->id,
-                                'project_id'        =>$project_id,
-                                'plan_id'           =>$details['plan_id'],
-                                'rate_applicable'   =>$details['rate_applicable'],
-                                'rate'              =>$details['rate'],
-                                'amount'            =>$details['rate'],
-                                'inserted_by'       =>$user_id,
-                            );
-                        }
-                     }
-                } 
+                        foreach($request->master_plan_arr[$subgroup_id] as $service_plan=>$plan_details)
+                        {
+                            if($request->service_type==$service_plan && $plan_details['rate_applicable']==1)
+                            {
+                                //dd($plan_details);
+                            
+                                $data[]= array(
+                                    'master_id'         =>$UserServicePlan->id,
+                                    'project_id'        =>$project_id,
+                                    'subgroup_id'       =>$subgroup_id,
+                                    'plan_id'           =>$plan_details['plan_id'],
+                                    'rate_applicable'   =>$plan_details['rate_applicable'],
+                                    'rate'              =>$plan_details['rate'],
+                                    'quantity'          =>$service_subgroup_details['default_quantity'],
+                                    'amount'            =>$plan_details['amount'],
+                                    'inserted_by'       =>$user_id,
+                                );
+                            }                        
+                        } 
+                    }
+                }
             }
         }
  
@@ -234,63 +288,84 @@ class UserServicePlanController extends Controller
         $DeleteUserServicePlanDetails=true;
 
         $inserted_data=array();
-        foreach($request->service_plan_arr as $key=>$service_details)
+        $UserServicePlanDetailsUpdate=true;
+        foreach($request->service_subgroup_arr as $key=>$service_group)
         {
-            if($key>0)
+            foreach($service_group as $subgroup_id=>$service_subgroup_details)
             {
-                foreach($service_details as $key1=>$plan_details)
+                if($key>0 && $service_subgroup_details['checked'])
                 {
-                    foreach($plan_details as $key2=>$details)
+                   
+                    if(!empty($request->master_plan_arr[$subgroup_id]))
                     {
-                        if($details['id'])
+                        foreach($request->master_plan_arr[$subgroup_id] as $service_plan=>$plan_details)
                         {
-                            if($details['checked']){
+                            if($plan_details['id'])
+                            {
+                                if($request->service_type==$service_plan && $plan_details['rate_applicable']==1)
+                                {
+                                
+                                    $data_update= array(
+                                        'master_id'         =>$id,
+                                        'project_id'        =>$project_id,
+                                        'subgroup_id'       =>$subgroup_id,
+                                        'plan_id'           =>$plan_details['plan_id'],
+                                        'rate_applicable'   =>$plan_details['rate_applicable'],
+                                        'rate'              =>$plan_details['rate'],
+                                        'quantity'          =>$service_subgroup_details['default_quantity'],
+                                        'amount'            =>$plan_details['amount'],
+                                        'updated_by'        =>$user_id,
+                                    );
+                                    $UserServicePlanDetailsUpdate=UserServicePlanDetails::where('id',"=",$plan_details['id'])->update($data_update);
 
-                                $data_update= array(
-                                    'master_id'         =>$id,
-                                    'project_id'        =>$project_id,
-                                    'plan_id'           =>$details['plan_id'],
-                                    'rate_applicable'   =>$details['rate_applicable'],
-                                    'rate'              =>$details['rate'],
-                                    'amount'            =>$details['amount'],
-                                    'inserted_by'       =>$user_id,
-                                );
 
-                                $UserServicePlanDetails=UserServicePlanDetails::where('id',"=",$details['id'])->update($data_update);
+                                } 
+                                else{
+
+                                    $DeleteUserServicePlanDetails=UserServicePlanDetails::where('id',"=",$plan_details['id'])->update(['status_active'=>0,'is_deleted'=>1]);
+                                    if( !$DeleteUserServicePlanDetails)
+                                    {
+                                        DB::rollBack();
+                                        return 10;
+                                        die;
+                                    }
+                                }
                             }
                             else
                             {
-                                $DeleteUserServicePlanDetails=UserServicePlanDetails::where('id',"=",$details['id'])->update(['status_active'=>2]);
+                                if($request->service_type==$service_plan && $plan_details['rate_applicable']==1)
+                                {
+                                    //dd($plan_details);
+                                
+                                    $inserted_data[]= array(
+                                        'master_id'         =>$id,
+                                        'project_id'        =>$project_id,
+                                        'subgroup_id'       =>$subgroup_id,
+                                        'plan_id'           =>$plan_details['plan_id'],
+                                        'rate_applicable'   =>$plan_details['rate_applicable'],
+                                        'rate'              =>$plan_details['rate'],
+                                        'quantity'          =>$service_subgroup_details['default_quantity'],
+                                        'amount'            =>$plan_details['amount'],
+                                        'inserted_by'       =>$user_id,
+                                    );
+                                }
                             }
-
-                        }
-                        else {
-
-                            if($details['checked']){
-
-                                $inserted_data[]= array(
-                                    'master_id'         =>$id,
-                                    'project_id'        =>$project_id,
-                                    'plan_id'           =>$details['plan_id'],
-                                    'rate_applicable'   =>$details['rate_applicable'],
-                                    'rate'              =>$details['rate'],
-                                    'amount'            =>$details['rate'],
-                                    'inserted_by'       =>$user_id,
-                                );
-                            }
-                        }    
-                     }
-                } 
+                                                    
+                        } 
+                    }
+                }
             }
         }
 
+        $InsertedPlanDetails=true;
+        
         if(!empty($inserted_data))
         {
             $InsertedPlanDetails=UserServicePlanDetails::insert($inserted_data);
         }
 
 
-        if($UserServicePlan  && $UserServicePlanDetails && $InsertedPlanDetails && $DeleteUserServicePlanDetails)
+        if($UserServicePlan  && $UserServicePlanDetailsUpdate && $InsertedPlanDetails && $DeleteUserServicePlanDetails)
         {
            DB::commit();
            //return redirect()->route('dashboard');

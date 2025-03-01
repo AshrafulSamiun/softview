@@ -15,14 +15,11 @@ class CreateServicePlansTable extends Migration
     {
         Schema::create('service_plans', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('plan_name',200)->nullable($value = true);
-            $table->tinyInteger('management_type')->default(1);
-            $table->tinyInteger('type_of_service')->default(10);
-            $table->double('rate',8,2)->default(0.00);
-            $table->double('amount',8,2)->default(0.00);
-            $table->tinyInteger('status')->default(1);
-            $table->tinyInteger('slno')->default(0);
-            $table->tinyInteger('rate_applicable')->default(0);
+            $table->foreignId('subgroup_id')->constrained('service_plan_subgroups')->onDelete('restrict')->onUpdate('cascade');
+            $table->enum('plan_type', ['Basic', 'Standard', 'Premium', 'Enterprise']);
+            $table->double('amount', 10, 2);
+           // $table->tinyInteger('slno')->default(0);
+            //$table->tinyInteger('rate_applicable')->default(0);
             $table->timestamps();
         });
     }

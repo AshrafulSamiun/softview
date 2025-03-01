@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="msapplication-tap-highlight" content="no">
     <title>SOFT VIEW</title>
-    <link href="assets/img/armitis_security.png" rel="icon">
+    <link href="assets/img/logo.png" rel="icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!------------CSS-------------->
     <link href="css/main.css" rel="stylesheet">
@@ -44,7 +44,7 @@
     <section class="app-header header-shadow" style="background:rgb(45, 123, 252)">
         <div class="app-header__logo" style="background:rgb(45, 123, 252)">
             <div class="logo-src">
-                <img src="assets/img/artemis.png" style="max-height: 60px; " alt=""/>
+                <img src="assets/img/logo.png" style="max-height: 60px; " alt=""/>
             </div>
         </div>
         <div class="app-header__mobile-menu">
@@ -158,35 +158,45 @@
 
     $( document ).ready(function() {
         var project_type=$("#hidden_project_type").val();
-        if(project_type==105)
+        if(project_type==107)
         {
            window.open('#/Temp-AccountNo','_self');
            setProgressBar(1,14); 
         } 
-        if(project_type==104)
+        if(project_type==106)
         {
            window.open('#/Temp-CompanyProfile','_self');
            setProgressBar(2,14); 
         } 
-        else if(project_type==103)
+        else if(project_type==105)
         {
            window.open('#/Temp-BusinessType','_self');
            setProgressBar(3,14); 
         } 
+        else if(project_type==104)
+        {
+            window.open('#/Temp-IndustryType','_self'); 
+            setProgressBar(4,14); 
+        }
+        else if(project_type==103)
+        {
+            window.open('#/Temp-ContactsPersons','_self'); 
+            setProgressBar(5,14); 
+        }
         else if(project_type==102)
         {
-           window.open('#/Temp-ServicePlan','_self'); 
-            setProgressBar(4,14); 
+            window.open('#/Temp-ServicePlan','_self'); 
+            setProgressBar(6,14); 
         }
         else if(project_type==101)
         {
-            window.open('#/Temp-ServiceContract','_self'); 
-           setProgressBar(5,14); 
+            window.open('#/Temp-PaymentMethod','_self'); 
+            setProgressBar(7,14); 
         } 
         else if(project_type==100)
         {
-           window.open('#/Temp-ContactsPersons','_self');
-           setProgressBar(6,14); 
+           window.open('#/Temp-ServiceContract','_self');
+           setProgressBar(8,14); 
         } 
          
         else if(project_type==99)

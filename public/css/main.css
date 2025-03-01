@@ -2482,6 +2482,8 @@ fieldset:disabled a.btn {
 .show > .btn-primary.dropdown-toggle:focus {
     box-shadow: 0 0 0 0 rgba(92, 128, 222, 0.5);
 }
+
+
 .btn-secondary {
     color: #fff;
     background-color: #6c757d;
@@ -9461,7 +9463,8 @@ button,
     text-decoration: none;
 }
 .vertical-nav-menu li a:hover i{
-    color:green;
+/*    color:green;*/
+    color:#000;
 }
 .vertical-nav-menu li a:hover i.metismenu-icon {
     opacity: 0.6;
@@ -20944,7 +20947,7 @@ a.fc-more:hover {
     font-weight: 600;
 }
 .fxt-template-layout4 .fxt-content {
-  padding: 30px;
+  padding: 0 30px;
   max-width: 460px;
   width: 100%;
 }

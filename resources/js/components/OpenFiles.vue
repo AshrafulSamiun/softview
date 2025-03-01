@@ -77,8 +77,8 @@
 
       change_company(row) {
           this.form.company_avaibale  =true,
-          this.form.company_id 		=row.company_id,
-          this.form.company_name		=row.company_name,
+          this.form.company_id    =row.company_id,
+          this.form.company_name    =row.company_name,
           this.form.last_modified_by  =row.last_modified_by,
           this.form.last_modified_date=row.last_modified_date,
           this.form.post('/OpenFiles').then(({data}) => {

@@ -6,7 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class servicePlan extends Model
 {
-    protected $fillable = ['plan_name', 'management_type', 'type_of_service','rate',
-    'amount', 'rate_applicable', 'status', 'slno'];
+
+    protected $table = 'service_plans';
+
+    protected $primaryKey = 'id';
+
+    protected $fillable = [
+        'subgroup_id', 
+        'plan_type', 
+        'amount',
+        'qty',
+        'rate_applicable',
+        'inserted_by',
+        'updated_by',
+        'status_active',
+        'is_deleted',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = true;
 
 }

@@ -32,7 +32,7 @@ class PurchaseOfferController extends Controller
                         ->groupBy('entry_form')
                         ->where('status_active',1)
                         ->get();
-
+       // dd($report_data);
         $data['total_purchase_offer_qty']=0; 
         $data['total_purchase_offer_acceptance_qty']=0; 
         $data['total_purchase_order_qty']=0; 

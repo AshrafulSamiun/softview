@@ -10,11 +10,13 @@ class AccountCompany extends Model
 
     protected $fillable = [
         
-        'project_id', 'user_id', 'company_logo_id','legal_name', 'business_registration_number', 'city','state','country','zip_code', 'website',
-        'management_type','business_registration_city','business_registration_state','business_registration_country','business_registration_zip_code',
-        'email','contact_person_name','position_in_company','contact_person_cell_phone','contact_person_email','company_logo_id',
-        'license_no','license_issuer','license_date','license_expirey_date',  
+        'project_id', 'user_id', 'company_logo_id','legal_name','headoffice_house_number','headoffice_street_number', 'headoffice_city','headoffice_state','headoffice_country','contact_person_website','contact_person_fax_no','contact_person_cell_phone','contact_person_email','company_logo_id',
         'inserted_by','updated_by','status_active','is_deleted'
 
     ];
+
+    public function companylogo()
+    {
+        return $this->belongsTo('App\Models\FileUpload','company_logo_id', 'id');
+    }
 }

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Module as Module;
 use App\Models\Menu as Menu;
 use Illuminate\Support\Facades\DB;
+use Charts;
+
 
 class userDashboardController extends Controller
 {
@@ -22,52 +24,82 @@ class userDashboardController extends Controller
     public function index()
     {
         $project_id = \Auth::user()->project_id;
-        $data['module']=Module::where('status', '=', 1)->orderBy('modSlNo')->get();
-        $data['menu']=Menu::where('status', '=', 1)->get();
+        $users = User::where(DB::raw("(DATE_FORMAT(created_at,'%Y'))"),date('Y'))
+                    ->get();
+
+        $data['areaspline'] = Charts::multi('line', 'highcharts')
+                ->title('My Areas Pline chart')
+                ->colors(['#ff0000', '#ffffff', '#408000'])
+                ->labels(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday', 'Sunday'])
+                ->dataset('John', [3, 4, 3, 5, 4, 10, 12])
+                ->dataset('Jane',  [1, 3, 4, 3, 3, 5, 4])
+                ->dataset('Jane',  [4, 2, 5, 1, 2, 15, 8]);
+
+        $data['line'] = Charts::create('line', 'highcharts')
+                ->title('My nice chart')
+                ->elementLabel('My nice label')
+                ->labels(['First', 'Second', 'Third'])
+                ->values([5,10,20])
+                ->dimensions(1000,500)
+                ->responsive(false);
+
+
+
+         $data['donut'] = Charts::create('donut', 'highcharts')
+                ->title('My nice chart')
+                ->labels(['First', 'Second', 'Third'])
+                ->values([5,10,20])
+                ->dimensions(500,500)
+                ->responsive(false);
+
+        $data['bar'] = Charts::database($users, 'bar', 'highcharts')
+                  ->title("Monthly new Register Users")
+                  ->elementLabel("Total Users")
+                  ->dimensions(1000, 500)
+                  ->responsive(false)
+                  ->groupByMonth(date('Y'), true);
+
+         $data['area']  =Charts::create('area', 'highcharts')
+                        ->title('My nice chart')
+                        ->elementLabel('My nice label')
+                        ->labels(['First', 'Second', 'Third'])
+                        ->values([5,10,20])
+                        ->dimensions(1000,500)
+                        ->responsive(false);
+
+         $data['chart1'] =Charts::create('geo', 'highcharts')
+                                ->title('My nice chart')
+                                ->elementLabel('My nice label')
+                                ->labels(['IN', 'CA', 'RU'])
+                                ->colors(['#b3b300', '#009900'])
+                                ->values([5,10,20])
+                                ->dimensions(1000,500)
+                                ->responsive(false);
+
+
+        $data['percentage']= Charts::create('percentage', 'justgage')
+                                ->title('My nice chart')
+                                ->elementLabel('My nice label')
+                                ->values([65,0,100])
+                                ->responsive(true)
+                                ->height(300)
+                                ->width(0);
+
+
+        $data['real_bar_chart'] = Charts::create( 'bar', 'highcharts')
+                  ->title("SITUAÇÃO DA EMPRESA 2018/2019")
+                  ->elementLabel("Total Users")
+                  ->labels(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday', 'Sunday'])
+                  ->values([5,10,20,10,15,12,18])
+                  ->dimensions(1000, 500)
+                  ->responsive(false);
+
         
     
-        return view('dashboard',$data);
+        return $data;
         //return view('dashboard');
     }
 
 
-    public function user_module($module_id)
-    {
-        $data['module']=Module::where('status', '=', 1)->get();
-        $selected_module=Module::where('id', '=', $module_id)->get(['moduleName']);
-        $data['title']=$selected_module[0]->moduleName;
-       // dd($data['title']);
-        $user_id = \Auth::user()->id;
-        $menu_data=Menu::where('status', '=', 1)->where('moduleId', '=', $module_id)->get();
-
-        $data['menu']=$menu_data;
-        $root_menu_arr=array();
-        $main_menu_arr=array();
-        foreach($menu_data as $m=>$mvalue)
-        {
-
-        	if($mvalue->rootMenu>0 || $mvalue->position>1)
-        	{
-        		 $root_menu_arr[$mvalue->rootMenu][$mvalue->id]['id']=$mvalue->id;
-           		 $root_menu_arr[$mvalue->rootMenu][$mvalue->id]['name']=$mvalue->menuName;
-           		 $root_menu_arr[$mvalue->rootMenu][$mvalue->id]['menuRoute']=$mvalue->menuRoute;
-
-           		 
-        	}
-        	else if($mvalue->rootMenu==0 || $mvalue->position==1)
-        	{
-        		 $main_menu_arr[$mvalue->id]['id']=$mvalue->id;
-           		 $main_menu_arr[$mvalue->id]['name']=$mvalue->menuName;
-                 $main_menu_arr[$mvalue->id]['menuRoute']=$mvalue->menuRoute;
-        	}
-           
-        }
-
-        $data['rootMenu']=$this->menu->where('moduleId', '=', $module_id)->where('rootMenu', '=', 0)->all();
-        $data['root_menu_arr']=$root_menu_arr;
-        $data['main_menu_arr']=$main_menu_arr;
-
-//return $data;
-        return view('dashboard_module',$data);
-    }
+    
 }

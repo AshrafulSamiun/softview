@@ -197,10 +197,6 @@
     import { format } from "date-fns"; // Import format from date-fns
     import Vue3datepicker from "vue3-datepicker";
 
-
-	
-
-
     export default {
         name:'list-product-categories',
        	components:{

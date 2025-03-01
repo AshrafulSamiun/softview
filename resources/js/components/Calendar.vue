@@ -8,9 +8,9 @@
                     <div class="form-holder">
                         <div class="year-calendar">
                             <div class="year-header">
-                                <button class="btn btn-primary" @click="prevYear">Previous Year</button>
+                                <button type="button" class="btn btn-primary" @click="prevYear">Previous Year</button>
                                 <h2 >{{ form.current_year }}</h2>
-                                <button class="btn btn-primary" @click="nextYear">Next Year</button>
+                                <button type="button" class="btn btn-primary" @click="nextYear">Next Year</button>
                             </div>
                             <div class="months-container">
                                 <div class="month" v-for="(month, index) in monthNames" :key="index">
@@ -342,7 +342,7 @@
                                         v-model="form.end_on">
                                     <label class="repetation_day" for="end_on">On</label> 
                                     <Vue3datepicker 
-                                        v-model="form.deadline" 
+                                        v-model="form.end_date" 
                                         :format="dateformat" 
                                         :class="{ 'is-invalid': form.errors.has('end_date') }"/>
                                 </div>
@@ -701,9 +701,11 @@
             },
             prevYear() {
                 this.form.current_year--;
+                this.fetchCalendar();
             },
             nextYear() {
                 this.form.current_year++;
+                this.fetchCalendar();
             },
 
             selectDate(day,currentMonth) {
@@ -834,7 +836,10 @@
                 })
                 
             },
+            createCalendarEvent()
+            {
 
+            },
             repost()
             {            
                 Swal.fire({

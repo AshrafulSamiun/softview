@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="msapplication-tap-highlight" content="no">
     <title>Softview Accounting</title>
-    <link href="assets/img/armitis_security.png" rel="icon">
+    <link href="<?php echo asset('assets/img/icon/logo.png'); ?>" rel="icon">
 
     <!------------CSS-------------->
     <link href="<?php echo e(asset('css/main.css')); ?>" rel="stylesheet">
@@ -32,23 +32,25 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 col-12 fxt-bg-wrap">                       
-                <img class="" src="assets/img/artemis.png" alt="">
-                <h1>Hello World</h1>
-        
-                <h2>Welcome To GuardMe</h2>
+                <img class="" src="assets/img/logo.png" alt="">        
+                <h2>Welcome To Softview Accounting</h2>
                
-                <h2>Empowering Security and Concierge Services with Innovative Web and Mobile Solutions.</h2>              
+                <h2>Where expart guidance and innovative Tools for your innovative financial clarity</h2>              
             </div> 
             <div class="col-md-8 col-12 fxt-bg-color" style="background-color: #fff;" align="">
                 <div class="fxt-content">
                     <div class="fxt-form">
+                        <div class="create-account-login" align="center">
+                            <span class="login">Log In</span>
+                            <span class="create-account">Create Account</span>
+                        </div>
                         <form method="POST" action="<?php echo e(route('login')); ?>">
                             <?php echo e(csrf_field()); ?>
 
 
                             <div class="create-account-login" align="center">
-                                <span class="login">Log In</span>
-                                <span class="create-account">Create Account</span>
+                                <span class="login">Master </span>
+                                <span class="create-account">Jonior</span>
                             </div>
 
                             <div class="form-group">

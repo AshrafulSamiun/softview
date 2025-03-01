@@ -13,56 +13,30 @@
 							    	<tr>
 							    		<td>
 							            	<div class="form-lebel" align="right">
-							                    Account No:
+							                    <h2>Account No:</h2>
 							                </div>
 							            </td>
 							            <td>
 							                <div class="form-group">
-		
-												<input 
-													v-model="form.account_no" 
-													type="text" name="account_no"
-													
-													v-on:dblclick="account_no_popup"
-													class="form-control" 
-													:class="{ 'is-invalid': form.errors.has('account_no') }">
-											    <has-error :form="form" field="account_no"></has-error>
+												<h2>{{form.account_no}}</h2>
+												
 							                </div>
 							    		</td>
 							    	
 							    	</tr>
-
-							    	
-
 							    	
 							    	<tr>
-							    		<td>
-							            	<div class="form-lebel" align="right">
-							                    <input v-model="form.id" type="hidden" name="id">
-							                </div>
-							            </td>
-							    		<td >
-							                
-										    
-										    <button 
-												:disabled="form.busy" 
-												v-show="!editmode && save_permission" 
-												type="submit" 
-												class="btn btn-primary btn-sm">Save</button>
-											<button 
-												:disabled="form.busy" 
-												v-show="editmode && update_permission" 
-												type="submit" 
-												class="btn btn-primary btn-sm">Update</button>
-
-											
-							                
+							    		<td colspan="2" align="center">
+							                										    
+										    <button type="button" 
+										    	@click="next_setp" 
+										    	class="btn btn-primary">Next 
+										    	<i class="fa fa-angle-right"></i></button>	
 							    		</td>
 
 							    	</tr>
 								</tbody>
 						   	</table>
-
 						  
 						</form>
 					</div>  
@@ -79,14 +53,12 @@
        
         data(){
             return{
-            	editmode:false,
 				filter: '',
 				editmode:false,
             	form:new Form({
             		account_no:'',
                   	id:''
             	}),
-      
 			}
         },
 		
@@ -94,94 +66,29 @@
         {
         	
             this.user_menu_name = this.$route.name;
-            this.fetchAccount_no();
-           
+            this.fetchAccount_no();          
         },
 		
 	    methods: {
-
-	    	
-            
+       
 	        fetchAccount_no()
             {
-                let uri = '/api/MenuApi';
+                let uri = 'AccountCrospondents';
                 window.axios.get(uri).then((response) => {
-                	this.rows = response.data;
+                	this.form.account_no = response.data.master_company_id;
                 });   
             },
 
-          
-         
-       
-
-            updateAccountNo()
+            next_setp()
             {
-				
-		        this.form.put('/Menus/'+this.form.id)
-				    .then(()=>{
-					       //success
-					      $('.modal.in').modal('hide');
-					      $('.modal-backdrop').remove() ;
-					
-							toast({
-							  type: 'success',
-							  title: 'Data Update Successfully'
-							});
-					
-					     this.form.reset ();
-					     this.fetchAccount_no();
-				    })
-				    .catch(()=>{
-					   Swal("failed!","there was some wrong","warning");
-				
-				    });
-            },
-            
-            createAccountNo()
-            {
-        	    this.form.post('/Menus') .then(({ data }) => { 
-               
-					$('.modal.in').modal('hide');
-					$('.modal-backdrop').remove() ;
-					toast({
-						type: 'success',
-						title: 'Data Save successfully'
-					});
-
-					this.form.reset ();
-					this.fetchAccount_no();
+            	this.form.post('/AccountCrospondents') .then(({ data }) => { 
+               		
+					let route = this.$router.resolve({ path: "/Temp-CompanyProfile" });
+	                window.open(route.href,'_self');
+	                return;
         	    })
+                
             },
-            deletemenu(id)
-            {            
-
-	              Swal.fire({
-	                title: 'Are you sure?',
-	                text: "You won't be able to revert this!",
-	                type: 'warning',
-	                showCancelButton: true,
-	                confirmButtonColor: '#3085d6',
-	                cancelButtonColor: '#d33',
-	                confirmButtonText: 'Yes, delete it!'
-	              }).then((result) => {
-
-	                  this.form.delete('/Menus/'+id).then(()=>{
-	                    
-	                      if(result.value) {
-	                           Swal(
-	                            'Deleted!',
-	                            'Your file has been deleted.',
-	                            'success'
-	                          );
-	                          this.fetchAccount_no();
-	                      }            
-
-	                  }).catch(()=>{
-	                    Swal("failed!","there was some wrong","warning");
-	              });
-               
-              })
-            }
 	    }
     
     }  

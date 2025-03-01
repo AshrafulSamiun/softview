@@ -71,22 +71,42 @@ class RegisterController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
+        $current_date=date("Y");
+        $property_code_sql= Project::whereRaw('property_code=(select max(property_code) as property_code from projects where YEAR(created_at)='.$current_date.') and YEAR(created_at)='.$current_date)->get(['property_code']); //toSql();//
+
+        if(count($property_code_sql)>0)
+        {
+
+            $property_code=($property_code_sql[0]->property_code)*1 +1; 
+        }
+        else
+        {
+            $property_code=1; 
+        }
+
+        $master_company_code=$current_date.str_pad($property_code, 4, 0, STR_PAD_LEFT).rand(11, 99);
+        
+
        $user_project=Project::create([
-            'project_name' => $request->input('company_name'),
-            'project_status' => 107,
+            'project_name'          => $request->input('company_name'),
+            'property_code'         => $property_code,
+            'master_company_code'   => $master_company_code,
+            'project_status'        => 107,
         ]);
 
 
         $userRaw=User::create([
-            'name'          => $request->input('name'),
-            'user_name'     => $request->input('user_name'),
-            'email'         => $request->input('email'),
-            'project_id'    => $user_project->id,
-            'user_type'     => $request->input('user_type'),
-            'project_type'  => 105,
-            'status_active' => 0,
-            'pin_code'      => rand(11111, 99999),
-            'password'      => bcrypt($request->input('password'))
+            'name'              => $request->input('name'),
+            'user_name'         => $request->input('user_name'),
+            'email'             => $request->input('email'),
+            'project_id'        => $user_project->id,
+            'master_company_id' => $user_project->master_company_code,
+            'user_type'         => $request->input('user_type'),
+            'project_type'      => 107,
+            'status_active'     => 0,
+            'pin_code'          => rand(11111, 99999),
+            'password'          => bcrypt($request->input('password'))
         ]);
 
         // Log the user in
@@ -145,7 +165,6 @@ class RegisterController extends Controller
             'zip_code'              => 'required',
             'office_phone'          => 'required',
             'mobile'                => 'required',
-
             'email'                 => 'required',
             'fax'                   => 'required',
             'website'               => 'required',

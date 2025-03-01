@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
     <meta name="msapplication-tap-highlight" content="no">
     <title>Softview Accounting</title>
-    <link href="assets/img/logo.png" rel="icon">
+    <link href="{!! asset('assets/img/icon/logo.png') !!}" rel="icon">
 
     <!-- CSS -->
     <link href="{{asset('css/main.css')}}" rel="stylesheet">

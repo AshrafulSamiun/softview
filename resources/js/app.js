@@ -57,7 +57,11 @@ import $ from 'jquery';
 window.$ = $;
 
 import router from './router';
+import VCalendar from 'v-calendar';
+import 'v-calendar/style.css';
 
 const app = createApp({});
 app.use(router);
+app.use(VCalendar, {}); // <-- This is the correct way to register VCalendar
+
 app.mount('#app');
