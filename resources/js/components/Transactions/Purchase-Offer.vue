@@ -264,616 +264,613 @@
                         </h3>
                         <div class="form-holder" v-show="general_info_show">
                            
-                            <div class="row align-self-stretch">
+                            <div class="row align-self-stretch ">
                                 <!-- Left Column -->
-                                <div class="col-md-6 ">
-                                    <div class="form-box-outer ">
-                                        <h3>Customer:</h3>
-                                        <div class="row">
-                                            <div class="col-md-3 col-sm-3 col-xs-12">
-                                                <label class="fieldlabels">Name:</label> 
-                                            </div> 
-                                            <div class="col-md-9 col-sm-12 col-xs-12">
-                                                <input v-model="form.customer_name" 
-                                                type="text" 
-                                                @click="browse_account_holder_info(4)"
-                                                name="customer_name" 
-                                                placeholder="Browse" 
-                                                :class="{ 'is-invalid': form.errors.has('customer_name') }" readonly/>
-                                            </div>
-                                        </div> 
-
-                                        <div class="row">
-                                            <div class="col-md-3 col-sm-3 col-xs-12">
-                                                <label class="fieldlabels">Company Name:</label> 
-                                            </div> 
-                                            <div class="col-md-6 col-sm-12 col-xs-12">
-
-                                                <input v-model="form.customer_name" 
-                                                    type="text" 
-                                                    :class="{ 'is-invalid': form.errors.has('customer_name') }" readonly/>
-                                            </div>
-                                            <div class="col-md-3 col-sm-12 col-xs-12">
-                                                <img style="border-radius:50% ;" :src="form.customer_photo_path" alt="Photo" width="40" height="40" />
-                                            
-                                            </div>
-                                        </div> 
-
-                                        <div class="row">
-                                            <div class="col-md-3 col-sm-3 col-xs-12">
-                                                <label class="fieldlabels">Address:</label> 
-                                            </div> 
-                                            <div class="col-md-9 col-sm-12 col-xs-12 border secondary-subtle rounded">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-box-outer ml-3">
+                                                            
+                                                <h3>Seller:</h3>
                                                 <div class="row">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">ID No - Name:</label>
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-12 col-xs-12">
+                                                        
+                                                        <AutoComplete 
+                                                            style="width:100%"
+                                                            id="seller"
+                                                            :class="{ 'is-invalid': form.errors.has('seller_name') }" 
+                                                            v-model="form.seller_name" 
+                                                            :suggestions="sellerSuggestions" 
+                                                            @complete="searchSellers" 
+                                                            placeholder="Search Seller..." />
+                                                    </div>
+                                                </div> 
+                                                <div class="row">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Company Name:</label> 
+                                                    </div> 
+                                                    <div class="col-md-6 col-sm-12 col-xs-12">
 
-                                                    <div class="col-md-2 col-sm-6 col-xs-6">
-                                                        <label class="fieldlabels">Number:</label> 
+                                                        <input v-model="form.seller_name" 
+                                                            type="text" 
+                                                            :class="{ 'is-invalid': form.errors.has('seller_name') }" readonly/>
                                                     </div>
-                                                    <div class="col-md-4 col-sm-6 col-xs-6">
-                                                       {{ }} 
+                                                    <div class="col-md-3 col-sm-12 col-xs-12">
+                                                        <img style="border-radius:50% ;" :src="form.seller_photo_path" alt="Logo" width="40" height="40" />
+                                                    
                                                     </div>
-                                                    <div class="col-md-2 col-sm-6 col-xs-6">
-                                                        <label class="fieldlabels">City:</label> 
-                                                    </div>
-                                                    <div class="col-md-4 col-sm-6 col-xs-6">
-                                                       {{ }} 
-                                                    </div>
+                                                </div> 
+                                                <div class="row my-1">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Address:</label> 
+                                                    </div> 
+                                                    <div class=" col-md-9 col-sm-12 col-xs-12 ">
+                                                        <div class="mx-1 px-1 border secondary-subtle rounded">
+                                                            <div class="row">
 
-                                                </div>
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Number:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
 
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">City:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">State/Provience:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Street:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Country:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Zip/Postal Code:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </div> 
+                                                <div class="row my-3">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Contact:</label> 
+                                                    </div> 
+                                                    <div class=" col-md-9 col-sm-12 col-xs-12 ">
+                                                        <div class="mx-1 px-3 border secondary-subtle rounded">
+                                                            <div class="row">
+
+                                                                <div class="col-md-4 col-sm-6 col-xs-6 ">
+                                                                    <label class="fieldlabels">Ph. Office:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Ph.Mobile:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Ph. After Hours:</label> 
+                                                                </div>
+                                                                <div class="col-md- col-sm-6 col-xs-6">
+                                                                {{ }}
+                                                            </div>
+                                                            <div class="row">
+                                                                </div>
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Email:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Fax:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Website:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </div> 
+                                                
                                                 
                                             </div>
-                                            
-                                        </div> 
-                                        
-                                       
-                                       
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Account No</td>
-                                                    <td>{{form.customer_account_no}}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Contact</td>
-                                                    <td>{{form.customer_contact_no}}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Address</td>
-                                                    <td>{{form.customer_address}}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td> Photo/ Logo</td>
-                                                    <td>{{form.customer_photo}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>  
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-box-outer ml-3">
+                                                <h3>Customer:</h3>
+                                                <div class="row">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">ID No - Name:</label> 
+                                                    </div> 
+                                                    <div class="col-md-9 col-sm-12 col-xs-12">
+                                                        <AutoComplete 
+                                                            style="width:100%"
+                                                            id="customer" 
+                                                            v-model="form.customer_name" 
+                                                            :suggestions="customerSuggestions" 
+                                                            @complete="searchCustomers" 
+                                                            placeholder="Search customer..." />
+                                                    
+                                                    </div>
+                                                </div> 
+
+                                                <div class="row">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Company Name:</label> 
+                                                    </div> 
+                                                    <div class="col-md-6 col-sm-12 col-xs-12">
+
+                                                        <input v-model="form.customer_name" 
+                                                            type="text" 
+                                                            :class="{ 'is-invalid': form.errors.has('customer_name') }" readonly/>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-12 col-xs-12">
+                                                        <img style="border-radius:50% ;" :src="form.customer_photo_path" alt="Photo" width="40" height="40" />
+                                                    
+                                                    </div>
+                                                </div> 
+
+                                                <div class="row my-1">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Address:</label> 
+                                                    </div> 
+                                                    <div class=" col-md-9 col-sm-12 col-xs-12 ">
+                                                        <div class="mx-1 px-1 border secondary-subtle rounded">
+                                                            <div class="row">
+
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Number:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">City:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">State/Provience:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Street:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Country:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Zip/Postal Code:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </div> 
+                                                <div class="row my-3">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Contact:</label> 
+                                                    </div> 
+                                                    <div class=" col-md-9 col-sm-12 col-xs-12 ">
+                                                        <div class="mx-1 px-3 border secondary-subtle rounded">
+                                                            <div class="row">
+
+                                                                <div class="col-md-4 col-sm-6 col-xs-6 ">
+                                                                    <label class="fieldlabels">Ph. Office:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Ph.Mobile:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Ph. After Hours:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }}
+                                                            </div>
+                                                            <div class="row">
+                                                                </div>
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Email:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Fax:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Website:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </div> 
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-box-outer ml-3">
+                                                <h3>Service Provider:</h3>
+                                                <div class="row">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">ID No - Name:</label> 
+                                                    </div> 
+                                                    <div class="col-md-9 col-sm-12 col-xs-12">
+                                                        <AutoComplete 
+                                                            style="width:100%"
+                                                            id="customer" 
+                                                            v-model="form.service_provider_name" 
+                                                            :suggestions="serviceProviderSuggestions" 
+                                                            @complete="searchServiceProviders" 
+                                                            placeholder="Search Service Provider..." />
+                                                    
+                                                    </div>
+                                                </div> 
+
+                                                <div class="row">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Company Name:</label> 
+                                                    </div> 
+                                                    <div class="col-md-6 col-sm-12 col-xs-12">
+
+                                                        <input v-model="form.service_provider_name" 
+                                                            type="text" 
+                                                            :class="{ 'is-invalid': form.errors.has('service_provider_name') }" readonly/>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-12 col-xs-12">
+                                                        <img style="border-radius:50% ;" :src="form.service_provider_photo" alt="Photo" width="40" height="40" />
+                                                    
+                                                    </div>
+                                                </div> 
+
+                                                <div class="row my-1">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Address:</label> 
+                                                    </div> 
+                                                    <div class=" col-md-9 col-sm-12 col-xs-12 ">
+                                                        <div class="mx-1 px-1 border secondary-subtle rounded">
+                                                            <div class="row">
+
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Number:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">City:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">State/Provience:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Street:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Country:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Zip/Postal Code:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </div> 
+                                                <div class="row my-3">
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <label class="fieldlabels">Contact:</label> 
+                                                    </div> 
+                                                    <div class=" col-md-9 col-sm-12 col-xs-12 ">
+                                                        <div class="mx-1 px-3 border secondary-subtle rounded">
+                                                            <div class="row">
+
+                                                                <div class="col-md-4 col-sm-6 col-xs-6 ">
+                                                                    <label class="fieldlabels">Ph. Office:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Ph.Mobile:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Ph. After Hours:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }}
+                                                            </div>
+                                                            <div class="row">
+                                                                </div>
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Email:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Fax:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-sm-6 col-xs-6">
+                                                                    <label class="fieldlabels">Website:</label> 
+                                                                </div>
+                                                                <div class="col-md-8 col-sm-6 col-xs-6">
+                                                                {{ }} 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </div> 
+                                                
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
+                                <div class="col-md-1 col-sm-12"></div>
                                 <!-- Right Column -->
-                                <div class="col-md-6 col-md-offset-1">
-
-                                    <div class="form-group">
-                                        <label class="form-label">No</label>
-                                        <input v-model="form.unique_no" 
-                                            type="text" 
-                                            name="unique_no" 
-                                            placeholder="Auto Generated"
-                                            :class="{ 'is-invalid': form.errors.has('unique_no') }" disabled/>
-                                        
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Date</label>
-                                        <Vue3datepicker 
-                                            style="width:100%"
-                                            class="form-control"
-                                            v-model="form.transaction_date" 
-                                            inputFormat="EE dd, MMM  yyyy"
-                                            :class="{ 'is-invalid': form.errors.has('next_meeting_date') }"/>
-                                        
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Expiry Date</label>
-                                        <input type="date" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Priority Level</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Invoice Terms</label>
-                                        <select v-model="form.early_payment_discount"
-                                            name="early_payment_discount"
-                                            class="custom-select" 
-                                            :class="{ 'is-invalid': form.errors.has('early_payment_discount') }">
-                                            <option disabled value="">--Select-- </option>
-                                            <option value="1">1/10 Net 30</option>
-                                            <option value="2">2/10 Net 30</option>
-                                            <option value="3">2/15 Net 30</option>
-                                            <option value="4">2/30 Net 60</option>
-                                            <option value="5">3/10 Net 45</option>
-                                            <option value="6">5/10 Net 60</option>
-                                            
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">Purchase Type</label>
-                                        <select v-model="form.purchase_type"
-                                                name="purchase_type"
-                                                class="custom-select"
-                                                @change="change_purchase_type" 
-                                                :class="{ 'is-invalid': form.errors.has('purchase_type') }">
-                                                <option  value="">--Select Purchase Type-- </option>
-                                                <option  value="1">Goods </option>
-                                                <option  value="2">Service </option>
-                                            </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Payment Method</label>
-                                        <select v-model="form.payment_method"
-                                            name="payment_method"
-                                            class="custom-select" 
-                                            :class="{ 'is-invalid': form.errors.has('payment_method') }">
-                                            <option disabled value="">--Select-- </option>
-                                            <option value="1">Credit Cards</option>
-                                            <option value="2">Debit Cards</option>
-                                            <option value="3">Bank Transfers</option>
-                                            <option value="4">Online Banking</option>
-                                            <option value="5">Email transfer</option>
-                                            <option value="6">Certified Check</option>
-                                            <option value="7">Personal Check </option>
-                                            <option value="8">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Accepted</label>
-                                        <select class="custom-select" >
-                                            <option>Yes</option>
-                                            <option>No</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Scheduled Delivery Date</label>
-                                        <input type="date" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Scheduled Delivery Time</label>
-                                        <input type="number" class="form-control" value="500">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Balance</label>
-                                        <input type="number" class="form-control" value="500">
-                                    </div>
-                                </div>
-                            </div>
-                           
-
-
-
-                            <div class="row align-self-stretch m-3">
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    
-                                </div>
-
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                                    
-                                        <h4>Seller:</h4>
-                                        <label class="fieldlabels">Name:</label>
-                                        <input v-model="form.seller_name" 
-                                            type="text" 
-                                            @click="browse_account_holder_info(3)"
-                                            name="seller_name" 
-                                            placeholder="Browse" 
-                                            :class="{ 'is-invalid': form.errors.has('seller_name') }" readonly/>
-
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td width="35%">
-                                                        Account No
-                                                    </td>
-                                                    <td width="65%">
-                                                        {{form.seller_account_no}}
-                                                    </td>
-                                                </tr>
-                                                
-                                                <tr>
-                                                    <td>
-                                                        Contact
-                                                    </td>
-                                                    <td>
-                                                        {{form.seller_contact_no}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Address
-                                                    </td>
-                                                    <td>
-                                                        {{form.seller_address}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Photo/ Logo
-                                                    </td>
-                                                    <td>
-                                                        {{form.seller_photo}}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                                    
-                                        <h4>Service Provider:</h4>
-                                        <label class="fieldlabels">Name:</label> 
-                                        <input v-model="form.service_provider_name" 
-                                            type="text" 
-                                            @click="browse_account_holder_info(2)"
-                                            name="service_provider_name" 
-                                            placeholder="Browse" 
-                                            :class="{ 'is-invalid': form.errors.has('service_provider_name') }" readonly/>
-                                        
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td width="35%">
-                                                        Account No
-                                                    </td>
-                                                    <td width="65%">
-                                                        {{form.service_provider_account_no}}
-                                                    </td>
-                                                </tr>
-                                                
-                                                <tr>
-                                                    <td>
-                                                        Contact
-                                                    </td>
-                                                    <td>
-                                                        {{form.service_provider_contact_no}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Address
-                                                    </td>
-                                                    <td>
-                                                        {{form.service_provider_address}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Photo/ Logo
-                                                    </td>
-                                                    <td>
-                                                        {{form.service_provider_photo}}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                                                                    
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-holder" v-show="general_info_show">
-                            <div class="row align-self-stretch">
                                 
-
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                        <div class="form-holder">
-                                            <label class="fieldlabels">Purchase Offer Acceptance Notified by:</label>
-                                            <div class="form-check-inline">
-                                               
-                                               <select v-model="form.notification_by"
-                                                   name="cicle[]"
-                                                   class="custom-select" 
-                                                   :class="{ 'is-invalid': form.errors.has('notification_by') }">
-                                                   <option disabled value="">--Select-- </option>
-                                                   <option value="1">Phone</option>
-                                                   <option value="2">Video Conferencing</option>
-                                                   <option value="3">Face-to-Face</option>
-                                                   <option value="4">Social Media</option>
-                                                   <option value="5">Chat Applications</option>
-                                                   <option value="6">Letters</option>
-                                                   <option value="7">SMS</option>
-                                                   <option value="8">Voice mail</option>
-                                                   <option value="9">Others</option>
-                                               </select>
-                                           </div>
-                                           <label class="fieldlabels">Back Order Allowed:</label>
-                                            <div class="form-check-inline">
-                                               
-                                                <select v-model="form.backorder_allowed"
-                                                    name="cicle[]"
-                                                    class="custom-select" 
-                                                    :class="{ 'is-invalid': form.errors.has('backorder_allowed') }">
-                                                    <option disabled value="">--Select-- </option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="2">No</option>
-                                                </select>
-                                            </div>
-
-                                            <h4>Approval Information:</h4>
-                                            <label class="fieldlabels">Approval Status:</label>
-                                            <div class="form-check-inline">
-                                               
-                                                <select v-model="form.approval_status"
-                                                    name="cicle[]"
-                                                    class="custom-select" 
-                                                    :class="{ 'is-invalid': form.errors.has('approval_status') }">
-                                                    <option disabled value="">--Select-- </option>
-                                                    <option value="1">Approved</option>
-                                                    <option value="2">Un-approved</option>
-                                                </select>
-                                            </div>
-
-                                            <label class="fieldlabels">Approve By:</label>
-                                             <input v-model="form.approve_by" 
-                                                type="text" 
-                                                name="approve_by" 
-                                                placeholder="Type Approve By" 
-                                                :class="{ 'is-invalid': form.errors.has('approve_by') }" />
-                                            
-                                            <label class="fieldlabels">Approval Date:</label>
-                                            <Vue3datepicker 
-                                                v-model="form.approval_date" 
-                                                inputFormat="EE dd, MMM  yyyy"
-                                                :class="{ 'is-invalid': form.errors.has('meeting_date') }"
-                                                :enable-time-picker     = "false">
-                                            </Vue3datepicker>
-
-                                            <label class="fieldlabels">Approval Time:</label>
-                                            <input type="time" v-model="form.approval_time" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                                    
-                                        <h4>Documents Tracker:</h4>
+                                <div class="col-md-4 col-sm-12">
+                                    <div class="form-box-outer ml-3 "  style="background: #2D7BFC4D; max-height:35%; margin-top:10px">
                                         <div class="row">
-                                            <table class="table  table-striped">
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Purchase Offer No
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_offer_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Offer Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_offer_date}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Offer Acceptance No
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_offer_acceptance_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Offer Acceptance Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_offer_acceptance_date}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Order No
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_order_no}}
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Order Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_order_date}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Packing Slip No
-                                                        </td>
-                                                        <td>
-                                                            {{form.packing_slip_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Packing Slip Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.packing_slip_date}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Invoice No
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_invoice_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Invoice Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_invoice_date}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Return No
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_return_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Return Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_return_date}}
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Debit Note No
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_debit_note_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Debit Note Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_debit_note_date}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Credit Note No
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_credit_note_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Purchase Credit Note Date
-                                                        </td>
-                                                        <td>
-                                                            {{form.purchase_credit_note_date}}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>No</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <input v-model="form.unique_no" 
+                                                    type="text" 
+                                                    name="unique_no" 
+                                                    placeholder="Auto Generated"
+                                                    :class="{ 'is-invalid': form.errors.has('unique_no') }" disabled/>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Date</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <Vue3datepicker 
+                                                    style="width:100%"
+                                                    class="form-control"
+                                                    v-model="form.transaction_date" 
+                                                    inputFormat="EE dd, MMM  yyyy"
+                                                    :class="{ 'is-invalid': form.errors.has('transaction_date') }"/>
+                                            </div>
                                         </div>
 
-                                    </div>
-                                </div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Expiry Date</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <Vue3datepicker 
+                                                    style="width:100%"
+                                                    class="form-control"
+                                                    v-model="form.expire_date" 
+                                                    inputFormat="EE dd, MMM  yyyy"
+                                                    :class="{ 'is-invalid': form.errors.has('expire_date') }"/>
+                                            </div>
+                                        </div>
 
-                            </div>
-                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Posting Status</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" v-model="form.posting_status_string">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Purchase Type</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <select v-model="form.purchase_type"
+                                                    name="purchase_type"
+                                                    class="custom-select"
+                                                    @change="change_purchase_type" 
+                                                    :class="{ 'is-invalid': form.errors.has('purchase_type') }">
+                                                    <option  value="">--Select Purchase Type-- </option>
+                                                    <option  value="1">Goods </option>
+                                                    <option  value="2">Service </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>User</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" v-model="form.user_name">
+                                            </div>
+                                        </div>
 
-                        <div class="form-holder" v-show="general_info_show">
-                            <div class="row align-self-stretch">
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                                    
-                                        <h4>Delivery Details:</h4>
-
-                                        <label class="fieldlabels">Scheduled Delivery Date:</label> 
-                                        <Vue3datepicker 
-                                            v-model                 ="form.schedule_delivery_date" 
-                                            inputFormat="EE dd, MMM  yyyy"
-                                            :class="{ 'is-invalid': form.errors.has('schedule_delivery_date') }"
-                                            :enable-time-picker     = "false">
-                                        </Vue3datepicker>  
-                                        <label class="fieldlabels">Scheduled Delivery Time:</label> 
-                                        <input type="time" v-model="form.schdule_delivery_time" />
-                                           
-                                        <label class="fieldlabels">Location:</label> 
-                                        <input v-model="form.delivery_location" 
-                                            type="text" 
-                                            name="delivery_location" 
-                                            :class="{ 'is-invalid': form.errors.has('delivery_location') }" />
-                                                
-                                        <label class="fieldlabels">Delivery Instruction:</label> 
-                                        <textarea 
-                                            v-model="form.delivery_instruction"
-                                                style="height:120px;"
-                                                id="delivery_instruction" 
-                                                name="delivery_instruction" 
-                                                rows="6" 
-                                                cols="80"
-                                                placeholder="Type Delivery Instruction" 
-                                                :class="{ 'is-invalid': form.errors.has('delivery_instruction') }">
-                                        </textarea>
-                                        
-                                            
-                                        <label class="fieldlabels">Contact Person Name:</label> 
-                                        <input v-model="form.delivery_contact_person_name" 
-                                            type="text" 
-                                            name="delivery_contact_person_name"
-                                            :class="{ 'is-invalid': form.errors.has('delivery_contact_person_name') }" />
-                                        
-                                        
-                                        <label class="fieldlabels">Contact Person Email:</label> 
-                                                <input v-model="form.delivery_contact_person_email" 
-                                                    type="email" 
-                                                    name="delivery_contact_person_email"
-                                                    :class="{ 'is-invalid': form.errors.has('delivery_contact_person_email') }" />
-                                        
-                                        
-                                        <label class="fieldlabels">Contact Person Phone:</label> 
-                                        <input v-model="form.delivery_contact_person_phone" 
-                                            type="text" 
-                                            name="delivery_contact_person_phone"
-                                            :class="{ 'is-invalid': form.errors.has('delivery_contact_person_phone') }" />
-                                                                                    
-                                        <label class="fieldlabels">Receive By:</label> 
-                                        <input v-model="form.delivery_receive_by" 
-                                            type="text" 
-                                            name="delivery_receive_by"
-                                            :class="{ 'is-invalid': form.errors.has('delivery_receive_by') }" />
-                                        
-
-                                    </div>
-                                </div>
-                               
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                                    
-                                        <div class="form-holder">
-                                            <h4>Payment Details:</h4>
-                                            <label class="fieldlabels">Due Date:</label>
-                                            <Vue3datepicker 
-                                                v-model="form.payment_due_date" 
-                                                inputFormat="EE dd, MMM  yyyy"
-                                                :class="{ 'is-invalid': form.errors.has('payment_due_date') }"
-                                                :enable-time-picker     = "false">
-                                            </Vue3datepicker>
-
-                                            <label class="fieldlabels">Days Left to Pay:</label>
-                                             <input v-model="form.days_left_to_pay" 
-                                                type="number" 
-                                                name="days_left_to_pay" 
-                                                placeholder="Days Left to Pay" 
-                                                :class="{ 'is-invalid': form.errors.has('days_left_to_pay') }" />
-                                            
-
-                                            <label class="fieldlabels">Early Payment Discount:</label>
-                                            <div class="form-check-inline">
-                                               
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Invoice Terms</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
                                                 <select v-model="form.early_payment_discount"
                                                     name="early_payment_discount"
                                                     class="custom-select" 
@@ -885,15 +882,19 @@
                                                     <option value="4">2/30 Net 60</option>
                                                     <option value="5">3/10 Net 45</option>
                                                     <option value="6">5/10 Net 60</option>
-                                                   
+                                                    
                                                 </select>
                                             </div>
+                                        </div>
 
-                                            <label class="fieldlabels">Payment Method(s):</label>
-                                            <div class="form-check-inline">
-                                               
+                                        
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Payment Method</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
                                                 <select v-model="form.payment_method"
-                                                    name="cicle[]"
+                                                    name="payment_method"
                                                     class="custom-select" 
                                                     :class="{ 'is-invalid': form.errors.has('payment_method') }">
                                                     <option disabled value="">--Select-- </option>
@@ -907,233 +908,39 @@
                                                     <option value="8">Other</option>
                                                 </select>
                                             </div>
+                                        </div>
 
-                                            <label class="fieldlabels">Posted Checks Acceptable:</label>
-                                            <div class="form-check-inline">
-                                               
-                                                <select v-model="form.posted_check_available"
-                                                    name="posted_check_available"
-                                                    class="custom-select" 
-                                                    :class="{ 'is-invalid': form.errors.has('posted_check_available') }">
-                                                    <option disabled value="">--Select-- </option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="2">No</option>
-                                                </select>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Accepted</strong></label>
                                             </div>
-
-                                            <label class="fieldlabels">Late Payment Penalty:</label>
-                                             <input v-model="form.late_payment_pelanty" 
-                                                type="number" 
-                                                name="late_payment_pelanty" 
-                                                placeholder="Type Late Payment Penalty" 
-                                                :class="{ 'is-invalid': form.errors.has('late_payment_pelanty') }" />
-
-                                            <label class="fieldlabels">Hidden Cost:</label>
-                                            <input v-model="form.hidden_cost" 
-                                                type="number" 
-                                                name="hidden_cost" 
-                                                placeholder="Type Hidden Cost" 
-                                                :class="{ 'is-invalid': form.errors.has('hidden_cost') }" />
-
-                                            <label class="fieldlabels">Shipping Cost Pay by:</label>
-                                            <div class="form-check-inline">
-                                               
-                                                <select v-model="form.shipping_cost_pay_by"
-                                                    name="cicle[]"
-                                                    class="custom-select" 
-                                                    :class="{ 'is-invalid': form.errors.has('shipping_cost_pay_by') }">
-                                                    <option disabled value="">--Select-- </option>
-                                                    <option value="1">None</option>
-                                                    <option value="2">Customer</option>
-                                                    <option value="3">Sell</option>
-                                                    <option value="4">Service Provider</option>
-                                                    <option value="5">Other</option>
-                                                </select>
-                                            </div>
-
-                                            <label class="fieldlabels">Payment Status:</label>
-                                            <div class="form-check-inline">
-                                               
-                                                <select v-model="form.payment_status"
-                                                    name="cicle[]"
-                                                    class="custom-select" 
-                                                    :class="{ 'is-invalid': form.errors.has('payment_status') }">
-                                                    <option disabled value="">--Select-- </option>
-                                                    <option value="1">Paid</option>
-                                                    <option value="2">Partially Paid</option>
-                                                    <option value="3">Unpaid/Panding</option>
-                                                    <option value="4">Payment in Process</option>
-                                                    <option value="5">Payment on Way</option>
-                                                    <option value="6">Overdue</option>
-                                                    <option value="7">Void</option>
-                                                    <option value="8">Refunded</option>
-                                                    <option value="9">Hold</option>
-                                                    <option value="10">Disputed</option>
-                                                    <option value="11">Payment Got NSF</option>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <select class="custom-select" >
+                                                    <option>Yes</option>
+                                                    <option>No</option>
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                        <h4>Shipping Company:</h4>
-                                        <label class="fieldlabels">Shipping Company Name:</label>
-                                        <input v-model="form.shipping_company_name" 
-                                            type="text" 
-                                            @click="browse_account_holder_info(102)"
-                                            name="shipping_company_name" 
-                                            placeholder="Browse" 
-                                            :class="{ 'is-invalid': form.errors.has('shipping_company_name') }" readonly/>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6 col-xs-12">
+                                                <label class="form-label"><strong>Balance</strong></label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-6 col-xs-12">
+                                                <input type="number" class="form-control" v-model="form.seller_balance">
+                                            </div>
+                                        </div>
                                         
-                                        <label class="fieldlabels">Shipping Company Logo:</label>
-                                        <input v-model="form.shipping_company_logo" 
-                                            type="text" 
-                                            @click="browse_shipping_company_logo"
-                                            name="shipping_company_logo" 
-                                            :class="{ 'is-invalid': form.errors.has('shipping_company_logo') }" disabled/>
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        Shipping Company Contact
-                                                    </td>
-                                                    <td>
-                                                        {{form.shipping_company_contact}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Shipping Company Address
-                                                    </td>
-                                                    <td>
-                                                        {{form.shipping_company_address}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        Shipping Company Account No
-                                                    </td>
-                                                    <td>
-                                                        {{form.shipping_company_account_no}}
-                                                    </td>
-                                                </tr>
-                                            </tbody>   
-                                        </table>
-                                        <h4>Shipped by Vehicle:</h4>
-                                        <label class="fieldlabels"> Vehicle Identification Number:</label>
-                                        <input v-model="form.vehicle_identification_number" 
-                                            type="text" 
-                                            name="vehicle_identification_number" 
-                                            placeholder="Type Vehicle Identification Number" 
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_identification_number') }" />
-
-                                        <label class="fieldlabels"> Make:</label>
-                                        <input v-model="form.vehicle_make" 
-                                            type="text" 
-                                            name="vehicle_make" 
-                                             placeholder="Type Make"
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_make') }" /> 
-
-                                        <label class="fieldlabels"> Model:</label>
-                                        <input v-model="form.vehicle_model" 
-                                            type="text" 
-                                            name="vehicle_model" 
-                                             placeholder="Type Model"
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_model') }" /> 
-
-                                        <label class="fieldlabels"> Year:</label>
-                                        <input v-model="form.vehicle_year" 
-                                            type="text" 
-                                            name="vehicle_year" 
-                                             placeholder="Type Year"
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_year') }" />
-
-                                        <label class="fieldlabels"> Type:</label>
-                                        <input v-model="form.vehicle_type" 
-                                            type="text" 
-                                            name="vehicle_type" 
-                                             placeholder="Type"
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_type') }" />
-
-                                        <label class="fieldlabels"> License Plate:</label>
-                                        <input v-model="form.vehicle_license_plate" 
-                                            type="text" 
-                                            name="vehicle_license_plate" 
-                                             placeholder="Type License Plate"
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_license_plate') }" />
-
-                                        <label class="fieldlabels"> Vehicle Images:</label>
-                                        <input v-model="form.vehicle_image" 
-                                            type="text" 
-                                            name="vehicle_image" 
-                                             placeholder=""
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_image') }" />
-
-
-                                        <label class="fieldlabels"> Insurance Information:</label>
-                                        <input v-model="form.vehicle_insurance_information" 
-                                            type="text" 
-                                            name="vehicle_insurance_information" 
-                                             placeholder="Type Insurance Information"
-                                            :class="{ 'is-invalid': form.errors.has('vehicle_insurance_information') }" />
-                                                                                        
+                                        
                                     </div>
                                 </div>
                             </div>
+                            
                         </div>
-                        <div class="form-holder" v-show="general_info_show">
-                            <div class="row align-self-stretch">
-                                
-                                <div class="col-md-4 col-sm-6 col-xs-12">
-                                    <div class="form-box-outer">
-                                            <h4>Driver Profile:</h4>
-                                            <label class="fieldlabels">Driver Name:</label>
-                                        <input v-model="form.driver_name" 
-                                            type="text" 
-                                            @click="browse_account_holder_info(103)"
-                                            name="driver_name" 
-                                            placeholder="Browse" 
-                                            :class="{ 'is-invalid': form.errors.has('driver_name') }" readonly/>
-                                        
-                                        <label class="fieldlabels">Driver Photo:</label>
-                                        <input v-model="form.driver_photo" 
-                                            type="text" 
-                                            name="driver_photo" 
-                                            :class="{ 'is-invalid': form.errors.has('driver_photo') }" disabled/>
-                                            <table>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            Driving Licence No
-                                                        </td>
-                                                        <td>
-                                                            {{form.driver_license_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                        Driver Contact
-                                                        </td>
-                                                        <td>
-                                                            {{form.driver_contact_no}}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Driver Address
-                                                        </td>
-                                                        <td>
-                                                            {{form.driver_address}}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>    
-                                            </table>
-                                                                                     
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+                       
+
+                        
+                        
                     </div>
 
                     <div class="form-folder">
@@ -1966,7 +1773,156 @@
                             <button :disabled="form.busy"  type="button" class="btn  btn-primary" style="min-width:110px" v-show="editmode" @click="show_pdf()">Preview</button>
                             <button :disabled="form.busy"  type="button" class="btn  btn-primary" style="min-width:110px" v-show="postable">Print</button>
                         </div>
+                        <div class="form-holder" v-show="general_info_show">
+                            <div class="row align-self-stretch">
+                                
 
+
+                                <div class="col-md-4 col-sm-6 col-xs-12">
+                                    <div class="form-box-outer">
+                                                    
+                                        <h4>Documents Tracker:</h4>
+                                        <div class="row">
+                                            <table class="table  table-striped">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Purchase Offer No
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_offer_no}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Offer Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_offer_date}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Offer Acceptance No
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_offer_acceptance_no}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Offer Acceptance Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_offer_acceptance_date}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Order No
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_order_no}}
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Order Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_order_date}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Packing Slip No
+                                                        </td>
+                                                        <td>
+                                                            {{form.packing_slip_no}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Packing Slip Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.packing_slip_date}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Invoice No
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_invoice_no}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Invoice Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_invoice_date}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Return No
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_return_no}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Return Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_return_date}}
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Debit Note No
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_debit_note_no}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Debit Note Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_debit_note_date}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Credit Note No
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_credit_note_no}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Purchase Credit Note Date
+                                                        </td>
+                                                        <td>
+                                                            {{form.purchase_credit_note_date}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                         
                     </div>
 
@@ -2019,21 +1975,11 @@
 
 
 <style>
-
-    .form-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
+    #progressbar li .middle_span_shadow{
+        margin-top: 72px;
     }
-    .form-group .form-label {
-        width: 40%;
-        background-color: #007bff;
-        color: white;
-        padding: 10px;
-        text-align: left;
-        border-radius: 5px;
-        font-weight: bold;
-    }
+    
+    
     .form-group .form-control {
         width: 60%;
         border-radius: 5px;
@@ -2093,13 +2039,14 @@
     import VueTimepicker from 'vue3-timepicker';
     import 'vue3-timepicker/dist/VueTimepicker.css';
     import Vue3datepicker from "vue3-datepicker";
-
+    import AutoComplete from 'primevue/autocomplete';
     export default {
         name:'list-product-categories',
         components:{
             Vue3datepicker,
             VueTimepicker,
-            Vue3Datatable
+            Vue3Datatable,
+            AutoComplete
         },
         data(){
             return{
@@ -2122,6 +2069,7 @@
                     next_step_debit:0,
                     next_step_credit:0,
                     seller_name:'',
+                    seller_balance:'',
                     seller_id:'',
                     seller_account_no:'',
                     seller_photo:'',
@@ -2240,6 +2188,9 @@
                     purchase_credit_note_no:'',
                     purchase_credit_note_date:'',
                     schdule_delivery_time:'',
+                    posting_status_string:'',
+
+                   
                     
                 }),
 
@@ -2313,7 +2264,16 @@
                 uom_arr:['','Square Feet','Square Meter','Square Yard'],
                 page: 1,
                 per_page:15,
-                expanded: null
+                expanded: null,
+                customer: "", // Customer input
+                seller: "", // Seller input
+                customerSuggestions: [], // Suggestions for customers
+                sellerSuggestions: [], // Suggestions for sellers
+                serviceProviderSuggestions:[],
+                customers: ["John Doe", "Alice Smith", "Michael Brown", "Sarah Johnson", "Emma Williams"],
+                sellers: ["Tech Store", "Gadget Hub", "Super Mart", "Fashion Trends", "Book Corner"],
+                service_providers: ["Tech Store", "Gadget Hub", "Super Mart", "Fashion Trends", "Book Corner"]
+
             }
         },
         
@@ -2326,11 +2286,31 @@
         },
         
         computed:{
-
-            
+  
             
         },
         methods: {
+
+            searchCustomers(event) {
+                alert(event)
+                this.customerSuggestions = this.customers.filter((c) =>
+                    c.toLowerCase().includes(event.query.toLowerCase())
+                );
+            },
+
+                // Search function for sellers
+            searchSellers(event) {
+                this.sellerSuggestions = this.sellers.filter((s) =>
+                    s.toLowerCase().includes(event.query.toLowerCase())
+                );
+            },
+
+               // Search function for service provider
+            searchServiceProviders(event) {
+                this.serviceProviderSuggestions = this.service_providers.filter((s) =>
+                    s.toLowerCase().includes(event.query.toLowerCase())
+                );
+            },
 
             purchase_summery(unique_no)
             {

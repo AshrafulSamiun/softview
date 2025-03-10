@@ -9,6 +9,8 @@ import './bootstrap';
 import {createApp} from 'vue';
 
 import { Form } from 'vform';
+import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
 window.Form=Form;
 
 import Swal from 'sweetalert2';
@@ -63,5 +65,9 @@ import 'v-calendar/style.css';
 const app = createApp({});
 app.use(router);
 app.use(VCalendar, {}); // <-- This is the correct way to register VCalendar
-
+app.use(PrimeVue, {
+    theme: {
+        preset: Aura
+    }
+});
 app.mount('#app');

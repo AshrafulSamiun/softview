@@ -13,6 +13,7 @@
     "dependencies": {
         "@bhplugin/vue3-datatable": "^2.0.0",
         "@popperjs/core": "^2.11.8",
+        "@primeuix/themes": "^1.0.0",
         "@vitejs/plugin-vue": "^5.1.4",
         "bootstrap-sass": "^3.4.3",
         "chart.js": "^3.9.1",
@@ -23,6 +24,7 @@
         "jspdf": "^2.5.2",
         "jspdf-autotable": "^3.8.4",
         "lodash": "^4.17.21",
+        "primevue": "^4.3.1",
         "sweetalert2": "^11.6.13",
         "v-calendar": "^3.1.2",
         "vee-validate": "^4.14.6",

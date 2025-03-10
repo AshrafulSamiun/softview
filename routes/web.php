@@ -129,6 +129,8 @@ Route::group(['middleware' => ['auth', 'twofactor']], function () {
 	Route::resource('PostingJobs','PostingJobsController');
 	Route::resource('PostingHousingRental','PostingHousingRentalController');
 
+	
+
 	Route::get('provience_by_country/{country}', 'provienceController@get_provience_by_country');
 	Route::get('Dashboard/', 'DashboardController@index')->name('dashboard');
 	Route::get('Dashboard/Module/{module_id}','DashboardController@user_module')->name('user_module');

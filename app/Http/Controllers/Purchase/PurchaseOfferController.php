@@ -11,6 +11,9 @@ use App\Models\Purchase;
 use App\Models\PurchaseDetails;
 use App\Models\PurchaseChargeBreakdown;
 use App\Models\PurchaseCharge;
+use App\Models\Customer;
+use App\Models\AccountHolderSeller;
+use App\Models\AccountHolderCustomer;
 
 use Illuminate\Support\Facades\DB;
 
@@ -70,10 +73,16 @@ class PurchaseOfferController extends Controller
         $inseurance_type_arr        =$ArrayFunction->inseurance_type;
         $additional_charge_arr      =$ArrayFunction->additional_charge_arr;
         $deduction_charge_arr       =$ArrayFunction->deduction_charge_arr;
+
+
         $service_provider           =AccountHolder::where('status_active',1)
                                             ->where('account_type',2)
                                             ->where('project_id',$project_id)
                                             ->get();
+
+
+
+
         $country                            =Country::where('status_active',1)->get();
         foreach ($country as $key => $value) {
             $country_arr[$value->id]        =$value->country_name;
